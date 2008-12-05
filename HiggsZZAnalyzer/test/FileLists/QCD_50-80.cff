@@ -1,0 +1,192 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_1.root",
+#    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_2.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_3.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_4.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_5.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_6.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_7.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_8.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_9.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_10.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_11.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_12.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_13.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_14.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_15.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_16.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_17.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_18.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_19.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_20.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_21.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_22.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_23.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_24.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_25.root",
+#    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_26.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_27.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_28.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_29.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_30.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_31.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_32.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_33.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_34.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_35.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_36.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_37.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_38.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_39.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_40.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_41.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_42.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_43.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_44.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_45.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_46.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_47.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_48.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_49.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/QCD_50-80/Fast_QCD_50-80_50.root"
+  }
+}
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      

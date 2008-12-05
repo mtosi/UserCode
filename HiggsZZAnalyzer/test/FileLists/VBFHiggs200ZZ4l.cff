@@ -1,0 +1,211 @@
+source = PoolSource {
+  untracked vstring fileNames = {
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_1.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_10.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_11.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_12.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_13.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_14.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_15.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_16.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_17.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_18.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_19.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_2.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_20.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_21.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_22.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_23.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_24.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_25.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_26.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_27.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_28.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_29.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_3.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_30.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_31.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_32.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_33.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_34.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_35.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_36.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_37.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_38.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_39.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_4.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_40.root",
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_41.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_42.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_43.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_44.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_45.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_46.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_47.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_48.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_49.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_5.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_50.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_6.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_7.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_8.root", 
+    "castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS200_ZZ4l_9.root" 
+  }
+}							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							       
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      
+							      

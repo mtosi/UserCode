@@ -1,0 +1,36 @@
+***************************************
+***                                 ***
+*** IN PROGRESS...as you can see ;) ***
+***                                 ***
+***************************************
+
+VBFHiggsToZZto2l2b analysis:
+
+- event topology:
+  - 2 leptons [muons or electrons] from Z decay
+  - 4 jets
+    - 2 (b-)jets from Z decay
+    - 2 jets from VBF production mechanism
+
+
+- HLT path:
+
+
+- jet correction
+  - L2L3JetCorrectorIC5Calo
+
+- b-tagging
+  - combinedSecondaryVertexBJetTags
+  - trackCountingHighEffBJetTags
+  - trackCountingHighPurBJetTags
+  - jetProbabilityBJetTags
+
+
+- muon selection
+
+
+- electron selection
+
+
+- tag jet selection
+  - eta1*eta2 < 0

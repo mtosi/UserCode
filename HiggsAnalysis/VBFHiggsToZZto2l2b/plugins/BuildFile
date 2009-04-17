@@ -1,0 +1,12 @@
+<lib name=HiggsAnalysisVBFHiggsToZZto2l2b>
+<use name=HiggsAnalysis/VBFHiggsToZZto2l2b>
+<library name=HiggsAnalysisVBFHiggsToZZto2l2bPlugins file=*.cc>
+ <lib name=EG> #for TParticle
+ <use name=FWCore/ParameterSet>
+ <use name=DataFormats/BTauReco>
+ <use name=DataFormats/JetReco>
+ <use name=FWCore/Framework>
+ <use name=JetMETCorrections/Objects>
+ <use name=PhysicsTools/Utilities>
+ <flags EDM_PLUGIN=1>
+</library>

@@ -1,0 +1,22 @@
+<lcgdict>
+  <class pattern="edm::AssociationVector<*>">
+    <field name="transientVector_" transient="true"/>
+    <field name="fixed_" transient="true"/>
+  </class>
+
+  <class name="edm::Wrapper<vbfhzz2l2b::CorJetBTagDiscrAssociation::Container>" />
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::CorBTagDiscrData"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::Values"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::value_type"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::transient_vector_type"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::Ref"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::RefProd"/>
+  <class name="vbfhzz2l2b::CorJetBTagDiscrAssociation::RefVector"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::jetUncorEt"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::discriminatorVector"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::setValue"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::getValue"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets"/>
+  <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::hasJet"/>
+
+</lcgdict>

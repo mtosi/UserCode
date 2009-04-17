@@ -1,0 +1,35 @@
+import FWCore.ParameterSet.Config as cms
+
+
+vbfhzzllbbSimpleNtple = cms.EDAnalyzer("SimpleNtple",
+        whichSim   = cms.int32(1),                               
+	TracksTag  = cms.InputTag('generalTracks'),
+	EleTag     = cms.InputTag('pixelMatchGsfElectrons'),
+	IsolEleTag = cms.InputTag('dummy'),
+	MuTag      = cms.InputTag('muons'),
+	IsolMuTag  = cms.InputTag('dummy'),
+	MetTag     = cms.InputTag('met'),
+#	MetTag     = cms.InputTag('corMetType1Icone5Muons'),
+	TagJetTag  = cms.InputTag('dummy'),
+	JetTag     = cms.InputTag('iterativeCone5CaloJets'),
+	MCtruthTag = cms.InputTag('genParticles'),
+	genJetTag  = cms.InputTag('iterativeCone5GenJets'),
+	genMetTag  = cms.InputTag('genMetNoNuBSM'),
+        bool_IterativeCone5CaloJetsTag         = cms.bool(True),
+        bool_IterativeCone5PFJetsTag           = cms.bool(True),  
+        bool_corIterativeCone5CaloJetsWithBTag = cms.bool(True ),
+        bool_corIterativeCone5PFJetsWithBTag   = cms.bool(False),
+        bool_SisCone5CaloJetsTag               = cms.bool(True),      
+        bool_SisCone5PFJetsTag                 = cms.bool(True),        
+        bool_corSisCone5CaloJetsWithBTag       = cms.bool(False),
+        bool_corSisCone5PFJetsWithBTag         = cms.bool(False),
+        IterativeCone5CaloJetsTag         = cms.InputTag('iterativeCone5CaloJets'),        
+        IterativeCone5PFJetsTag           = cms.InputTag('iterativeCone5PFJets'),          
+        corIterativeCone5CaloJetsWithBTag = cms.string('vbfhzzllbbCorJetWithBTagProd'),
+        corIterativeCone5PFJetsWithBTag   = cms.string(''),  
+        SisCone5CaloJetsTag               = cms.InputTag('sisCone5CaloJets'),              
+        SisCone5PFJetsTag                 = cms.InputTag('sisCone5PFJets'),                
+        corSisCone5CaloJetsWithBTag       = cms.string(''),      
+        corSisCone5PFJetsWithBTag         = cms.string('')        
+)
+

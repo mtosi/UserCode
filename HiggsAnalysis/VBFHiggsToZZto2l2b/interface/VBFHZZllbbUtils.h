@@ -21,24 +21,7 @@ namespace vbfhzz2l2b
 	 JETPROB       = 3 };
   
   
-  int bTaggerCode ( const std::string& bTagger ) {
-    
-    int code = -1;
-    if ( bTagger == "HIGHEFF" )            code = HIGHEFF;
-    else if ( bTagger == "HIGHPUR"       ) code = HIGHPUR;
-    else if ( bTagger == "COMBSECVTX"    ) code = COMBSECVTX;
-    else if ( bTagger == "COMBSECVTXMVA" ) code = COMBSECVTXMVA;
-    else if ( bTagger == "SOFTMUON"      ) code = SOFTMUON;
-    else if ( bTagger == "SOFTELECTRON"  ) code = SOFTELECTRON;
-    else if ( bTagger == "JETPROB"       ) code = JETPROB;
-    else
-      std::cout << "[VBFHZZllbbUtils::bTaggerCode] --> WARNING: bTagger " << bTagger << " NOT IMPLEMENTED!" << std::endl;
-    
-    return code;
- }
-  
-  
-
+  int bTaggerCode ( const std::string& bTagger );
 
 typedef reco::CaloJetCollection::const_iterator caloJetItr ;
 

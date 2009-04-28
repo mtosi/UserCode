@@ -23,12 +23,19 @@ namespace vbfhzz2l2b
   
   int bTaggerCode ( const std::string& bTagger );
 
-typedef reco::CaloJetCollection::const_iterator caloJetItr ;
+  double resolution ( double & recValue, double & refValue );
 
-template <typename T>
-std::pair<T,T> findCaloJetsPair_maxInvMass (T &begin, T &end,
-					    double jetPtMin,
-					    double jetEtaMax) {
+  class PtGreater {
+  public:
+    template <typename T> bool operator () (const T& i, const T& j) {
+      return (i.pt() > j.pt());
+    }
+  };
+
+  template <typename T>
+  std::pair<T,T> findJetsPair_maxInvMass (const T begin, const T end,
+					  double jetPtMin,
+					  double jetEtaMax) {
 
   std::pair<T,T> jetsPair (begin,begin) ;
   double maxInvMass = 0. ;
@@ -61,19 +68,20 @@ std::pair<T,T> findCaloJetsPair_maxInvMass (T &begin, T &end,
 }
 
 template <typename T>
-std::pair<T,T> findCaloJetsPair_maxPt (T &begin, T &end,
-				       double jetPtMin, 
-				       double jetEtaMax) {
-  std::pair<caloJetItr,caloJetItr> jetsPair (begin, begin) ; 
+std::pair<T,T> findJetsPair_maxPt (T &begin, T &end,
+				   double jetPtMin, 
+				   double jetEtaMax) {
+
+  std::pair<T,T> jetsPair (begin, begin) ; 
 
   double maxPt1 = 0.;
   double maxPt2 = 0.;
 
-  caloJetItr jet1;
-  caloJetItr jet2;
+  T jet1;
+  T jet2;
 
   // loop over jets
-  for ( caloJetItr jet = begin; jet != end; ++jet ) {
+  for ( T jet = begin; jet != end; ++jet ) {
     if (jet->pt() < jetPtMin || 
 	fabs( jet->eta() ) > jetEtaMax) continue ;
     
@@ -96,26 +104,6 @@ std::pair<T,T> findCaloJetsPair_maxPt (T &begin, T &end,
   
 }
 
-template <typename T1, typename T2>
-std::pair<T1,T1> findCaloJetsPair_sortT (T1 &begin, T1 &end) {
-
-  std::vector<std::pair<T1,T1> > jetsPairsVector;
-  
-    // first loop over jets
-    for ( T1 firstJet = begin; firstJet != end ; ++firstJet ) {
-  
-      // second loop over jets
-      for ( T1 secondJet = firstJet + 1 ; secondJet != end; ++secondJet ) {
-	
-	jetsPairsVector.push_back ( make_pair (firstJet, secondJet)) ;
-      } // end second loop over jets
-    } // end first loop over jetsPairsVector
-    
-    sort ( jetsPairsVector.begin () , jetsPairsVector.end () , T2 () ) ;
-    return jetsPairsVector.back () ;
-}
-  
- 
 template <typename T>
 struct ptSorting {
   typedef T first_argument_type;
@@ -155,6 +143,86 @@ struct maxSumPtSorting {
   }
 };
 
+template<class T>
+std::pair<T,T> findTagJets (T & begin, T & end,
+			    double jetPtMin, 
+			    double jetEtaMax) {
+
+  std::pair<T,T> tagJets (begin,begin) ;
+  double maxInvMass = 0. ;
+
+  // first loop over jets
+  for (T firstJet = begin ; 
+       firstJet != end ; 
+       ++firstJet ) {
+
+      if (firstJet->pt () < jetPtMin || 
+          fabs (firstJet->eta ()) > jetEtaMax) continue ;
+
+      math::XYZTLorentzVector firstLV = firstJet->p4 () ;
+
+      // second loop over jets
+      for (T secondJet = firstJet + 1 ; 
+           secondJet != end ; 
+           ++secondJet ) {
+	
+	if (secondJet->pt () < jetPtMin || 
+	    fabs (secondJet->eta ()) > jetEtaMax) continue ;
+	
+	if (firstJet->eta ()*secondJet->eta () > 0) continue ; // only tags in opposite emispheres are considered
+	
+	math::XYZTLorentzVector sumLV = secondJet->p4 () + firstLV ;
+	if (sumLV.M () > maxInvMass) {
+	  
+	  maxInvMass = sumLV.M () ;
+	  tagJets.first = firstJet ;
+	  tagJets.second = secondJet ;
+	  
+	}
+      } // second loop over jets
+  } // first loop over jets
+  
+  return tagJets ;
+}
+
+
+// --------------------------------------------------------------------
+
+template <class T>
+std::pair<T,T> findMaxPtJetsPair (T & begin, T & end,
+				  double jetPtMin, double jetEtaMax) {
+
+  std::pair<T,T> tagJets (begin, begin) ; 
+
+  double ptMax1 = 0;
+  double ptMax2 = 0;
+
+  T myJet1, myJet2;
+
+  for (T Jet = begin ;
+       Jet != end ;
+       ++Jet) {
+
+    if (Jet->p4().Pt() > ptMax1) {
+      myJet1 = Jet;
+      myJet2 = myJet1;
+      ptMax2 = ptMax1;
+      ptMax1 = Jet->p4().Pt() ;
+      
+    } 
+    else if ( (Jet->p4().Pt() > ptMax2) && 
+	      (myJet1->p4().Eta() *Jet->p4().Eta() < 0) ) {
+      myJet2 = Jet;
+      ptMax2 = Jet->p4().Pt() ;
+    }
+  }
+  
+  tagJets.first = myJet1;
+  tagJets.second = myJet2 ;
+  
+  return tagJets ;
+  
+}
 
 
 }

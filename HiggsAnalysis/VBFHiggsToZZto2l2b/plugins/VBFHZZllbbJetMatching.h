@@ -52,7 +52,7 @@ class VBFHZZllbbJetMatching : public edm::EDAnalyzer {
   edm::InputTag genJetLabel_;
   edm::InputTag genMetLabel_;
 
-  edm::Service<TFileService> fs;
+  //  edm::Service<TFileService> fs;
 
   TH1D * eventsNumber_;
 
@@ -94,6 +94,7 @@ class VBFHZZllbbJetMatching : public edm::EDAnalyzer {
   TH1D * jetCorrPt_;
   TH1D * jetPhi_;
   TH1D * jetEta_;
+  TH1D * jetMass_;
   TH1D * jetEMfrac_;
   TH1D * jetHIGHEFFdiscr_;   	  
   TH1D * jetHIGHPURdiscr_;   	  
@@ -152,7 +153,8 @@ class VBFHZZllbbJetMatching : public edm::EDAnalyzer {
   TH1D * ZjetsMassResolution_;
   TH1D * ZjetsPt_;
   TH1D * ZjetsPtResolution_;
-  TH1D * ZjetsEt_;
+  TH1D * ZjetsE_;
+  TH1D * ZjetsEResolution_;
   TH1D * ZjetsCollinearity_;
   TH1D * ZjetsCollinearityResolution_;
 
@@ -167,7 +169,8 @@ class VBFHZZllbbJetMatching : public edm::EDAnalyzer {
   TH1D * TAGjetsMassResolution_;
   TH1D * TAGjetsPt_;
   TH1D * TAGjetsPtResolution_;
-  TH1D * TAGjetsEt_;
+  TH1D * TAGjetsE_;
+  TH1D * TAGjetsEResolution_;
   TH1D * TAGjetsCollinearity_;
   TH1D * TAGjetsCollinearityResolution_;
 

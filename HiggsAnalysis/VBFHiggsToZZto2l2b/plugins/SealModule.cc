@@ -19,6 +19,9 @@
 //define this as a plug-in
 DEFINE_SEAL_MODULE () ;
 
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBhadronReconstruction.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBhadronReconstruction);
+
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/SimpleNtple.h"
 DEFINE_ANOTHER_FWK_MODULE(SimpleNtple); 
 
@@ -30,6 +33,9 @@ DEFINE_FWK_MODULE(VBFHZZllbbAnalyzer);
 
 //#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatching.h"
 //DEFINE_FWK_MODULE(VBFHZZllbbJetMatching);
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCfilterValidation.h"
+DEFINE_FWK_MODULE(VBFHZZllbbMCfilterValidation);
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCvalidation.h"
 DEFINE_FWK_MODULE(VBFHZZllbbMCvalidation);

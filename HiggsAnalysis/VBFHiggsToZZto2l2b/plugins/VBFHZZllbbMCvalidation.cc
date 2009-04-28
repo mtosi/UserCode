@@ -29,7 +29,7 @@
 VBFHZZllbbMCvalidation::VBFHZZllbbMCvalidation(const edm::ParameterSet& iConfig) :
   conf_( iConfig ),
   MCParticleLabel_(iConfig.getUntrackedParameter<std::string>("MCParticles") ),
-  SIGNAL_(iConfig.getUntrackedParameter<bool>("SIGNAL") )
+  signal_(iConfig.getUntrackedParameter<bool>("signal") )
 {
    //now do what ever initialization is needed
   eventcounter_ = 0;
@@ -232,7 +232,7 @@ VBFHZZllbbMCvalidation::analyze(const edm::Event& iEvent, const edm::EventSetup&
     std::cout << "***************************************" << std::endl;
     std::cout << "pythiac: " << pythiac_ << std::endl;
     std::cout << "TAG SYSTEM: ";
-    for ( int tagIndex = 0; tagIndex != tagSystem.size(); tagIndex++ ) {
+    for ( unsigned int tagIndex = 0; tagIndex != tagSystem.size(); tagIndex++ ) {
       int tmpParticleId = tagSystem[tagIndex]->pdgId();
       std::cout << " " << " ID" << tagIndex+1 << ": " << tmpParticleId;
       if (tmpParticleId == pythiagluon_) tagQuarkFlavour_->Fill(0.);

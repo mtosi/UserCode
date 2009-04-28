@@ -92,7 +92,7 @@ class VBFHZZllbbMCvalidation : public edm::EDAnalyzer {
 
   edm::ParameterSet conf_;
   std::string MCParticleLabel_;
-  bool        SIGNAL_;
+  bool        signal_;
 
   TFile* OutputFile;
 

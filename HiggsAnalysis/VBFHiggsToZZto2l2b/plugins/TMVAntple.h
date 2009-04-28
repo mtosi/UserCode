@@ -44,55 +44,29 @@ class TMVAntple : public edm::EDAnalyzer {
   virtual void endJob() ;
 
   // signal-like event TTree
-  auto_ptr<TMVAtreeWriter<Float_t> > tmvaSignalTreeWriterPtr_;
-  // combinatorial-like event TTree
-  auto_ptr<TMVAtreeWriter<Float_t> > tmvaCombinTreeWriterPtr_;
-  // signal-like w/ eta cut event TTree
-  auto_ptr<TMVAtreeWriter<Float_t> > tmvaEtaCutTreeWriterPtr_;
-  // signal-like w/ closest mjj to mZ cut event TTree
-  auto_ptr<TMVAtreeWriter<Float_t> > tmvaMZcutTreeWriterPtr_;
+  auto_ptr<TMVAtreeWriter<Float_t> > tmvaTreeWriterPtr_;
   // event variables vectors [value and name]
   vector<TString> eventVariablesNamesVector_;
-  vector<Float_t> eventSignalVariablesVector_;
-  vector<Float_t> eventCombinVariablesVector_;
-  vector<Float_t> eventEtaCutVariablesVector_;
-  vector<Float_t> eventMZcutVariablesVector_;
+  vector<Float_t> eventVariablesVector_;
 
   int eventcounter_;
-
-  int lljjEventCounter_;
   int tmvaMatchingCounter_;
-  int combinatorialCounter_;
-  int etaCutMatchingCounter_;
-  int mZMatchingCounter_;
 
   int nbin_;
 
   math::XYZTLorentzVector null_XYZTLorentzVector_;
 
   // ----------member data ---------------------------
-  int           signal_;
-  int           whichSim_;
+  int signal_;
+  int whichSim_;
   edm::InputTag electronLabel_;
   edm::InputTag muonLabel_;
   edm::InputTag metLabel_;
-  edm::InputTag jetLabel_;
-  std::string   corJetsWithBTagLabel_;
   edm::InputTag mcParticleLabel_;
-  edm::InputTag genJetLabel_;
-  edm::InputTag genMetLabel_;
-
-  double leptonPtCut_;
-  double jetEtCut_;
-  double jetPartonDeltaR2Cut_;
-  double jetLeptonDeltaRCut_;
-  double jetEMfracCut_;
-  double mHres_;
-  double mH_;
-  std::string tmvaSignalSuffix_;
-  std::string tmvaCombinSuffix_;
-  std::string tmvaEtaCutSuffix_;
-  std::string tmvaMZcutSuffix_;
+  std::string leptonicZLabel_;
+  std::string hadronicZLabel_;
+  std::string tagSystemLabel_;
+  std::string tmvaSuffix_;
 
   int variablesNumber_;
 
@@ -105,16 +79,7 @@ class TMVAntple : public edm::EDAnalyzer {
   // when moving from one input file to another.
   // The histograms must be created after the TFile is opened.
 
-  std::vector< std::pair<int,int> > vecTypeIndexPair;
-
   TH1D * eventsNumber_;
-  TH1D * goodLeptonicEventsNumber_;
-  TH1D * twoJetsAboveEtCutEventsNumber_;
-  TH1D * fourJetsAboveEtCutEventsNumber_;
-  TH1D * lljjEventNumber_;
   TH1D * tmvaMatchingEventNumber_;
-  TH1D * combinatorialMatchEventNumber_;
-  TH1D * etaCutMatchingEventNumber_;
-  TH1D * mZMatchingEventNumber_;
 
 };

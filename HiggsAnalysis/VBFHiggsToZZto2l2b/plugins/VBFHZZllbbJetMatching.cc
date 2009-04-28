@@ -7,7 +7,7 @@
 
 
 // system include files
-#include <memory>
+//#include <memory>
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatching.h"
 
@@ -84,7 +84,7 @@ enum { NZ        = 2,
        NZLEPTONS = 2,
        NZJETS    = 2,
        NTAGJETS  = 2,
-       NMINJETS  = 4,
+       NJETS     = 4,
        NBIN      = 100
 };
 
@@ -114,6 +114,8 @@ VBFHZZllbbJetMatching::VBFHZZllbbJetMatching(const edm::ParameterSet& iConfig) :
   // constants, enums and typedefs
   eventcounter_ = 0;
 
+  std::cout << "[VBFHZZllbbJetMatching::VBFHZZllbbJetMatching]" << std::endl;
+
   //  gROOT->Time();
 
 }
@@ -125,6 +127,7 @@ VBFHZZllbbJetMatching::~VBFHZZllbbJetMatching()
  
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
+  std::cout << "[VBFHZZllbbJetMatching::~VBFHZZllbbJetMatching]" << std::endl;
 
 }
 
@@ -137,6 +140,8 @@ VBFHZZllbbJetMatching::~VBFHZZllbbJetMatching()
 void
 VBFHZZllbbJetMatching::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
+  std::cout << "[VBFHZZllbbJetMatching::analyze]" << std::endl;
 
   eventcounter_++;
   if ( eventcounter_/100 == float(eventcounter_)/100. ) {
@@ -324,6 +329,26 @@ VBFHZZllbbJetMatching::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
   } // end loop over MCparticle
     
+  if (tagSystem.size() == 2 ) {
+    std::cout << "***************************************" << std::endl;
+    std::cout << "pythiac: " << pythiac_ << std::endl;
+    std::cout << "TAG SYSTEM: ";
+    for ( unsigned int tagIndex = 0; tagIndex != tagSystem.size(); tagIndex++ ) {
+      int tmpParticleId = tagSystem[tagIndex]->pdgId();
+      std::cout << " " << " ID" << tagIndex+1 << ": " << tmpParticleId;
+      if (tmpParticleId == pythiagluon_) ;
+      else {
+	if ( fabs(tmpParticleId) >= pythiac_ ) heavyQcounter++;
+	else lightQcounter++;
+      }
+    }
+    std::cout << "" << std::endl;
+    std::cout << "***************************************" << std::endl;
+  }
+
+  std::cout << "heavyQcounter: " << heavyQcounter << std::endl;
+  std::cout << "lightQcounter: " << lightQcounter << std::endl;
+
   ////////////////////////////////////// PLOT HEPG DISTRIBUTION ////////////////////////////
   std::vector< const Candidate* > partonsCandidates;
   if ( hadronicZ.size() == NZJETS ) {
@@ -416,18 +441,6 @@ VBFHZZllbbJetMatching::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     double tmp_jetPhi      = (*jet_itr)->phi();
 
     int tagger = -1;
-//    tagger = vbfhzz2l2b::bTaggerCode("HIGHEFF"); double tmp_jetHIGHEFFdiscr = discrVec[tagger];
-//    std::cout << "HIGHEFF:    " << (*corJetWithBTagHandle)[*jet_itr].highEffDiscr_ 
-//	      << " <--> discrVec[" << tagger << "]: " << discrVec[tagger] << std::endl;
-//    tagger = vbfhzz2l2b::bTaggerCode("HIGHPUR"); double tmp_jetHIGHPURdiscr = discrVec[tagger];	  
-//    std::cout << "HIGHPUR:    " << (*corJetWithBTagHandle)[*jet_itr].highPurDiscr_ 
-//	      << " <--> discrVec[" << tagger << "]: " << discrVec[tagger] << std::endl;
-//    tagger = vbfhzz2l2b::bTaggerCode("COMBSECVTX"); double tmp_jetCOMBSECVTXdiscr = discrVec[tagger];
-//    std::cout << "COMBSECVTX: " << (*corJetWithBTagHandle)[*jet_itr].compoSVDiscr_
-//	      << " <--> discrVec[" << tagger << "]: " << discrVec[tagger] << std::endl;
-//    tagger = vbfhzz2l2b::bTaggerCode("JETPROB"); double tmp_jetJETPROBdiscr = discrVec[tagger];   
-//    std::cout << "JETPROB:    " << (*corJetWithBTagHandle)[*jet_itr].jetProbDiscr_
-//	      << " <--> discrVec[" << tagger << "]: " << discrVec[tagger] << std::endl;
     tagger = bTaggerCode("HIGHEFF"); double tmp_jetHIGHEFFdiscr = discrVec[tagger];
     std::cout << "HIGHEFF:    " << (*corJetWithBTagHandle)[*jet_itr].highEffDiscr_ 
 	      << " <--> discrVec[" << tagger << "]: " << discrVec[tagger] << std::endl;
@@ -468,176 +481,215 @@ VBFHZZllbbJetMatching::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   }
 
-//    std::vector< reco::CaloJet > ZjetVec;
-//    std::vector< double >     ZjetDeltaRVec;
-//    std::vector<int>          ZjetInd;
-//    for ( unsigned int index = 0; index < NZJETS; index++ ) ZjetDeltaRVec.push_back(99.);
-//
-//    std::vector< reco::CaloJet > TjetVec;
-//    std::vector< double >   TjetDeltaRVec;
-//    std::vector<int>        TjetInd;
-//    for ( unsigned int index = 0; index < NTAGJETS; index++) TjetDeltaRVec.push_back(99.);
-//    
-//    std::vector<std::vector<double> > closestJetDeltaRVec;
-//    std::vector<std::vector<int> >    closestJetIndexVec;
-//    unsigned int partonsCandidatesNumber = partonsCandidates.size();
-//    for ( unsigned index = 0; index < partonsCandidatesNumber; index++ ) {
-//      std::vector<double> null_closestJetDeltaRVec;
-//      std::vector<int>    null_closestJetIndexVec;
-//      for ( unsigned index = 0; index < partonsCandidatesNumber; index++ ) {
-//	null_closestJetDeltaRVec.push_back(99.);
-//	null_closestJetIndexVec.push_back(-1);
-//      }
-//      closestJetDeltaRVec.push_back(null_closestJetDeltaRVec);
-//      closestJetIndexVec.push_back(null_closestJetIndexVec);
-//    }
-//    
-//    std::vector< const Candidate* >::const_iterator partonsCandidates_itr = partonsCandidates.begin();
-//    unsigned int partonIndex = 0;
-//    for ( ; partonsCandidates_itr != partonsCandidates.end(); ++partonsCandidates_itr,
-//	    partonIndex++ ) {
-//      double partonPt  = partonsCandidates[partonIndex]->pt();
-//      double partonEta = partonsCandidates[partonIndex]->eta();
-//      double partonPhi = partonsCandidates[partonIndex]->phi();
-//      //	      std::cout << "parton[" << partonIndex << "]: pt: " << partonPt
-//      //			<< " eta: " << partonEta
-//      //			<< " phi: " << partonPhi << std::endl;
-//      std::vector< reco::CaloJet >::const_iterator jet_itr = aboveEtCutJetVec.begin();
-//      unsigned int jetIndex = 0;
-//      for ( ; jet_itr != aboveEtCutJetVec.end(); ++jet_itr, 
-//	      jetIndex++ ) {
-//	double jetEt  = jet_itr->et();
-//	double jetEta = jet_itr->eta();
-//	double jetPhi = jet_itr->phi();
-//	//		std::cout << "jet[" << jetIndex << "]: et: " << jetEt
-//	//			  << " eta: " << jetEta
-//	//			  << " phi: " << jetPhi << std::endl;
-//	
-//	double jetParton_deltaEta = jetEta - partonEta;
-//	double jetParton_deltaPhi = deltaPhi(jetPhi,partonPhi);
-//	double jetParton_deltaR   = deltaR(jetEta,jetPhi,partonEta,partonPhi);      
-//      //		std::cout << "deltaR: " << deltaR << std::endl;
-//      
-//      //		if ( deltaR <= jetPartonDeltaRCut_ ) {
-//      if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][3] ) {
-//	if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][2] ) {
-//	  if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][1] ) {
-//	    if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][0] ) {
-//	      closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
-//	      closestJetDeltaRVec[partonIndex][2] = closestJetDeltaRVec[partonIndex][1];
-//	      closestJetDeltaRVec[partonIndex][1] = closestJetDeltaRVec[partonIndex][0];
-//	      closestJetDeltaRVec[partonIndex][0] = jetParton_deltaR;
-//	      closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
-//	      closestJetIndexVec[partonIndex][2] = closestJetIndexVec[partonIndex][1];
-//	      closestJetIndexVec[partonIndex][1] = closestJetIndexVec[partonIndex][0];
-//	      closestJetIndexVec[partonIndex][0] = jetIndex;
-//	    } else {
-//	      closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
-//	      closestJetDeltaRVec[partonIndex][2] = closestJetDeltaRVec[partonIndex][1];
-//	      closestJetDeltaRVec[partonIndex][1] = jetParton_deltaR;
-//	      closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
-//	      closestJetIndexVec[partonIndex][2] = closestJetIndexVec[partonIndex][1];
-//	      closestJetIndexVec[partonIndex][1] = jetIndex;
-//	    }
-//	  } else {
-//	    closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
-//	    closestJetDeltaRVec[partonIndex][2] = jetParton_deltaR;
-//	    closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
-//	    closestJetIndexVec[partonIndex][2] = jetIndex;
-//	  }
-//	} else {
-//	  closestJetDeltaRVec[partonIndex][3] = jetParton_deltaR;
-//	  closestJetIndexVec[partonIndex][3] = jetIndex;
-//	}
-//      }
-//    } // end loop over jet
-//    for (int index = 0; index < NJETS; index++ ) {
-//      unsigned int jetMatchedIndex = closestJetIndexVec[partonIndex][index];
-//      double etRes = (aboveEtCutJetVec[jetMatchedIndex].et()-partonPt)/partonPt;
-//      double jetMass = aboveEtCutJetVec[jetMatchedIndex].p4().M();
-//      std::cout << "closestJetDeltaRVec[" << partonIndex << "][" << index << ": " << jetMatchedIndex 
-//		<< " etRes (%): " << etRes*100.  << std::endl;      
-//    }
-//  } // end loop over partons
-//  
-//  unsigned int nAss = 0;
-//  std::vector<bool> partonAss;
-//  for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) 
-//    partonAss.push_back(kFALSE);
-//  
-//  for ( unsigned int assIndex = 0; assIndex < partonsCandidatesNumber; assIndex++ ) {
-//    //	      std::cout << "assIndex: " << assIndex << std::endl;
-//    double minDeltaR = 99.;
-//    int minPartonIndex = -1;
-//    // find the best DeltaR matching to find the best parton association in the collection
-//    for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) {
-//      //		std::cout << "partonIndex: " << partonIndex << " partonAss: " << partonAss[partonIndex] << std::endl;
-//      if ( !partonAss[partonIndex] && closestJetDeltaRVec[partonIndex][0] <= minDeltaR ) {
-//	minDeltaR = closestJetDeltaRVec[partonIndex][0];
-//	minPartonIndex = partonIndex;
-//      }
-//    } // end loop over partons [not matched yet]
-//    
-//    // parton association
-//    partonAss[minPartonIndex] = kTRUE;
-//    nAss++;
-//    // save the matched jet into the proper vector
-//    unsigned int jetIndex = closestJetIndexVec[minPartonIndex][0];
-//    //	      std::cout << "minPartonIndex: " << minPartonIndex 
-//    //			<< " to jetIndex: " << jetIndex
-//    //			<< " => nAss: " << nAss << std::endl;
-//    if ( minPartonIndex == 0 || minPartonIndex == 1 ) {
-//      ZjetVec.push_back(aboveEtCutJetVec[jetIndex]);
-//      ZjetInd.push_back(jetIndex);
-//    }
-//    else if ( minPartonIndex == 2 || minPartonIndex == 3 ) {
-//      TjetVec.push_back(aboveEtCutJetVec[jetIndex]);
-//      TjetInd.push_back(jetIndex);
-//    }
-//    
-//    // in case of "non-biunivocity" pop-up jet associations belong to worst DeltaR parton
-//    for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) {
-//      if ( partonAss[partonIndex] ) continue;
-//      //		std::cout << "partonIndex: " << partonIndex 
-//      //			  << " partonAss: " << partonAss[partonIndex] << std::endl;
-//      //		std::cout << "closestJetIndex: " << closestJetIndexVec[partonIndex][0] << std::endl;
-//      for ( unsigned int iAssIndex = 0; iAssIndex < partonsCandidatesNumber; iAssIndex++ ) {
-//	if ( closestJetIndexVec[partonIndex][iAssIndex] != closestJetIndexVec[minPartonIndex][0] ) continue;
-//	//		  std::cout << "iAssIndex: " << iAssIndex << std::endl;
-//	for ( unsigned int jAssIndex = iAssIndex+1; jAssIndex < partonsCandidatesNumber; jAssIndex++ ) {
-//	  //		    std::cout << "jAssIndex: " << jAssIndex << std::endl;
-//	  closestJetDeltaRVec[partonIndex][jAssIndex-1] = closestJetDeltaRVec[partonIndex][jAssIndex];
-//	  closestJetIndexVec[partonIndex][jAssIndex-1] = closestJetIndexVec[partonIndex][jAssIndex];
-//	}
-//      }
-//      //		std::cout << "closestJetIndex: " << closestJetIndexVec[partonIndex][0] << std::endl;
-//    } // end loop over partons [not matched yet and w/ the same jet]
-//    
-//  } // end loop over association index
-//  
-//  std::cout << "************************************" << std::endl;
-//  std::cout << "ZjetVec: " << ZjetVec.size() << std::endl;
-//  std::cout << "TjetVec: " << TjetVec.size() << std::endl;
-//  
-//    
+    std::vector< reco::JetBaseRef > ZjetVec;
+    std::vector< double >     ZjetDeltaRVec;
+    std::vector<int>          ZjetInd;
+    for ( unsigned int index = 0; index < NZJETS; index++ ) ZjetDeltaRVec.push_back(99.);
+
+    std::vector< reco::JetBaseRef > TjetVec;
+    std::vector< double >   TjetDeltaRVec;
+    std::vector<int>        TjetInd;
+    for ( unsigned int index = 0; index < NTAGJETS; index++) TjetDeltaRVec.push_back(99.);
+    
+    std::vector<std::vector<double> > closestJetDeltaRVec;
+    std::vector<std::vector<int> >    closestJetIndexVec;
+    unsigned int partonsCandidatesNumber = partonsCandidates.size();
+    for ( unsigned index = 0; index < partonsCandidatesNumber; index++ ) {
+      std::vector<double> null_closestJetDeltaRVec;
+      std::vector<int>    null_closestJetIndexVec;
+      for ( unsigned index = 0; index < partonsCandidatesNumber; index++ ) {
+	null_closestJetDeltaRVec.push_back(99.);
+	null_closestJetIndexVec.push_back(-1);
+      }
+      closestJetDeltaRVec.push_back(null_closestJetDeltaRVec);
+      closestJetIndexVec.push_back(null_closestJetIndexVec);
+    }
+    
+    std::vector< const Candidate* >::const_iterator partonsCandidates_itr = partonsCandidates.begin();
+    unsigned int partonIndex = 0;
+    for ( ; partonsCandidates_itr != partonsCandidates.end(); ++partonsCandidates_itr,
+	    partonIndex++ ) {
+      double partonPt  = partonsCandidates[partonIndex]->pt();
+      double partonEta = partonsCandidates[partonIndex]->eta();
+      double partonPhi = partonsCandidates[partonIndex]->phi();
+      //	      std::cout << "parton[" << partonIndex << "]: pt: " << partonPt
+      //			<< " eta: " << partonEta
+      //			<< " phi: " << partonPhi << std::endl;
+
+      unsigned int jetIndex = 0;
+      for ( std::vector<reco::JetBaseRef>::const_iterator jet_itr = jets.begin(); 
+	    jet_itr != jets.end();
+	    ++jet_itr, jetIndex++ ) {
+	
+	double jetEt  = (*jet_itr)->et();
+	double jetEta = (*jet_itr)->eta();
+	double jetPhi = (*jet_itr)->phi();
+	//		std::cout << "jet[" << jetIndex << "]: et: " << jetEt
+	//			  << " eta: " << jetEta
+	//			  << " phi: " << jetPhi << std::endl;
+	
+	double jetParton_deltaEta = jetEta - partonEta;
+	double jetParton_deltaPhi = deltaPhi(jetPhi,partonPhi);
+	double jetParton_deltaR   = deltaR(jetEta,jetPhi,partonEta,partonPhi);      
+      //		std::cout << "deltaR: " << deltaR << std::endl;
+      
+      //		if ( deltaR <= jetPartonDeltaRCut_ ) {
+      if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][3] ) {
+	if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][2] ) {
+	  if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][1] ) {
+	    if ( jetParton_deltaR <= closestJetDeltaRVec[partonIndex][0] ) {
+	      closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
+	      closestJetDeltaRVec[partonIndex][2] = closestJetDeltaRVec[partonIndex][1];
+	      closestJetDeltaRVec[partonIndex][1] = closestJetDeltaRVec[partonIndex][0];
+	      closestJetDeltaRVec[partonIndex][0] = jetParton_deltaR;
+	      closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
+	      closestJetIndexVec[partonIndex][2] = closestJetIndexVec[partonIndex][1];
+	      closestJetIndexVec[partonIndex][1] = closestJetIndexVec[partonIndex][0];
+	      closestJetIndexVec[partonIndex][0] = jetIndex;
+	    } else {
+	      closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
+	      closestJetDeltaRVec[partonIndex][2] = closestJetDeltaRVec[partonIndex][1];
+	      closestJetDeltaRVec[partonIndex][1] = jetParton_deltaR;
+	      closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
+	      closestJetIndexVec[partonIndex][2] = closestJetIndexVec[partonIndex][1];
+	      closestJetIndexVec[partonIndex][1] = jetIndex;
+	    }
+	  } else {
+	    closestJetDeltaRVec[partonIndex][3] = closestJetDeltaRVec[partonIndex][2];
+	    closestJetDeltaRVec[partonIndex][2] = jetParton_deltaR;
+	    closestJetIndexVec[partonIndex][3] = closestJetIndexVec[partonIndex][2];
+	    closestJetIndexVec[partonIndex][2] = jetIndex;
+	  }
+	} else {
+	  closestJetDeltaRVec[partonIndex][3] = jetParton_deltaR;
+	  closestJetIndexVec[partonIndex][3] = jetIndex;
+	}
+      }
+    } // end loop over jet
+    for (int index = 0; index < NJETS; index++ ) {
+      unsigned int jetMatchedIndex = closestJetIndexVec[partonIndex][index];
+      double etRes = (jets[jetMatchedIndex]->et()-partonPt)/partonPt;
+      double jetMass = jets[jetMatchedIndex]->p4().M();
+      std::cout << "closestJetDeltaRVec[" << partonIndex << "][" << index << ": " << jetMatchedIndex 
+		<< " etRes (%): " << etRes*100.  
+		<< " jetMass: " << jetMass
+		<< std::endl;      
+    }
+  } // end loop over partons
+  
+  unsigned int nAss = 0;
+  std::vector<bool> partonAss;
+  for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) 
+    partonAss.push_back(kFALSE);
+  
+  for ( unsigned int assIndex = 0; assIndex < partonsCandidatesNumber; assIndex++ ) {
+    //	      std::cout << "assIndex: " << assIndex << std::endl;
+    double minDeltaR = 99.;
+    int minPartonIndex = -1;
+    // find the best DeltaR matching to find the best parton association in the collection
+    for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) {
+      //		std::cout << "partonIndex: " << partonIndex << " partonAss: " << partonAss[partonIndex] << std::endl;
+      if ( !partonAss[partonIndex] && closestJetDeltaRVec[partonIndex][0] <= minDeltaR ) {
+	minDeltaR = closestJetDeltaRVec[partonIndex][0];
+	minPartonIndex = partonIndex;
+      }
+    } // end loop over partons [not matched yet]
+    
+    // parton association
+    partonAss[minPartonIndex] = kTRUE;
+    nAss++;
+    // save the matched jet into the proper vector
+    unsigned int jetIndex = closestJetIndexVec[minPartonIndex][0];
+    //	      std::cout << "minPartonIndex: " << minPartonIndex 
+    //			<< " to jetIndex: " << jetIndex
+    //			<< " => nAss: " << nAss << std::endl;
+    if ( minPartonIndex == 0 || minPartonIndex == 1 ) {
+      ZjetVec.push_back(jets[jetIndex]);
+      ZjetInd.push_back(jetIndex);
+    }
+    else if ( minPartonIndex == 2 || minPartonIndex == 3 ) {
+      TjetVec.push_back(jets[jetIndex]);
+      TjetInd.push_back(jetIndex);
+    }
+    
+    // in case of "non-biunivocity" pop-up jet associations belong to worst DeltaR parton
+    for ( unsigned int partonIndex = 0; partonIndex < partonsCandidatesNumber; partonIndex++ ) {
+      if ( partonAss[partonIndex] ) continue;
+      //		std::cout << "partonIndex: " << partonIndex 
+      //			  << " partonAss: " << partonAss[partonIndex] << std::endl;
+      //		std::cout << "closestJetIndex: " << closestJetIndexVec[partonIndex][0] << std::endl;
+      for ( unsigned int iAssIndex = 0; iAssIndex < partonsCandidatesNumber; iAssIndex++ ) {
+	if ( closestJetIndexVec[partonIndex][iAssIndex] != closestJetIndexVec[minPartonIndex][0] ) continue;
+	//		  std::cout << "iAssIndex: " << iAssIndex << std::endl;
+	for ( unsigned int jAssIndex = iAssIndex+1; jAssIndex < partonsCandidatesNumber; jAssIndex++ ) {
+	  //		    std::cout << "jAssIndex: " << jAssIndex << std::endl;
+	  closestJetDeltaRVec[partonIndex][jAssIndex-1] = closestJetDeltaRVec[partonIndex][jAssIndex];
+	  closestJetIndexVec[partonIndex][jAssIndex-1] = closestJetIndexVec[partonIndex][jAssIndex];
+	}
+      }
+      //		std::cout << "closestJetIndex: " << closestJetIndexVec[partonIndex][0] << std::endl;
+    } // end loop over partons [not matched yet and w/ the same jet]
+    
+  } // end loop over association index
+  
+  std::cout << "************************************" << std::endl;
+  std::cout << "ZjetVec: " << ZjetVec.size() << std::endl;
+  std::cout << "TjetVec: " << TjetVec.size() << std::endl;
+  
+  for ( unsigned index = 0; index < NZJETS; index++ ) {
+    ZjetEta_  ->Fill(ZjetVec[index]->eta());
+    ZjetPt_   ->Fill(ZjetVec[index]->pt());
+    ZjetEt_   ->Fill(ZjetVec[index]->et());
+    //    ZjetE_    ->Fill(ZjetVec[index]->e());
+    ZjetMass_ ->Fill(ZjetVec[index]->mass());
+  }
+  ZjetsDeltaEta_ ->Fill(fabs(ZjetVec[0]->eta()-ZjetVec[1]->eta()));
+  ZjetsDeltaR_ 	 ->Fill(deltaR(ZjetVec[0]->eta(),ZjetVec[0]->phi(),ZjetVec[1]->eta(),ZjetVec[1]->phi()));
+  double recMass = (ZjetVec[0]->p4()+(ZjetVec[1]->p4())).mass();
+  double mcMass = (hadronicZ[0]->p4()+(hadronicZ[1]->p4())).mass();
+  ZjetsMass_           ->Fill(recMass);
+  ZjetsMassResolution_ ->Fill(resolution(recMass,mcMass));
+  double recPt = (ZjetVec[0]->p4()+(ZjetVec[1]->p4())).pt();
+  double mcPt = (hadronicZ[0]->p4()+(hadronicZ[1]->p4())).pt();
+  ZjetsPt_           ->Fill(recPt);
+  ZjetsPtResolution_ ->Fill(resolution(recPt,mcPt));
+  double recE = (ZjetVec[0]->p4()+(ZjetVec[1]->p4())).e();
+  double mcE = (hadronicZ[0]->p4()+(hadronicZ[1]->p4())).e();
+  ZjetsE_           ->Fill(recE);
+  ZjetsEResolution_ ->Fill(resolution(recE,mcE));
+  double recCollinearity = ZjetVec[0]->pz()*ZjetVec[1]->pz();
+  double mcCollinearity = hadronicZ[0]->pz()*hadronicZ[1]->pz();
+  ZjetsCollinearity_           ->Fill(recCollinearity);
+  ZjetsCollinearityResolution_ ->Fill(resolution(recCollinearity,mcCollinearity));
+  
+    
 
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
 VBFHZZllbbJetMatching::beginJob(const edm::EventSetup&)
 {
 
-  int nbin = NBIN;
+  std::cout << "VBFHZZllbbJetMatching::beginJob]" << std::endl;
 
-  eventsNumber_ = new TH1D("eventsNumber","total number of events",1,0.,1.);
+  int nbin = 100;
+
+  std::cout << "nbin: " << nbin << std::endl;
 
   // histo from HEPG information
   // ---------------------------
-  TFileDirectory mcSubDir = fs->mkdir( "HEPGinfo" );
+  edm::Service<TFileService> fs;
 
-  TFileDirectory mcZSubDir = mcZSubDir.mkdir( "Zpartons" );
+  eventsNumber_ = fs->make<TH1D>("eventsNumber","total number of events",1,0.,1.);
+
+  std::cout << "eventsNumber" << std::endl;
+
+  TFileDirectory mcSubDir = fs->mkdir( "HEPGinfo" );
+  std::cout << "HEPGinfo" << std::endl;
+
+  TFileDirectory mcZSubDir = mcSubDir.mkdir( "Zpartons" );
+
   ZpartonEta_ = mcZSubDir.make<TH1D>("ZpartonEta","partons from Z #eta", nbin, -8.,   8.);
   ZpartonPt_  = mcZSubDir.make<TH1D>("ZpartonPt", "partons from Z p_{T}",nbin,  0., 500.);
   ZpartonEt_  = mcZSubDir.make<TH1D>("ZpartonEt", "partons from Z E_{T}",nbin,  0., 500.);
@@ -650,12 +702,13 @@ VBFHZZllbbJetMatching::beginJob(const edm::EventSetup&)
   ZpartonsE_            = mcZSubDir.make<TH1D>("ZpartonsE",           "invariant E of partons from Z",    nbin,    0.,   500.);
   ZpartonsCollinearity_ = mcZSubDir.make<TH1D>("ZpartonsCollinearity","collinearity of partons from Z",   nbin,-7000.,  7000.);
 
-//  ZpartonsDeltaRVSjetMass_ = mcZSubDir.make<TH2D>("ZpartonsDeltaRVSjetMass","jet mass VS #DelraR between the 2 partons from Z",nbin,0.,0.8,nbin,0.,150.);
+
+//  ZpartonsDeltaRVSjetMass_ = mcZSubDir.make<TH2D>("ZpartonsDeltaRVSjetMass","jet mass VS #DeltaR between the 2 partons from Z",nbin,0.,0.8,nbin,0.,150.);
 //  ZpartonsEtResVSjetMass_  = mcZSubDir.make<TH2D>("ZpartonsEtResVSjetMass", "jet mass VS E_{T} resolution",nbin,0.,1.,nbin,0.,150.);
-//  ZpartonsDeltaRVSetRes_   = mcZSubDir.make<TH2D>("ZpartonsDeltaRVSetRes",  "E_{T} resolution VS #DelraR between the 2 partons from Z",nbin,0.,0.8,nbin,0.,1.);
-//  ZpartonsDeltaRVSjetMass_profile_ = mcZSubDir.make<TProfile>("ZpartonsDeltaRVSjetMass_profile","jet mass VS #DelraR between the 2 partons from Z",nbin,0.,0.8,0.,150.);
+//  ZpartonsDeltaRVSetRes_   = mcZSubDir.make<TH2D>("ZpartonsDeltaRVSetRes",  "E_{T} resolution VS #DeltaR between the 2 partons from Z",nbin,0.,0.8,nbin,0.,1.);
+//  ZpartonsDeltaRVSjetMass_profile_ = mcZSubDir.make<TProfile>("ZpartonsDeltaRVSjetMass_profile","jet mass VS #DeltaR between the 2 partons from Z",nbin,0.,0.8,0.,150.);
 //  ZpartonsEtResVSjetMass_profile_  = mcZSubDir.make<TProfile>("ZpartonsEtResVSjetMass_profile", "jet mass VS E_{T} resolution",nbin,0.,1.,0.,150.);
-//  ZpartonsDeltaRVSetRes_profile_   = mcZSubDir.make<TProfile>("ZpartonsDeltaRVSetRes_profile",  "E_{T} resolution VS #DelraR between the 2 partons from Z",nbin,0.,0.8,0.,1.);
+//  ZpartonsDeltaRVSetRes_profile_   = mcZSubDir.make<TProfile>("ZpartonsDeltaRVSetRes_profile",  "E_{T} resolution VS #DeltaR between the 2 partons from Z",nbin,0.,0.8,0.,1.);
 //
   TFileDirectory mcTSubDir = mcSubDir.mkdir( "tagSystem" );
   TAGpartonEta_ = mcTSubDir.make<TH1D>("TAGpartonEta","tag partons #eta", nbin, -8.,   8.);
@@ -671,68 +724,95 @@ VBFHZZllbbJetMatching::beginJob(const edm::EventSetup&)
   TAGpartonsCollinearity_ = mcTSubDir.make<TH1D>("TAGpartonsCollinearity","collinearity of tag partons system",   nbin,-7000., 7000.);
 
   TFileDirectory jetSubDir = fs->mkdir( "jet" );
-  jetNumber_          = jetSubDir.make<TH1D>("jetNumber",         "number of jets",              nbin,  0.,100. );
-  jetUncorrEt_        = jetSubDir.make<TH1D>("jetUncorrEt",       "jet uncorrected E_{T}",       nbin,  0.,500. );
-  jetCorrEt_          = jetSubDir.make<TH1D>("jetCorrEt",         "jet correctedE_{T}",          nbin,  0.,500. );
-  jetUncorrPt_        = jetSubDir.make<TH1D>("jetUncorrPt",       "jet uncorrected p_{T}",       nbin,  0.,500. );
-  jetCorrPt_          = jetSubDir.make<TH1D>("jetCorrPt",         "jet corrected p_{T}",         nbin,  0.,500. );
+  jetNumber_          = jetSubDir.make<TH1D>("jetNumber",         "number of jets",              nbin,  0. ,100. );
+  jetUncorrEt_        = jetSubDir.make<TH1D>("jetUncorrEt",       "jet uncorrected E_{T}",       nbin,  0. ,500. );
+  jetCorrEt_          = jetSubDir.make<TH1D>("jetCorrEt",         "jet correctedE_{T}",          nbin,  0. ,500. );
+  jetUncorrPt_        = jetSubDir.make<TH1D>("jetUncorrPt",       "jet uncorrected p_{T}",       nbin,  0. ,500. );
+  jetCorrPt_          = jetSubDir.make<TH1D>("jetCorrPt",         "jet corrected p_{T}",         nbin,  0. ,500. );
   jetPhi_             = jetSubDir.make<TH1D>("jetPhi",            "jet #Phi",                    nbin, -TMath::Pi(),TMath::Pi() );
-  jetEta_             = jetSubDir.make<TH1D>("jetEta",            "jet #eta",                    nbin, -8.,  8. );
-  jetEMfrac_          = jetSubDir.make<TH1D>("jetEMfrac",         "jet EM fraction",             nbin, -0.5, 1.5);
-  jetHIGHEFFdiscr_    = jetSubDir.make<TH1D>("jetHIGHEFFdiscr",   "jet HIGHEFF discriminator",   nbin, -100., 1.5);   	  
-  jetHIGHPURdiscr_    = jetSubDir.make<TH1D>("jetHIGHPURdiscr",   "jet HIGHPUR discriminator",   nbin, -100., 1.5);   	  
-  jetCOMBSECVTXdiscr_ = jetSubDir.make<TH1D>("jetCOMBSECVTXdiscr","jet COMBSECVTX discriminator",nbin, -100., 1.5);
-  jetJETPROBdiscr_    = jetSubDir.make<TH1D>("jetJETPROBdiscr",   "jet JETPROB discriminator",   nbin, -100., 1.5);   
+  jetEta_             = jetSubDir.make<TH1D>("jetEta",            "jet #eta",                    nbin, -8.,   8. );
+  jetMass_            = jetSubDir.make<TH1D>("jetMass",           "jet mass",                    nbin,  0. ,100. );
+  jetEMfrac_          = jetSubDir.make<TH1D>("jetEMfrac",         "jet EM fraction",             nbin, -0.5,  1.5);
+  jetHIGHEFFdiscr_    = jetSubDir.make<TH1D>("jetHIGHEFFdiscr",   "jet HIGHEFF discriminator",   nbin, -100., 10.);   	  
+  jetHIGHPURdiscr_    = jetSubDir.make<TH1D>("jetHIGHPURdiscr",   "jet HIGHPUR discriminator",   nbin, -100., 10.);   	  
+  jetCOMBSECVTXdiscr_ = jetSubDir.make<TH1D>("jetCOMBSECVTXdiscr","jet COMBSECVTX discriminator",nbin, -100., 10.);
+  jetJETPROBdiscr_    = jetSubDir.make<TH1D>("jetJETPROBdiscr",   "jet JETPROB discriminator",   nbin, -100., 10.);   
 
   jetEMfracVSeta_             = jetSubDir.make<TH2D>("jetEMfracVSeta"             ,"jet EM fraction VS #eta",                    nbin, -0.5, 1.5, nbin,   -8.,   8. );	      
   jetEMfracVScorrEt_          = jetSubDir.make<TH2D>("jetEMfracVScorrEt"          ,"jet EM fraction VS corrected E_{T}",         nbin, -0.5, 1.5, nbin,    0., 500. );	      
   jetEMfracVScorrPt_          = jetSubDir.make<TH2D>("jetEMfracVScorrPt"          ,"jet EM fraction VS corrected p_{T}",         nbin, -0.5, 1.5, nbin,    0., 500. );	      
   jetEMfracVSuncorrEt_        = jetSubDir.make<TH2D>("jetEMfracVSuncorrEt"        ,"jet EM fraction VS uncorrected E_{T}",       nbin, -0.5, 1.5, nbin,    0., 500. );	      
   jetEMfracVSuncorrPt_        = jetSubDir.make<TH2D>("jetEMfracVSuncorrPt"        ,"jet EM fraction VS uncorrected p_{T}",       nbin, -0.5, 1.5, nbin,    0., 500. );	      
-  jetEMfracVShighEFFdiscr_    = jetSubDir.make<TH2D>("jetEMfracVShighEFFdiscr"    ,"jet EM fraction VS HIGHEFF discriminator",   nbin, -0.5, 1.5, nbin, -100.,   1.5);    
-  jetEMfracVShighPURdiscr_    = jetSubDir.make<TH2D>("jetEMfracVShighPURdiscr"    ,"jet EM fraction VS HIGHPUR discriminator",   nbin, -0.5, 1.5, nbin, -100.,   1.5);    
-  jetEMfracVScomboSECVTXdiscr_= jetSubDir.make<TH2D>("jetEMfracVScomboSECVTXdiscr","jet EM fraction VS COMBSECVTX discriminator",nbin, -0.5, 1.5, nbin, -100.,   1.5);
-  jetEMfracVSjetPROBdiscr_    = jetSubDir.make<TH2D>("jetEMfracVSjetPROBdiscr"    ,"jet EM fraction VS JETPROB discriminator",   nbin, -0.5, 1.5, nbin, -100.,   1.5);    
-  jetEMfracVSeta_profile_             = jetSubDir.make<TProfile>("jetEMfracVSeta"             ,"jet EM fraction VS #eta",                    nbin, -0.5, 1.5,   -8.,   8. );	      
-  jetEMfracVScorrEt_profile_          = jetSubDir.make<TProfile>("jetEMfracVScorrEt"          ,"jet EM fraction VS corrected E_{T}",         nbin, -0.5, 1.5,    0., 500. );	      
-  jetEMfracVScorrPt_profile_          = jetSubDir.make<TProfile>("jetEMfracVScorrPt"          ,"jet EM fraction VS corrected p_{T}",         nbin, -0.5, 1.5,    0., 500. );	      
-  jetEMfracVSuncorrEt_profile_        = jetSubDir.make<TProfile>("jetEMfracVSuncorrEt"        ,"jet EM fraction VS uncorrected E_{T}",       nbin, -0.5, 1.5,    0., 500. );	      
-  jetEMfracVSuncorrPt_profile_        = jetSubDir.make<TProfile>("jetEMfracVSuncorrPt"        ,"jet EM fraction VS uncorrected p_{T}",       nbin, -0.5, 1.5,    0., 500. );	      
-  jetEMfracVShighEFFdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVShighEFFdiscr"    ,"jet EM fraction VS HIGHEFF discriminator",   nbin, -0.5, 1.5, -100.,   1.5);    
-  jetEMfracVShighPURdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVShighPURdiscr"    ,"jet EM fraction VS HIGHPUR discriminator",   nbin, -0.5, 1.5, -100.,   1.5);    
-  jetEMfracVScomboSECVTXdiscr_profile_= jetSubDir.make<TProfile>("jetEMfracVScomboSECVTXdiscr","jet EM fraction VS COMBSECVTX discriminator",nbin, -0.5, 1.5, -100.,   1.5);
-  jetEMfracVSjetPROBdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVSjetPROBdiscr"    ,"jet EM fraction VS JETPROB discriminator",   nbin, -0.5, 1.5, -100.,   1.5);    
+  jetEMfracVShighEFFdiscr_    = jetSubDir.make<TH2D>("jetEMfracVShighEFFdiscr"    ,"jet EM fraction VS HIGHEFF discriminator",   nbin, -0.5, 1.5, nbin, -100.,   10.);    
+  jetEMfracVShighPURdiscr_    = jetSubDir.make<TH2D>("jetEMfracVShighPURdiscr"    ,"jet EM fraction VS HIGHPUR discriminator",   nbin, -0.5, 1.5, nbin, -100.,   10.);    
+  jetEMfracVScomboSECVTXdiscr_= jetSubDir.make<TH2D>("jetEMfracVScomboSECVTXdiscr","jet EM fraction VS COMBSECVTX discriminator",nbin, -0.5, 1.5, nbin, -100.,   10.);
+  jetEMfracVSjetPROBdiscr_    = jetSubDir.make<TH2D>("jetEMfracVSjetPROBdiscr"    ,"jet EM fraction VS JETPROB discriminator",   nbin, -0.5, 1.5, nbin, -100.,   10.);    
+  jetEMfracVSeta_profile_             = jetSubDir.make<TProfile>("jetEMfracVSeta_profile"             ,"jet EM fraction VS #eta",                    nbin, -0.5, 10.,   -8.,   8. );	      
+  jetEMfracVScorrEt_profile_          = jetSubDir.make<TProfile>("jetEMfracVScorrEt_profile"          ,"jet EM fraction VS corrected E_{T}",         nbin, -0.5, 10.,    0., 500. );	      
+  jetEMfracVScorrPt_profile_          = jetSubDir.make<TProfile>("jetEMfracVScorrPt_profile"          ,"jet EM fraction VS corrected p_{T}",         nbin, -0.5, 10.,    0., 500. );	      
+  jetEMfracVSuncorrEt_profile_        = jetSubDir.make<TProfile>("jetEMfracVSuncorrEt_profile"        ,"jet EM fraction VS uncorrected E_{T}",       nbin, -0.5, 10.,    0., 500. );	      
+  jetEMfracVSuncorrPt_profile_        = jetSubDir.make<TProfile>("jetEMfracVSuncorrPt_profile"        ,"jet EM fraction VS uncorrected p_{T}",       nbin, -0.5, 10.,    0., 500. );	      
+  jetEMfracVShighEFFdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVShighEFFdiscr_profile"    ,"jet EM fraction VS HIGHEFF discriminator",   nbin, -0.5, 10., -100.,   1.5);    
+  jetEMfracVShighPURdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVShighPURdiscr_profile"    ,"jet EM fraction VS HIGHPUR discriminator",   nbin, -0.5, 10., -100.,   1.5);    
+  jetEMfracVScomboSECVTXdiscr_profile_= jetSubDir.make<TProfile>("jetEMfracVScomboSECVTXdiscr_profile","jet EM fraction VS COMBSECVTX discriminator",nbin, -0.5, 10., -100.,   1.5);
+  jetEMfracVSjetPROBdiscr_profile_    = jetSubDir.make<TProfile>("jetEMfracVSjetPROBdiscr_profile"    ,"jet EM fraction VS JETPROB discriminator",   nbin, -0.5, 10., -100.,   1.5);    
 
-//
-//  muonJetMatchedNumber_ = jetSubDir.make<TH1D>("muonJetMatchedNumber","number of jets w/ at least 1 muon in a distance #DeltaR<0.5", 10,0.,10.0);
-//
-//  jetParton_deltaR_      = jetSubDir.make<TH1D>("jetParton_deltaR",     "#DeltaR^{2} between jet and partons from Z",    nbin,0.,4.0);
-//  jetParton_deltaR_zoom_ = jetSubDir.make<TH1D>("jetParton_deltaR_zoom","#DeltaR^{2} between jet and partons from Z",    nbin,0.,0.1);
-//  jetParton_deltaRmax_   = jetSubDir.make<TH1D>("jetParton_deltaRmax",  "max #DeltaR^{2} between jet and partons from Z",nbin,0.,4.0);
-//
-//  jetParton_deltaEtVSdeltaR_         = jetSubDir.make<TH2D>("jetParton_deltaEtVSdeltaR",        "#DeltaE_{T} VS #DeltaR^{2} between partons and matched jets",          nbin,0.,0.04,nbin,-50.,50.);
-//  jetParton_deltaEtmeanVSdeltaRmean_ = jetSubDir.make<TH2D>("jetParton_deltaEtmeanVSdeltaRmean","mean #DeltaE_{T} VS mean #DeltaR^{2} between partons and matched jets",nbin,0.,0.04,nbin,  0.,50.);
-//  jetParton_deltaEVSdeltaR_   = jetSubDir.make<TH2D>("jetParton_deltaEVSdeltaR",  "#DeltaE VS #DeltaR^{2} between partons and matched jets",    nbin,0.,0.04,nbin,-50.,50.);
-//  jetParton_deltaEtaVSdeltaR_ = jetSubDir.make<TH2D>("jetParton_deltaEtaVSdeltaR","#Delta#eta VS #DeltaR^{2} between partons and matched jets", nbin,0.,0.04,nbin, -5., 5.);
-//  jetParton_deltaEtVSdeltaR_profile_         = jetSubDir.make<TProfile>("jetParton_deltaEtVSdeltaR_profile",        "#DeltaE_{T} VS #DeltaR^{2} between partons and matched jets",          nbin,0.,0.04,-50.,50.);
-//  jetParton_deltaEtmeanVSdeltaRmean_profile_ = jetSubDir.make<TProfile>("jetParton_deltaEtmeanVSdeltaRmean_profile","mean #DeltaE_{T} VS mean #DeltaR^{2} between partons and matched jets",nbin,0.,0.04,  0.,50.);
-//  jetParton_deltaEVSdeltaR_profile_   = jetSubDir.make<TProfile>("jetParton_deltaEVSdeltaR_profile",  "#DeltaE VS #DeltaR^{2} between partons and matched jets",    nbin,0.,0.04,-50.,50.);
-//  jetParton_deltaEtaVSdeltaR_profile_ = jetSubDir.make<TProfile>("jetParton_deltaEtaVSdeltaR_profile","#Delta#eta VS #DeltaR^{2} between partons and matched jets", nbin,0.,0.04, -5., 5.);
-//  jetParton_deltaEta_ = jetSubDir.make<TH1D>("jetParton_deltaEta","#Delta#eta between partons and matched jets", nbin, -5., 5.);
-//  jetParton_deltaEt_  = jetSubDir.make<TH1D>("jetParton_deltaEt", "#DeltaE_{T} between partons and matched jets",nbin,-50.,50.);
-//  jetParton_deltaEtRes_  = jetSubDir.make<TH1D>("jetParton_deltaEtRes", "E_{T} resolution between partons and matched jets",nbin,-1.,1.);
-//  jetParton_004deltaEtRes_ = jetSubDir.make<TH1D>("jetParton_004deltaEtRes", "E_{T} resolution between partons and matched jets (#DeltaR<=0.2)",nbin,-1.,1.);
-//
-//  jetParton_deltaRVSdeltaR_ = jetSubDir.make<TH2D>("jetParton_deltaRVSdeltaR","#DeltaR between the 2jets VS #DeltaR between the 2 partons",nbin,0.,5.,nbin,0.,5.);
-//  jetParton_deltaRVSdeltaR_profile_ = jetSubDir.make<TProfile>("jetParton_deltaRVSdeltaR_profile","#DeltaR between the 2jets VS #DeltaR between the 2 partons",nbin,0.,5.,0.,5.);
-//
-//  TFileDirectory jetZSubDir = fs->mkdir( "Zjet" );
-//  hadronicZrecMass_           = jetZSubDir.make<TH1D>("hadronicZrecMass",          "reconstructed Z mass from jets matched to Z partons",           nbin, 0.,150.);
-//  hadronicZrecMassResolution_ = jetZSubDir.make<TH1D>("hadronicZrecMassResolution","reconstructed Z mass resolution from jets matched to Z partons",nbin,-1.,  1.);
-//  hadronicZrecPt_           = jetZSubDir.make<TH1D>("hadronicZrecPt",          "reconstructed Z p_{T} from jets matched to Z partons",           nbin, 0.,500.);
-//  hadronicZrecPtResolution_ = jetZSubDir.make<TH1D>("hadronicZrecPtResolution","reconstructed Z p_{T} resolution from jets matched to Z partons",nbin,-1.,  1.);
-//  hadronicZrecCollinearity_           = jetZSubDir.make<TH1D>("hadronicZrecCollinearity",          "reconstructed collinearity between jets matched to Z partons",        nbin, -6000.,6000.);
-//  hadronicZrecCollinearityResolution_ = jetZSubDir.make<TH1D>("hadronicZrecCollinearityResolution","reconstructed collinearity resolution from jets matched to Z partons",nbin,    -1.,   1.);
+
+ muonJetMatchedNumber_ = jetSubDir.make<TH1D>("muonJetMatchedNumber","number of jets w/ at least 1 muon in a distance #DeltaR<0.5", 10,0.,10.0);
+
+ jetParton_deltaR_      = jetSubDir.make<TH1D>("jetParton_deltaR",     "#DeltaR^{2} between jet and partons from Z",    nbin,0.,4.0);
+ jetParton_deltaR_zoom_ = jetSubDir.make<TH1D>("jetParton_deltaR_zoom","#DeltaR^{2} between jet and partons from Z",    nbin,0.,0.1);
+ jetParton_deltaRmax_   = jetSubDir.make<TH1D>("jetParton_deltaRmax",  "max #DeltaR^{2} between jet and partons from Z",nbin,0.,4.0);
+
+ jetParton_deltaEtVSdeltaR_         = jetSubDir.make<TH2D>("jetParton_deltaEtVSdeltaR",        "#DeltaE_{T} VS #DeltaR^{2} between partons and matched jets",          nbin,0.,0.04,nbin,-50.,50.);
+ jetParton_deltaEtmeanVSdeltaRmean_ = jetSubDir.make<TH2D>("jetParton_deltaEtmeanVSdeltaRmean","mean #DeltaE_{T} VS mean #DeltaR^{2} between partons and matched jets",nbin,0.,0.04,nbin,  0.,50.);
+ jetParton_deltaEVSdeltaR_   = jetSubDir.make<TH2D>("jetParton_deltaEVSdeltaR",  "#DeltaE VS #DeltaR^{2} between partons and matched jets",    nbin,0.,0.04,nbin,-50.,50.);
+ jetParton_deltaEtaVSdeltaR_ = jetSubDir.make<TH2D>("jetParton_deltaEtaVSdeltaR","#Delta#eta VS #DeltaR^{2} between partons and matched jets", nbin,0.,0.04,nbin, -5., 5.);
+ jetParton_deltaEtVSdeltaR_profile_         = jetSubDir.make<TProfile>("jetParton_deltaEtVSdeltaR_profile",        "#DeltaE_{T} VS #DeltaR^{2} between partons and matched jets",          nbin,0.,0.04,-50.,50.);
+ jetParton_deltaEtmeanVSdeltaRmean_profile_ = jetSubDir.make<TProfile>("jetParton_deltaEtmeanVSdeltaRmean_profile","mean #DeltaE_{T} VS mean #DeltaR^{2} between partons and matched jets",nbin,0.,0.04,  0.,50.);
+ jetParton_deltaEVSdeltaR_profile_   = jetSubDir.make<TProfile>("jetParton_deltaEVSdeltaR_profile",  "#DeltaE VS #DeltaR^{2} between partons and matched jets",    nbin,0.,0.04,-50.,50.);
+ jetParton_deltaEtaVSdeltaR_profile_ = jetSubDir.make<TProfile>("jetParton_deltaEtaVSdeltaR_profile","#Delta#eta VS #DeltaR^{2} between partons and matched jets", nbin,0.,0.04, -5., 5.);
+ jetParton_deltaEta_ = jetSubDir.make<TH1D>("jetParton_deltaEta","#Delta#eta between partons and matched jets", nbin, -5., 5.);
+ jetParton_deltaEt_  = jetSubDir.make<TH1D>("jetParton_deltaEt", "#DeltaE_{T} between partons and matched jets",nbin,-50.,50.);
+ jetParton_deltaEtRes_  = jetSubDir.make<TH1D>("jetParton_deltaEtRes", "E_{T} resolution between partons and matched jets",nbin,-1.,1.);
+ jetParton_004deltaEtRes_ = jetSubDir.make<TH1D>("jetParton_004deltaEtRes", "E_{T} resolution between partons and matched jets (#DeltaR<=0.2)",nbin,-1.,1.);
+
+ jetParton_deltaRVSdeltaR_ = jetSubDir.make<TH2D>("jetParton_deltaRVSdeltaR","#DeltaR between the 2jets VS #DeltaR between the 2 partons",nbin,0.,5.,nbin,0.,5.);
+ jetParton_deltaRVSdeltaR_profile_ = jetSubDir.make<TProfile>("jetParton_deltaRVSdeltaR_profile","#DeltaR between the 2jets VS #DeltaR between the 2 partons",nbin,0.,5.,0.,5.);
+
+ TFileDirectory jetZSubDir = fs->mkdir( "Zjet" );
+ ZjetEta_  = jetZSubDir.make<TH1D>("ZjetEta", "#eta of jets matched to Z partons", nbin,-8.,8.);
+ ZjetPt_   = jetZSubDir.make<TH1D>("ZjetPt",  "p_{T} of jets matched to Z partons",nbin,0.,500.);
+ ZjetEt_   = jetZSubDir.make<TH1D>("ZjetEt",  "E_{T} of jets matched to Z partons",nbin,0.,500.);
+ ZjetE_    = jetZSubDir.make<TH1D>("ZjetE",   "E of jets matched to Z partons",    nbin,0.,500.);
+ ZjetMass_ = jetZSubDir.make<TH1D>("ZjetMass","mass of jets matched to Z partons", nbin,0.,100.); 
+ ZjetsDeltaEta_ = jetZSubDir.make<TH1D>("ZjetsDeltaEta","#Delta#eta between jets matched to Z partons", nbin,0.,10.);
+ ZjetsDeltaR_ = jetZSubDir.make<TH1D>("ZjetsDeltaR","#DeltaR between jets matched to Z partons", nbin,0.,10.);
+ ZjetsMass_           = jetZSubDir.make<TH1D>("ZjetsMass",          "reconstructed Z mass from jets matched to Z partons",           nbin, 0.,150.);
+ ZjetsMassResolution_ = jetZSubDir.make<TH1D>("ZjetsMassResolution","reconstructed Z mass resolution from jets matched to Z partons",nbin,-1.,  1.);
+ ZjetsPt_           = jetZSubDir.make<TH1D>("ZjetsPt",          "reconstructed Z p_{T} from jets matched to Z partons",           nbin, 0.,500.);
+ ZjetsPtResolution_ = jetZSubDir.make<TH1D>("ZjetsPtResolution","reconstructed Z p_{T} resolution from jets matched to Z partons",nbin,-1.,  1.);
+ ZjetsE_           = jetZSubDir.make<TH1D>("ZjetsE",          "reconstructed Z E from jets matched to Z partons",           nbin, 0.,500.);
+ ZjetsEResolution_ = jetZSubDir.make<TH1D>("ZjetsEResolution","reconstructed Z E resolution from jets matched to Z partons",nbin,-1.,  1.);
+ ZjetsCollinearity_           = jetZSubDir.make<TH1D>("ZjetsCollinearity",          "reconstructed collinearity between jets matched to Z partons",        nbin, -6000.,6000.);
+ ZjetsCollinearityResolution_ = jetZSubDir.make<TH1D>("ZjetsCollinearityResolution","reconstructed collinearity resolution from jets matched to Z partons",nbin,    -1.,   1.);
+
+ TFileDirectory jetTAGSubDir = fs->mkdir( "TAGjet" );
+ TAGjetEta_  = jetTAGSubDir.make<TH1D>("TAGjetEta", "#eta of jets matched to TAG partons", nbin,-8.,8.);
+ TAGjetPt_   = jetTAGSubDir.make<TH1D>("TAGjetPt",  "p_{T} of jets matched to TAG partons",nbin,0.,500.);
+ TAGjetEt_   = jetTAGSubDir.make<TH1D>("TAGjetEt",  "E_{T} of jets matched to TAG partons",nbin,0.,500.);
+ TAGjetE_    = jetTAGSubDir.make<TH1D>("TAGjetE",   "E of jets matched to TAG partons",    nbin,0.,500.);
+ TAGjetMass_ = jetTAGSubDir.make<TH1D>("TAGjetMass","mass of jets matched to TAG partons", nbin,0.,100.); 
+ TAGjetsDeltaEta_ = jetTAGSubDir.make<TH1D>("TAGjetsDeltaEta","#Delta#eta between jets matched to TAG partons", nbin,0.,10.);
+ TAGjetsDeltaR_ = jetTAGSubDir.make<TH1D>("TAGjetsDeltaR","#DeltaR between jets matched to TAG partons", nbin,0.,10.);
+ TAGjetsMass_           = jetTAGSubDir.make<TH1D>("TAGjetsMass",          "reconstructed TAG system mass from jets matched to TAG partons",           nbin, 0.,150.);
+ TAGjetsMassResolution_ = jetTAGSubDir.make<TH1D>("TAGjetsMassResolution","reconstructed TAG system mass resolution from jets matched to TAG partons",nbin,-1.,  1.);
+ TAGjetsPt_           = jetTAGSubDir.make<TH1D>("TAGjetsPt",          "reconstructed TAG system p_{T} from jets matched to TAG partons",           nbin, 0.,500.);
+ TAGjetsPtResolution_ = jetTAGSubDir.make<TH1D>("TAGjetsPtResolution","reconstructed TAG system p_{T} resolution from jets matched to TAG partons",nbin,-1.,  1.);
+ TAGjetsE_           = jetTAGSubDir.make<TH1D>("TAGjetsE",          "reconstructed TAG system E from jets matched to TAG partons",           nbin, 0.,500.);
+ TAGjetsEResolution_ = jetTAGSubDir.make<TH1D>("TAGjetsEResolution","reconstructed TAG system E resolution from jets matched to TAG partons",nbin,-1.,  1.);
+ TAGjetsCollinearity_           = jetTAGSubDir.make<TH1D>("TAGjetsCollinearity",          "reconstructed collinearity between jets matched to TAG partons",        nbin, -6000.,6000.);
+ TAGjetsCollinearityResolution_ = jetTAGSubDir.make<TH1D>("TAGjetsCollinearityResolution","reconstructed collinearity resolution from jets matched to TAG partons",nbin,    -1.,   1.);
 
 }
 
@@ -740,83 +820,12 @@ VBFHZZllbbJetMatching::beginJob(const edm::EventSetup&)
 void 
 VBFHZZllbbJetMatching::endJob() {
 
+  std::cout << "VBFHZZllbbJetMatching::endJob" << std::endl;
+
   // Fill histograms
   // ---------------
   eventsNumber_->SetBinContent(1,eventcounter_);
-  eventsNumber_->Write();
 
-  ZpartonEta_          ->Write();	       
-  ZpartonPt_           ->Write();	       
-  ZpartonEt_           ->Write();	       
-  ZpartonE_            ->Write();	       
-  ZpartonsDeltaEta_    ->Write();    
-  ZpartonsDeltaR_      ->Write();      
-  ZpartonsMass_        ->Write();	      
-  ZpartonsPt_          ->Write();	      
-  ZpartonsEt_          ->Write();	      
-  ZpartonsE_           ->Write();	      
-  ZpartonsCollinearity_->Write();
-
-  TAGpartonEta_ ->Write();
-  TAGpartonPt_  ->Write();
-  TAGpartonEt_  ->Write();
-  TAGpartonE_   ->Write();
-  TAGpartonsDeltaEta_     ->Write();
-  TAGpartonsDeltaR_       ->Write();
-  TAGpartonsMass_         ->Write();
-  TAGpartonsPt_           ->Write();
-  TAGpartonsEt_           ->Write();
-  TAGpartonsE_            ->Write();
-  TAGpartonsCollinearity_ ->Write();
-
-  jetNumber_          ->Write();
-  jetUncorrEt_        ->Write();
-  jetCorrEt_          ->Write();
-  jetUncorrPt_        ->Write();
-  jetCorrPt_          ->Write();
-  jetPhi_             ->Write();
-  jetEta_             ->Write();
-  jetEMfrac_          ->Write();
-  jetHIGHEFFdiscr_    ->Write();   	  
-  jetHIGHPURdiscr_    ->Write();   	  
-  jetCOMBSECVTXdiscr_ ->Write();
-  jetJETPROBdiscr_    ->Write();   
-
-  jetEMfracVSeta_              ->Write();    
-  jetEMfracVScorrEt_           ->Write();    
-  jetEMfracVScorrPt_           ->Write();    
-  jetEMfracVSuncorrEt_         ->Write();    
-  jetEMfracVSuncorrPt_         ->Write();    
-  jetEMfracVShighEFFdiscr_     ->Write();
-  jetEMfracVShighPURdiscr_     ->Write();
-  jetEMfracVScomboSECVTXdiscr_ ->Write();
-  jetEMfracVSjetPROBdiscr_     ->Write();
-  jetEMfracVSeta_profile_              ->Write();      
-  jetEMfracVScorrEt_profile_           ->Write();      
-  jetEMfracVScorrPt_profile_           ->Write();      
-  jetEMfracVSuncorrEt_profile_         ->Write();      
-  jetEMfracVSuncorrPt_profile_         ->Write();      
-  jetEMfracVShighEFFdiscr_profile_     ->Write();
-  jetEMfracVShighPURdiscr_profile_     ->Write();
-  jetEMfracVScomboSECVTXdiscr_profile_ ->Write();
-  jetEMfracVSjetPROBdiscr_profile_     ->Write();
-
-}
-
-int bTaggerCode ( const std::string& bTagger ) {
-    
-  int code = -1;
-  if ( bTagger == "HIGHEFF" )            code = vbfhzz2l2b::HIGHEFF;
-  else if ( bTagger == "HIGHPUR"       ) code = vbfhzz2l2b::HIGHPUR;
-  else if ( bTagger == "COMBSECVTX"    ) code = vbfhzz2l2b::COMBSECVTX;
-  else if ( bTagger == "COMBSECVTXMVA" ) code = vbfhzz2l2b::COMBSECVTXMVA;
-  else if ( bTagger == "SOFTMUON"      ) code = vbfhzz2l2b::SOFTMUON;
-  else if ( bTagger == "SOFTELECTRON"  ) code = vbfhzz2l2b::SOFTELECTRON;
-  else if ( bTagger == "JETPROB"       ) code = vbfhzz2l2b::JETPROB;
-  else
-    std::cout << "[VBFHZZllbbUtils::bTaggerCode] --> WARNING: bTagger " << bTagger << " NOT IMPLEMENTED!" << std::endl;
-  
-  return code;
 }
 
 //define this as a plug-in

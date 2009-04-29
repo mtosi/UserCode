@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id$
+// $Id: VBFHZZllbbMCfilterValidation.h,v 1.1 2009/04/28 16:45:44 tosi Exp $
 //
 //
 
@@ -80,6 +80,8 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   int           whichSim_;
   bool          signal_;
   edm::InputTag genJetLabel_;
+  edm::InputTag muonLabel_;
+  edm::InputTag electronLabel_;
 
   int    jetNumberCut_;
   double firstJetPtCut_;
@@ -94,10 +96,14 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
 
   TH1D * VBFfirstJetPt_; 
   TH1D * VBFsecondJetPt_; 
+  TH1D * VBFthirdJetPt_;
+  TH1D * VBFfourthJetPt_;
   TH1D * VBFmaxDeltaEtaJetJet_;
   TH1D * VBFmaxInvMassJetJet_;
   TH1D * ggFfirstJetPt_; 
   TH1D * ggFsecondJetPt_; 
+  TH1D * ggFthirdJetPt_;
+  TH1D * ggFfourthJetPt_;
   TH1D * ggFmaxDeltaEtaJetJet_;
   TH1D * ggFmaxInvMassJetJet_;
 

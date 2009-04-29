@@ -30,9 +30,11 @@ typedef reco::GenJetCollection::const_iterator genJetItr;
 // constructors and destructor
 //
 VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterSet& iConfig) :
-  whichSim_    ( iConfig.getParameter<int>           ( "whichSim"    ) ), // 0:FastSim, 1:FullSim
-  signal_      ( iConfig.getParameter<bool>          ( "signal"      ) ),
-  genJetLabel_ ( iConfig.getParameter<edm::InputTag> ( "genJetLabel" ) ),
+  whichSim_      ( iConfig.getParameter<int>           ( "whichSim"      ) ), // 0:FastSim, 1:FullSim
+  signal_        ( iConfig.getParameter<bool>          ( "signal"        ) ),
+  genJetLabel_   ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"   ) ),
+  muonLabel_     ( iConfig.getParameter<edm::InputTag> ( "muonLabel"     ) ),
+  electronLabel_ ( iConfig.getParameter<edm::InputTag> ( "electronLabel" ) ),
   jetNumberCut_   ( iConfig.getParameter<int>    ( "jetNumberCut"   ) ),
   firstJetPtCut_  ( iConfig.getParameter<double> ( "firstJetPtCut"  ) ),
   secondJetPtCut_ ( iConfig.getParameter<double> ( "secondJetPtCut" ) ),
@@ -88,24 +90,42 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
   iEvent.getByLabel( genJetLabel_, genJetsHandle ) ;
   std::cout << "genJetsHandle->size(): " << genJetsHandle->size() << std::endl;  
 
-  GenJetCollection mygenjets=*genJetsHandle;
-    
-  std::sort(mygenjets.begin(),mygenjets.end(),PtGreater());
+  // pt sorting
+  GenJetCollection genJetSortedColl=*genJetsHandle;
+  std::sort(genJetSortedColl.begin(),genJetSortedColl.end(),PtGreater());
+
+  // looking for the highest invariant mass jets pair
+  std::pair<genJetItr,genJetItr> maxInvMassPair = 
+    vbfhzz2l2b::findPair_maxInvMass_ptMinCut<genJetItr>(genJetsHandle->begin(), genJetsHandle->end(),
+							firstJetPtCut_, secondJetPtCut_);
+  double maxInvMass = ( (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
+  std::cout << "[VBFHZZllbbMCfilterValidation::analyze] max inv mass: " << maxInvMass << std::endl;
+
+  // looking for the highest delta eta jets pair
+  std::pair<genJetItr,genJetItr> maxDeltaEtaPair = 
+    vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<genJetItr>(genJetsHandle->begin(), genJetsHandle->end(),
+							 firstJetPtCut_, secondJetPtCut_);
+  double maxDeltaEta = fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
+  std::cout << "[VBFHZZllbbMCfilterValidation::analyze] max delta eta: " << maxDeltaEta << std::endl;
+
   
-  std::pair<genJetItr,genJetItr> test = 
-    vbfhzz2l2b::findJetsPair_maxInvMass<genJetItr>(genJetsHandle->begin(),
-						   genJetsHandle->end(),
-						   firstJetPtCut_,10.);
-
-  double invMass = ( (test.first)->p4() + (test.second)->p4() ).M();
-
-  std::cout << "max inv mass: " << invMass << std::endl;
-  
-  for (genJetItr genJet_itr = genJetsHandle->begin (); 
-       genJet_itr != genJetsHandle->end (); 
-       ++genJet_itr ) {
-
+  // fill proper histograms
+  if ( IDevent == HWWFusion_ || IDevent == HZZFusion_ ) {
+    VBFfirstJetPt_        -> Fill(genJetSortedColl[0].pt());    
+    VBFsecondJetPt_       -> Fill(genJetSortedColl[1].pt());
+    VBFthirdJetPt_        -> Fill(genJetSortedColl[2].pt());
+    VBFfourthJetPt_       -> Fill(genJetSortedColl[3].pt());
+    VBFmaxInvMassJetJet_  -> Fill(maxInvMass);
+    VBFmaxDeltaEtaJetJet_ -> Fill(maxDeltaEta);
+  } else if ( IDevent == HggFusion_ ) {
+    ggFfirstJetPt_        -> Fill(genJetSortedColl[0].pt());    
+    ggFsecondJetPt_       -> Fill(genJetSortedColl[1].pt());
+    ggFthirdJetPt_        -> Fill(genJetSortedColl[2].pt());
+    ggFfourthJetPt_       -> Fill(genJetSortedColl[3].pt());
+    ggFmaxInvMassJetJet_  -> Fill(maxInvMass);
+    ggFmaxDeltaEtaJetJet_ -> Fill(maxDeltaEta);
   }
+ 
 }
 
 
@@ -126,12 +146,16 @@ VBFHZZllbbMCfilterValidation::beginJob(const edm::EventSetup&)
   TFileDirectory VBFSubDir = fs->mkdir( "VBF" );
   VBFfirstJetPt_        = VBFSubDir.make<TH1D>("VBFfirstJetPt",       "1^{st} gen-jet p_{T} distribution",nbin,0., 500.); 
   VBFsecondJetPt_       = VBFSubDir.make<TH1D>("VBFsecondJetPt",      "2^{nd} gen-jet p_{T} distribution",nbin,0., 500.); 
+  VBFthirdJetPt_        = VBFSubDir.make<TH1D>("VBFthirdJetPt",       "3^{rd} gen-jet p_{T} distribution",nbin,0., 500.); 
+  VBFfourthJetPt_       = VBFSubDir.make<TH1D>("VBFfourthJetPt",      "4^{th} gen-jet p_{T} distribution",nbin,0., 500.); 
   VBFmaxDeltaEtaJetJet_ = VBFSubDir.make<TH1D>("VBFmaxDeltaEtaJetJet","maximum #Delta#eta between 2 jets",nbin,0.,  10.);
   VBFmaxInvMassJetJet_  = VBFSubDir.make<TH1D>("VBFmaxInvMassJetJet", "maximum 2 jets invariant mass",    nbin,0.,4000.);
 
   TFileDirectory ggFSubDir = fs->mkdir( "ggF" );
   ggFfirstJetPt_        = ggFSubDir.make<TH1D>("ggFfirstJetPt",       "1^{st} gen-jet p_{T} distribution",nbin,0., 500.); 
   ggFsecondJetPt_       = ggFSubDir.make<TH1D>("ggFsecondJetPt",      "2^{nd} gen-jet p_{T} distribution",nbin,0., 500.); 
+  ggFthirdJetPt_        = ggFSubDir.make<TH1D>("ggFthirdJetPt",       "3^{rd} gen-jet p_{T} distribution",nbin,0., 500.); 
+  ggFfourthJetPt_       = ggFSubDir.make<TH1D>("ggFfourthJetPt",      "4^{th} gen-jet p_{T} distribution",nbin,0., 500.); 
   ggFmaxDeltaEtaJetJet_ = ggFSubDir.make<TH1D>("ggFmaxDeltaEtaJetJet","maximum #Delta#eta between 2 jets",nbin,0.,  10.);
   ggFmaxInvMassJetJet_  = ggFSubDir.make<TH1D>("ggFmaxInvMassJetJet", "maximum 2 jets invariant mass",    nbin,0.,4000.);
 

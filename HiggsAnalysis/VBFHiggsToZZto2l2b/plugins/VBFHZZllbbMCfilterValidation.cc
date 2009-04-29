@@ -30,11 +30,10 @@ typedef reco::GenJetCollection::const_iterator genJetItr;
 // constructors and destructor
 //
 VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterSet& iConfig) :
-  whichSim_      ( iConfig.getParameter<int>           ( "whichSim"      ) ), // 0:FastSim, 1:FullSim
-  signal_        ( iConfig.getParameter<bool>          ( "signal"        ) ),
-  genJetLabel_   ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"   ) ),
-  muonLabel_     ( iConfig.getParameter<edm::InputTag> ( "muonLabel"     ) ),
-  electronLabel_ ( iConfig.getParameter<edm::InputTag> ( "electronLabel" ) ),
+  whichSim_ ( iConfig.getParameter<int>  ( "whichSim" ) ), // 0:FastSim, 1:FullSim
+  signal_   ( iConfig.getParameter<bool> ( "signal"   ) ),
+  genJetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
+  genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
   jetNumberCut_   ( iConfig.getParameter<int>    ( "jetNumberCut"   ) ),
   firstJetPtCut_  ( iConfig.getParameter<double> ( "firstJetPtCut"  ) ),
   secondJetPtCut_ ( iConfig.getParameter<double> ( "secondJetPtCut" ) ),
@@ -49,6 +48,24 @@ VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterS
   eventVBFcounter_ = 0;
   eventGGFcounter_ = 0;
 
+  jetNumberCut_eventcounter_   = 0;
+  firstJetPtCut_eventcounter_  = 0;
+  secondJetPtCut_eventcounter_ = 0;
+  invMassCut_eventcounter_     = 0;
+  deltaEtaCut_eventcounter_    = 0;
+  leptonPtCut_eventcounter_    = 0;
+  jetNumberCut_eventVBFcounter_   = 0;
+  firstJetPtCut_eventVBFcounter_  = 0;
+  secondJetPtCut_eventVBFcounter_ = 0;
+  invMassCut_eventVBFcounter_     = 0;
+  deltaEtaCut_eventVBFcounter_    = 0;
+  leptonPtCut_eventVBFcounter_    = 0;
+  jetNumberCut_eventGGFcounter_   = 0;
+  firstJetPtCut_eventGGFcounter_  = 0;
+  secondJetPtCut_eventGGFcounter_ = 0;
+  invMassCut_eventGGFcounter_     = 0;
+  deltaEtaCut_eventGGFcounter_    = 0;
+  leptonPtCut_eventGGFcounter_    = 0;
   //  gROOT->Time();
 
 }
@@ -88,7 +105,6 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
 
   edm::Handle< reco::GenJetCollection > genJetsHandle ;
   iEvent.getByLabel( genJetLabel_, genJetsHandle ) ;
-  std::cout << "genJetsHandle->size(): " << genJetsHandle->size() << std::endl;  
 
   // pt sorting
   GenJetCollection genJetSortedColl=*genJetsHandle;
@@ -98,17 +114,34 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
   std::pair<genJetItr,genJetItr> maxInvMassPair = 
     vbfhzz2l2b::findPair_maxInvMass_ptMinCut<genJetItr>(genJetsHandle->begin(), genJetsHandle->end(),
 							firstJetPtCut_, secondJetPtCut_);
-  double maxInvMass = ( (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
-  std::cout << "[VBFHZZllbbMCfilterValidation::analyze] max inv mass: " << maxInvMass << std::endl;
+  double maxInvMass = 0.;
+  if (maxInvMassPair.first != maxInvMassPair.second) 
+    maxInvMass = ( (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
 
   // looking for the highest delta eta jets pair
   std::pair<genJetItr,genJetItr> maxDeltaEtaPair = 
     vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<genJetItr>(genJetsHandle->begin(), genJetsHandle->end(),
 							 firstJetPtCut_, secondJetPtCut_);
-  double maxDeltaEta = fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
-  std::cout << "[VBFHZZllbbMCfilterValidation::analyze] max delta eta: " << maxDeltaEta << std::endl;
+  double maxDeltaEta = 0.;
+  if(maxDeltaEtaPair.first != maxDeltaEtaPair.second) 
+    maxDeltaEta = fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
 
-  
+  edm::Handle < reco::GenParticleCollection > genParticlesHandle;
+  iEvent.getByLabel( genParticleLabel_, genParticlesHandle ) ;
+
+  std::vector<reco::GenParticle> electronsVec;
+  std::vector<reco::GenParticle> muonsVec;
+
+  for ( reco::GenParticleCollection::const_iterator particle_itr = genParticlesHandle->begin();
+	particle_itr != genParticlesHandle->end(); ++particle_itr ) {
+    if ( fabs(particle_itr->pdgId()) == pythiae_  ) electronsVec.push_back (*particle_itr);
+    if ( fabs(particle_itr->pdgId()) == pythiamu_ ) muonsVec.push_back     (*particle_itr);
+  }
+
+  // pt sorting
+  std::sort(electronsVec.begin(),electronsVec.end(),PtGreater());
+  std::sort(muonsVec.begin(),muonsVec.end(),PtGreater());
+
   // fill proper histograms
   if ( IDevent == HWWFusion_ || IDevent == HZZFusion_ ) {
     VBFfirstJetPt_        -> Fill(genJetSortedColl[0].pt());    
@@ -125,7 +158,49 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
     ggFmaxInvMassJetJet_  -> Fill(maxInvMass);
     ggFmaxDeltaEtaJetJet_ -> Fill(maxDeltaEta);
   }
- 
+  if (electronsVec.size() >= 1) firstElectronPt_  -> Fill(electronsVec[0].pt()); 
+  if (electronsVec.size() >= 2) secondElectronPt_ -> Fill(electronsVec[1].pt()); 
+  if (muonsVec.size() >= 1)     firstMuonPt_      -> Fill(muonsVec[0].pt()); 
+  if (muonsVec.size() >= 2)     secondMuonPt_     -> Fill(muonsVec[1].pt()); 
+
+
+
+  // filter efficiency
+  if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventcounter_++;
+  if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventcounter_++;
+  if ( maxInvMass >= invMassCut_                   ) invMassCut_eventcounter_++;
+  if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventcounter_++;
+  if ( electronsVec.size() >= 1 ) {
+    if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventcounter_++;
+  }
+  if ( muonsVec.size() >= 1 ) {
+    if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventcounter_++;
+  }
+  
+  if ( IDevent == HWWFusion_ || IDevent == HZZFusion_ ) {
+    if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventVBFcounter_++;
+    if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventVBFcounter_++;
+    if ( maxInvMass >= invMassCut_                   ) invMassCut_eventVBFcounter_++;
+    if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventVBFcounter_++;
+    if ( electronsVec.size() >= 1 ) {
+      if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventVBFcounter_++;
+    }
+    if ( muonsVec.size() >= 1 ) {
+      if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventVBFcounter_++;
+    }
+  } else if ( IDevent == HggFusion_ ) {
+    if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventGGFcounter_++;
+    if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventGGFcounter_++;
+    if ( maxInvMass >= invMassCut_                   ) invMassCut_eventGGFcounter_++;
+    if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventGGFcounter_++;
+    if ( electronsVec.size() >= 1 ) {
+      if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventGGFcounter_++;
+    }
+    if ( muonsVec.size() >= 1 ) {
+      if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventGGFcounter_++;
+    }
+  }
+
 }
 
 
@@ -137,9 +212,8 @@ VBFHZZllbbMCfilterValidation::beginJob(const edm::EventSetup&)
   // file for output histograms
   edm::Service<TFileService> fs;
 
-  eventsNumber_    = fs->make<TH1D>("eventsNumber",   "total number of events",    1,0.,1.);
-  eventsVBFNumber_ = fs->make<TH1D>("eventsVBFNumber","total number of VBF events",1,0.,1.);
-  eventsGGFNumber_ = fs->make<TH1D>("eventsGGFNumber","total number of ggF events",1,0.,1.);
+  eventsNumber_   = fs->make<TH1D>("eventsNumber",   "total number of events",    1,0.,1.);
+  eventsIDNumber_ = fs->make<TH1D>("eventsVBFNumber","total number of VBF events",2,0.,2.);
 
   int nbin = 100;
 
@@ -171,14 +245,40 @@ VBFHZZllbbMCfilterValidation::beginJob(const edm::EventSetup&)
 void 
 VBFHZZllbbMCfilterValidation::endJob() {
 
-  std::cout << "number of events:     " << eventcounter_    << std::endl;
-  std::cout << "number of VBF events: " << eventVBFcounter_ << std::endl;
-  std::cout << "number of ggF events: " << eventGGFcounter_ << std::endl;
+  eventsNumber_   -> SetBinContent(1,eventcounter_   );
+  eventsIDNumber_ -> SetBinContent(1,eventVBFcounter_);
+  eventsIDNumber_ -> SetBinContent(2,eventGGFcounter_);
 
-  eventsNumber_    -> SetBinContent(1,eventcounter_   );
-  eventsVBFNumber_ -> SetBinContent(1,eventVBFcounter_);
-  eventsGGFNumber_ -> SetBinContent(1,eventGGFcounter_);
-
+  std::cout << "************************************************************" << std::endl;
+  std::cout << "number of events read: " << eventcounter_    << std::endl;
+  std::cout << "number of VBF events:  " << eventVBFcounter_ << " (" << double(eventVBFcounter_)/double(eventcounter_)*100. << "%)" << std::endl;
+  std::cout << "number of ggF events:  " << eventGGFcounter_ << " (" << double(eventGGFcounter_)/double(eventcounter_)*100. << "%)" << std::endl;
+  std::cout << "*** Efficiency for the various subsamples *** " <<  std::endl;
+  std::cout << "---> jet number cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(jetNumberCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(jetNumberCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(jetNumberCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "---> first jet pt cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(firstJetPtCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(firstJetPtCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(firstJetPtCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "---> second jet pt cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(secondJetPtCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(secondJetPtCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(secondJetPtCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "---> invariant mass cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(invMassCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(invMassCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(invMassCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "---> delta eta cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(deltaEtaCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(deltaEtaCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(deltaEtaCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "---> lepton pt cut" << std::endl;
+  std::cout << "     w.r.t. all events: " << double(leptonPtCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(leptonPtCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(leptonPtCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "************************************************************" << std::endl;
 }
 
 int

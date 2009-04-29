@@ -27,7 +27,6 @@ namespace vbfhzz2l2b
     return (recValue-refValue)/refValue;
   }
   
-
   void setMomentum (TLorentzVector & myvector, 
 		    const reco::Candidate & gen) {
     myvector.SetPx (gen.px ()) ;

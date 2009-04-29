@@ -24,14 +24,14 @@ namespace vbfhzz2l2b
 	 JETPROB       = 3 };
   
   
-  int bTaggerCode ( const std::string& bTagger );
+  int bTaggerCode ( const std::string& );
 
-  double resolution ( double & recValue, double & refValue );
+  double resolution ( double &, double & );
 
   bool Bhadrontable(int pdgcode);
 
-  void setMomentum (TLorentzVector & myvector, 
-		    const reco::Candidate & gen);
+  void setMomentum (TLorentzVector &, 
+		    const reco::Candidate &);
 
 
   // *********************************************************
@@ -69,7 +69,7 @@ namespace vbfhzz2l2b
   std::pair<T,T> findPair_maxInvMass_ptMinCut (const T begin, const T end,
 					       double ptMin1, double ptMin2 = -1.) {
 
-    std::pair<T,T> objPair (begin,begin) ;
+    std::pair<T,T> objPair(begin,begin) ;
     double maxInvMass = 0. ;
     // first loop over objects
     for ( T firstObj = begin; firstObj != end; ++firstObj ) {
@@ -80,7 +80,7 @@ namespace vbfhzz2l2b
 	if (secondObj->pt() < ptMin2) continue ;
 	
 	math::XYZTLorentzVector objsSumP4 = firstObj->p4 () + secondObj->p4 ();
-	
+
 	if ( objsSumP4.M () > maxInvMass ) {
 	  maxInvMass = objsSumP4.M () ;
 	  objPair.first  = firstObj ;
@@ -313,7 +313,7 @@ namespace vbfhzz2l2b
   // *** find couple of objs w/ the highest delta eta ***
   // ****************************************************
   template <typename T>
-  std::pair<T,T> findPair_maxDeltaEta_ptMinCut (const T begin, const T end) {
+  std::pair<T,T> findPair_maxDeltaEta (const T begin, const T end) {
 
     std::pair<T,T> objPair (begin,begin) ;
     double maxDeltaEta = 0. ;
@@ -335,6 +335,37 @@ namespace vbfhzz2l2b
     return objPair ;
   }
   // ------------------------------------------------------------
+
+  // ****************************************************
+  // *** find couple of objs which satisfy pt min cut ***
+  // *** w/ the highest delta eta                     ***
+  // ****************************************************
+  template <typename T>
+  std::pair<T,T> findPair_maxDeltaEta_ptMinCut (const T begin, const T end,
+						double ptMin1, double ptMin2 = -1.) {
+
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxDeltaEta = 0. ;
+    // first loop over objects
+    for ( T firstObj = begin; firstObj != end; ++firstObj ) {
+      if (firstObj->pt() < ptMin1) continue ;
+      
+      // second loop over objs
+      for ( T secondObj = firstObj + 1; secondObj != end; ++secondObj ) {
+	if (secondObj->pt() < ptMin2) continue ;
+	
+	double deltaEta = fabs(firstObj->eta() - secondObj->eta());
+	if ( deltaEta > maxDeltaEta ) {
+	  maxDeltaEta = deltaEta ;
+	  objPair.first  = firstObj ;
+	  objPair.second = secondObj ;
+	}
+      } // end second loop over objs
+    } // end first loop over objs  
+    return objPair ;
+  }
+  // ------------------------------------------------------------
+
 
   // *****************************************
   // *** find couple of objs which satisfy ***
@@ -372,36 +403,6 @@ namespace vbfhzz2l2b
   }
   // ------------------------------------------------------------
 
-  // ****************************************************
-  // *** find couple of objs which satisfy pt min cut ***
-  // *** w/ the highest delta eta                     ***
-  // ****************************************************
-  template <typename T>
-  std::pair<T,T> findPair_maxDeltaEta_ptMinCut (const T begin, const T end,
-						double ptMin1, double ptMin2 = -1.) {
-
-    std::pair<T,T> objPair (begin,begin) ;
-    double maxDeltaEta = 0. ;
-    // first loop over objects
-    for ( T firstObj = begin; firstObj != end; ++firstObj ) {
-      if (firstObj->pt() < ptMin1) continue ;
-      
-      // second loop over objs
-      for ( T secondObj = firstObj + 1; secondObj != end; ++secondObj ) {
-	if (secondObj->pt() < ptMin2) continue ;
-	
-	double deltaEta = fabs(firstObj->eta() - secondObj->eta());
-	
-	if ( deltaEta > maxDeltaEta ) {
-	  maxDeltaEta = deltaEta ;
-	  objPair.first  = firstObj ;
-	  objPair.second = secondObj ;
-	}
-      } // end second loop over objs
-    } // end first loop over objs  
-    return objPair ;
-  }
-  // ------------------------------------------------------------
 
 // --------------------------------------------------------------------
 
@@ -514,7 +515,7 @@ std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & 
       return (i.pt() > j.pt());
     }
   };
-
+  
 
 template <typename T>
 struct maxPtSorting {

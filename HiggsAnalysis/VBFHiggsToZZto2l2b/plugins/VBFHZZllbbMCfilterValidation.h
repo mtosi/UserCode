@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id: VBFHZZllbbMCfilterValidation.h,v 1.1 2009/04/28 16:45:44 tosi Exp $
+// $Id: VBFHZZllbbMCfilterValidation.h,v 1.2 2009/04/29 11:19:34 tosi Exp $
 //
 //
 
@@ -77,11 +77,30 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   unsigned int eventVBFcounter_;
   unsigned int eventGGFcounter_;
 
+  unsigned int jetNumberCut_eventcounter_;
+  unsigned int firstJetPtCut_eventcounter_;
+  unsigned int secondJetPtCut_eventcounter_;
+  unsigned int invMassCut_eventcounter_;
+  unsigned int deltaEtaCut_eventcounter_;
+  unsigned int leptonPtCut_eventcounter_;
+  unsigned int jetNumberCut_eventVBFcounter_;
+  unsigned int firstJetPtCut_eventVBFcounter_;
+  unsigned int secondJetPtCut_eventVBFcounter_;
+  unsigned int invMassCut_eventVBFcounter_;
+  unsigned int deltaEtaCut_eventVBFcounter_;
+  unsigned int leptonPtCut_eventVBFcounter_;
+  unsigned int jetNumberCut_eventGGFcounter_;
+  unsigned int firstJetPtCut_eventGGFcounter_;
+  unsigned int secondJetPtCut_eventGGFcounter_;
+  unsigned int invMassCut_eventGGFcounter_;
+  unsigned int deltaEtaCut_eventGGFcounter_;
+  unsigned int leptonPtCut_eventGGFcounter_;
+
+
   int           whichSim_;
   bool          signal_;
   edm::InputTag genJetLabel_;
-  edm::InputTag muonLabel_;
-  edm::InputTag electronLabel_;
+  edm::InputTag genParticleLabel_;
 
   int    jetNumberCut_;
   double firstJetPtCut_;
@@ -91,8 +110,7 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   double leptonPtCut_;
 
   TH1D * eventsNumber_;
-  TH1D * eventsVBFNumber_;
-  TH1D * eventsGGFNumber_;
+  TH1D * eventsIDNumber_;
 
   TH1D * VBFfirstJetPt_; 
   TH1D * VBFsecondJetPt_; 

@@ -1,11 +1,20 @@
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include <iostream>
-
+#include "Math/VectorUtil.h"
 #include "TLorentzVector.h"
 
 namespace vbfhzz2l2b
 {
+
+
+  // calculate the distance between two lorentz vectors 
+  // using DeltaR(eta, phi) or normal space angle(theta, phi)
+  double distance(const math::XYZTLorentzVector& v1, const math::XYZTLorentzVector& v2, bool useDeltaR = true) {
+    if(useDeltaR) return ROOT::Math::VectorUtil::DeltaR(v1, v2);
+    return ROOT::Math::VectorUtil::Angle(v1, v2);
+  }
+
 
   int bTaggerCode ( const std::string& bTagger ) {
     
@@ -42,7 +51,7 @@ namespace vbfhzz2l2b
   //    return deltaphi;
   //  }
   
-  bool Bhadrontable(int pdgcode) {
+  bool BhadronTable(int pdgcode) {
     bool isBhadron = false;
     int Bmeson[53] = {511,521,10511,10521,513,523,10513,10523,20513,20523,515,
 		      525,531,10531,533,10533,20533,535,541,10541,543,10543,

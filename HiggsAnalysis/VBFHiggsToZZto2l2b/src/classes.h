@@ -20,8 +20,9 @@
 #include "DataFormats/JetReco/interface/GenericJetCollection.h"
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetBTagDiscrAssociation.h"
-
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetWithBTagDiscr.h"
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleNtpleObj.h"
 
 //#include <vector>
 //#include <map>

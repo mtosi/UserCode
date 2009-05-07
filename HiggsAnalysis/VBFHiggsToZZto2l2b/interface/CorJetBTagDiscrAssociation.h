@@ -60,7 +60,7 @@ namespace vbfhzz2l2b {
       CorBTagDiscrData ();
       ~CorBTagDiscrData () {}
       double highEffDiscr_;
-      double_t highPurDiscr_;
+      double highPurDiscr_;
       double compoSVDiscr_;
       double jetProbDiscr_;
       DiscriminatorVector discrVec_;

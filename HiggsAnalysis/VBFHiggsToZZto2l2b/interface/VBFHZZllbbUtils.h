@@ -23,12 +23,15 @@ namespace vbfhzz2l2b
 	 SOFTELECTRON  = 6,
 	 JETPROB       = 3 };
   
-  
+  // calculate the distance between two lorentz vectors 
+  // using DeltaR(eta, phi) or normal space angle(theta, phi)
+  double distance(const math::XYZTLorentzVector&, const math::XYZTLorentzVector&, bool);
+
   int bTaggerCode ( const std::string& );
 
   double resolution ( double &, double & );
 
-  bool Bhadrontable(int pdgcode);
+  bool BhadronTable(int pdgcode);
 
   void setMomentum (TLorentzVector &, 
 		    const reco::Candidate &);

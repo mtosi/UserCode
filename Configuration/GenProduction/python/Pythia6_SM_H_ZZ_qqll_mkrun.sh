@@ -32,18 +32,29 @@ for k in 130; do
     echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py '********'
     echo `ls PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py`
 
-### FastSim ###
-	cmsDriver.py Configuration/GenProduction/python/PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py \
-	-s GEN,FASTSIM \
-	--pileup=NoPileUp \
-	--conditions $CONDITION \
-	--beamspot=Early10TeVCollision \
-	--datatier 'GEN-SIM-DIGI-RECO' \
+### FullSim ###
+    cmsDriver.py Configuration/GenProduction/python/PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py \
+	-s GEN,SIM,DIGI,L1,DIGI2RAW,HLT \
 	--eventcontent $EVENTCONTENT \
-	-n 1000 \
+	--datatier GEN-SIM-RAW \
+	--conditions $CONDITION \
+	-n 10 \
 	--no_exec
+    
+    sed -i -e 's/_py_/_/' PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py
+    
+### FastSim ###
+#    cmsDriver.py Configuration/GenProduction/python/PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py \
+#	-s GEN,FASTSIM \
+#	--pileup=NoPileUp \
+#	--conditions $CONDITION \
+#	--beamspot=Early10TeVCollision \
+#	--datatier 'GEN-SIM-DIGI-RECO' \
+#	--eventcontent $EVENTCONTENT \
+#	-n 1000 \
+#	--no_exec
 
-	sed -i -e "s/_py_/_/" PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_FASTSIM_IDEAL.py
+#     sed -i -e "s/_py_/_/" PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_FASTSIM_IDEAL.py
 
+echo '**************************************************************************'
 done
-echo '***********************************************************************************************'

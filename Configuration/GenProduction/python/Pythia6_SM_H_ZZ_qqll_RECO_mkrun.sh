@@ -18,19 +18,12 @@ echo datatier $DATATIER
 
 cd $CMSSW_BASE/src/Configuration/GenProduction/python/
 
-
-for k in ${HIGGSMASSLIST}; do 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py '********'
-    sed -e 's/<HIGGSMASS>/'${k}'/g' PYTHIA6_SM_H_ZZ_2l_2jets_mHTEMPLATE_10TeV_cff.py > PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py
-done
-echo '**************************************************************************'
-
 scramv1 b --reset
 echo '**************************************************************************'
 
 for k in 130; do 
 #for k in ${HIGGSMASSLIST}; do 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL.py '********'
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_RECO_IDEAL.py '********'
     echo `ls PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py`
 
 ### FullSim ###

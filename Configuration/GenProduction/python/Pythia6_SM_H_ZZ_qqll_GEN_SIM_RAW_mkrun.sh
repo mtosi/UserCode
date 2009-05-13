@@ -43,7 +43,8 @@ for k in 130; do
 	--no_exec
 
 	mv PYTHIA6_SM_H_ZZ_2l_2jets_mH130_10TeV_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL_cfg.py
-	sed -i -e 's/_py_/_/' PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL_cfg.py
+	sed -i -e 's/_py_/_/g' PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL_cfg.py
+	sed -i -e 's/_GEN_SIM_DIGI_L1_DIGI2RAW_HLT/_GEN_SIM_RAW/g' PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL_cfg.py
 done
 echo '****************************************************************************************************************'
 

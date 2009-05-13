@@ -9,15 +9,15 @@ else
 fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
-
 CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
-EVENTCONTENT="RECO" # "AODSIM"
-DATATIER="GEN-SIM-DIGI-RECO"
+EVENTCONTENT="RECOSIM"
+DATATIER="GEN-SIM-RECO"
 echo condition $CONDITION
 echo eventcontent $EVENTCONTENT
 echo datatier $DATATIER
 
 cd $CMSSW_BASE/src/Configuration/GenProduction/python/
+
 
 for k in ${HIGGSMASSLIST}; do 
     echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py '********'
@@ -28,24 +28,23 @@ echo '**************************************************************************
 scramv1 b --reset
 echo '**************************************************************************'
 
-
 for k in 130; do 
 #for k in ${HIGGSMASSLIST}; do 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py '********'
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_SIM_RAW_IDEAL.py '********'
     echo `ls PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py`
 
-### FastSim ###
+### FullSim ###
 	cmsDriver.py Configuration/GenProduction/python/PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py \
-	-s GEN:ProductionFilterSequence,FASTSIM \
-	--pileup=NoPileUp \
-	--conditions $CONDITION \
-	--beamspot=Early10TeVCollision \
-	--datatier 'GEN-SIM-DIGI-RECO' \
+	-s RAW2DIGI,RECO \
+	--filein file:gensimraw.root \    
 	--eventcontent $EVENTCONTENT \
-	-n 1000 \
+	--datatier $DATATIER \
+	--conditions $CONDITION \
+	-n 10 \
 	--no_exec
 
-	sed -i -e "s/_py_/_/" PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_GEN_FASTSIM_IDEAL.py
-
+	mv PYTHIA6_SM_H_ZZ_2l_2jets_mH130_10TeV_cff_py_RAW2DIGI_RECO_IDEAL.py PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_RECO_IDEAL_cfg.py
+	sed -i -e 's/_py_/_/' PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_py_RECO_IDEAL_cfg.py
 done
-echo '***********************************************************************************************'
+echo '****************************************************************************************************************'
+

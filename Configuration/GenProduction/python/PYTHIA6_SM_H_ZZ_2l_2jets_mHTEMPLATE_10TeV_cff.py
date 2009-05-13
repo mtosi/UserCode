@@ -11,6 +11,13 @@ generator = cms.EDFilter("Pythia6GeneratorFilter",
     comEnergy = cms.double(10000.0),
     PythiaParameters = cms.PSet(
         pythiaUESettingsBlock,
+        pythiaCMSDefaults = cms.vstring(
+             'PMAS(5,1)=4.4  ! b quarks mass', 
+             'PMAS(6,1)=172.4  ! t quarks mass', 
+             'MSTJ(1)=1      !...Fragmentation/hadronization on or off', 
+             'MSTP(61)=1     ! Parton showering on or off', 
+             'MSEL=0         ! User defined processes/Full user control'
+        ),
         processParameters = cms.vstring(
             'MSEL=0            ! User defined processes',
             'MSUB(102)=0       ! ggH', 				       
@@ -65,13 +72,14 @@ generator = cms.EDFilter("Pythia6GeneratorFilter",
         # This is a vector of ParameterSet names to be read, in this order
         parameterSets = cms.vstring(
             'pythiaUESettings',
+            'pythiaCMSDefaults',
             'processParameters'
         )
     )
 )
 
 configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     name = cms.untracked.string(
         '$Source: /cvs_server/repositories/CMSSW/UserCode/Tosi/Configuration/GenProduction/python/PYTHIA6_SM_H_ZZ_2l_2jets_mHTEMPLATE_10TeV_cff.py,v $'),
     annotation = cms.untracked.string('PYTHIA6 SM H->ZZ->2l2jets at 10TeV with mH=<HIGGSMASS> GeV')

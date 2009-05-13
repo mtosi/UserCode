@@ -10,8 +10,8 @@ fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
 CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
-EVENTCONTENT="RECOSIM"
-DATATIER="GEN-SIM-RECO"
+EVENTCONTENT="RAWSIM"
+DATATIER="GEN-SIM-RAW"
 echo condition $CONDITION
 echo eventcontent $EVENTCONTENT
 echo datatier $DATATIER
@@ -25,23 +25,26 @@ for k in 130; do
 #for k in ${HIGGSMASSLIST}; do 
     DIROUT="H${k}ZZllqq/"
 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.py '********'
-    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root`
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py '********'
+    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_GEN.root`
 
-    cmsDriver.py Reconstruction_${k}_10TeV.py \
-	-s RAW2DIGI,RECO \
+    cmsDriver.py SIM_DIGI_L1_DIGI2RAW_HLT_${k}_10TeV.py \
+	-s SIM,DIGI,L1,DIGI2RAW,HLT \
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
-	--conditions $CONDITION \ #FrontierConditions_GlobalTag,IDEAL_V11::All \
-	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
-	--fileout file:PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.root \
-	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL_cfg.py \
+	--conditions FrontierConditions_GlobalTag,IDEAL_30X::All \
+	--customise HLTrigger/Configuration/HLT_8E29_cff \
+	--processName SIM-RAW-HLT \
+	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \
+	--fileout file:PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
+	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py \
 	--mc \
 	--dirout $DIROUT \
 	-n 10 \
 	--no_exec
 
-    sed -i -e 's/Reconstruction_/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL_cfg.py
+    sed -i -e 's/SIM_DIGI_L1_DIGI2RAW_HLT/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py
+
 done
 echo '****************************************************************************************************************'
 

@@ -29,8 +29,8 @@ scramv1 b --reset
 
 echo '**************************************************************************'
 
-for k in 130; do 
-#for k in ${HIGGSMASSLIST}; do 
+#for k in 130; do 
+for k in ${HIGGSMASSLIST}; do 
     echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.py '********'
     echo `ls PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py`
 
@@ -50,15 +50,11 @@ for k in 130; do
 	-n 10 \
 	--no_exec 
 
+    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
     cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py ${DIROUT}
     cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py* ${DIROUT}
 
 done
 echo '****************************************************************************************************************'
-
-cvs add H130ZZllqq/PYTHIA6_SM_H_ZZ_2l_2jets_mH130_10TeV_GEN_IDEAL_cfg.py
-for k in ${HIGGSMASSLIST}; do 
-    echo k ${k}
-    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
 done
 cvs commit

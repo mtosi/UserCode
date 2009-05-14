@@ -58,7 +58,7 @@ echo '**************************************************************************
 
 cvs add H130ZZllqq/PYTHIA6_SM_H_ZZ_2l_2jets_mH130_10TeV_GEN_IDEAL_cfg.py
 for k in ${HIGGSMASSLIST}; do 
-
+    echo k ${k}
     cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
 done
 cvs commit

@@ -33,15 +33,14 @@ for k in 130; do
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
 	--conditions $CONDITION \
-	--customise HLTrigger/Configuration/HLT_8E29_cff \
 	--processName SIM-RAW-HLT \
 	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \
-	--fileout file:PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
+	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
 	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py \
 	--mc \
-	--dirout $DIROUT \
-	-n 10 \
-	--no_exec
+	--dirout $DIROUT 
+#	-n 10 \
+#	--no_exec
 
     sed -i -e 's/SIM_DIGI_L1_DIGI2RAW_HLT/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py
 

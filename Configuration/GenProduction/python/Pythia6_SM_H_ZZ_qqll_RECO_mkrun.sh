@@ -34,7 +34,7 @@ for k in 130; do
 	--datatier $DATATIER \
 	--conditions $CONDITION \
 	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
-	--fileout file:PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.root \
+	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.root \
 	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL_cfg.py \
 	--mc \
 	--dirout $DIROUT \

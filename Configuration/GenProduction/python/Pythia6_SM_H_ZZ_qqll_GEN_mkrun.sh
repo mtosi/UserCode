@@ -44,7 +44,7 @@ for k in 130; do
 	--datatier $DATATIER \
 	--conditions $CONDITION \
         --fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \
-	--python_filename PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py \
+	--python_filename ${DIROPUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py \
 	--mc \
 	--dirout $DIROUT \
 	-n 10 \

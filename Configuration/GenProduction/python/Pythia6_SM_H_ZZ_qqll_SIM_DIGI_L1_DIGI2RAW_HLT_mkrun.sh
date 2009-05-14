@@ -26,7 +26,7 @@ for k in 130; do
     DIROUT="H${k}ZZllqq/"
 
     echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py '********'
-    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff_GEN.root`
+    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN.root`
 
     cmsDriver.py SIM_DIGI_L1_DIGI2RAW_HLT_${k}_10TeV.py \
 	-s SIM,DIGI,L1,DIGI2RAW,HLT \

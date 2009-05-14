@@ -13,12 +13,13 @@ namespace vbfhzz2l2b {
 
   namespace SimpleNtpleObj {
 
+    /*
     class EVT;
     class JET;
     class MUON;
     class ELECTRON;
     class ZHAD;
-
+    */
     // event variables
     class EVT : public TObject {
     public:
@@ -28,6 +29,9 @@ namespace vbfhzz2l2b {
       int    Run;                   // run number
       int    Event;                 // event number
       double Ilum;                  // instantaneous luminosity (e30)
+      int    eventID;               // event ID
+                                    // VBF:123 or 124
+                                    // ggF: 102
       int    nPV;                   // number of primary vertices
       int    trigpath;              // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists). 
       // ex. 101 means main + 2nd test trigger where fired.
@@ -44,6 +48,9 @@ namespace vbfhzz2l2b {
       double   Zvertex;             // Z of the reconstructed primary vertex
       TVector2 P2met;               // Missing Et vector
       
+      int nmuon;
+      int nelectron;
+      int nZhad;
       //      ClassDef(EVT,1)
     };
 
@@ -150,8 +157,9 @@ class MUON : public TObject {
 public:
   MUON();
   ~MUON() {};
-  double isolMuonSumPt;       // sum of tracks Pt associated to isolated muon
-  int    isolMuonTrkNumber;   // number of tracks associated to isolated muon
+  TLorentzVector P4muon;            // 4-momentum of muon
+  double         isolMuonSumPt;     // sum of tracks Pt associated to isolated muon
+  int            isolMuonTrkNumber; // number of tracks associated to isolated muon
 
   //  ClassDef(MUON,1);
 };
@@ -161,9 +169,10 @@ class ELECTRON : public TObject {
 public:
   ELECTRON();
   ~ELECTRON() {};
-  double isolEleSumPt;       // sum of tracks Pt associated to isolated electron
-  int    isolEleTrkNumber;   // number of tracks associated to isolated electron
-  int    eleId;              // electron ID
+  TLorentzVector P4electron;         // 4-momentum of electron
+  double         isolEleSumPt;       // sum of tracks Pt associated to isolated electron
+  int            isolEleTrkNumber;   // number of tracks associated to isolated electron
+  int            eleId;              // electron ID
 
   //  ClassDef(ELECTRON,1);
 };

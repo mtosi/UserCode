@@ -43,7 +43,16 @@ namespace vbfhzz2l2b
     myvector.SetPz (gen.pz ()) ;
     myvector.SetE (gen.energy ()) ;
   }
+
+  void setMomentum (TLorentzVector & v1, 
+		    const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v2) {
+    v1.SetPx ( v2.Px() );
+    v1.SetPy ( v2.Py() );
+    v1.SetPz ( v2.Pz() );
+    v1.SetE  ( v2.E()  );
+  }
   
+
   //  double deltaPhi (double phi1, double phi2) {    
   //    double deltaphi=fabs(phi1-phi2);
   //    if (deltaphi > 6.283185308) deltaphi -= 6.283185308;

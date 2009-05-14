@@ -19,20 +19,26 @@
 //define this as a plug-in
 DEFINE_SEAL_MODULE () ;
 
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBTagInfoAnalyzer.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBTagInfoAnalyzer);
+
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBhadronReconstruction.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBhadronReconstruction);
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/newSimpleNtple.h"
+DEFINE_ANOTHER_FWK_MODULE(newSimpleNtple); 
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/SimpleNtple.h"
 DEFINE_ANOTHER_FWK_MODULE(SimpleNtple); 
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbDeltaRAnalyzer.h"
-DEFINE_FWK_MODULE(VBFHZZllbbDeltaRAnalyzer);
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbDeltaRAnalyzer);
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbAnalyzer.h"
-DEFINE_FWK_MODULE(VBFHZZllbbAnalyzer);
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbAnalyzer);
 
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatching.h"
-//DEFINE_FWK_MODULE(VBFHZZllbbJetMatching);
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatching.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbJetMatching);
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCfilterValidation.h"
 DEFINE_FWK_MODULE(VBFHZZllbbMCfilterValidation);
@@ -43,6 +49,12 @@ DEFINE_FWK_MODULE(VBFHZZllbbMCvalidation);
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbRAWCORBTAGtesting.h"
 DEFINE_FWK_MODULE(VBFHZZllbbRAWCORBTAGtesting);
 
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCzTObbFilter.h"
+DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMCzTObbFilter); 
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCbQuarkFilter.h"
+DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMCbQuarkFilter); 
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCprocessFilter.h"
 DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMCprocessFilter); 

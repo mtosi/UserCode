@@ -36,6 +36,9 @@ namespace vbfhzz2l2b
   void setMomentum (TLorentzVector &, 
 		    const reco::Candidate &);
 
+  void setMomentum (TLorentzVector & v1, 
+		    const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v2);
+
 
   // *********************************************************
   // *** find couple of objs w/ the highest invariant mass ***

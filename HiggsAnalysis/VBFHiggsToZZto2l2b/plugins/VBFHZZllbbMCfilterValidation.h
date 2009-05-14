@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id: VBFHZZllbbMCfilterValidation.h,v 1.2 2009/04/29 11:19:34 tosi Exp $
+// $Id: VBFHZZllbbMCfilterValidation.h,v 1.3 2009/04/29 14:06:22 tosi Exp $
 //
 //
 
@@ -80,20 +80,23 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   unsigned int jetNumberCut_eventcounter_;
   unsigned int firstJetPtCut_eventcounter_;
   unsigned int secondJetPtCut_eventcounter_;
-  unsigned int invMassCut_eventcounter_;
-  unsigned int deltaEtaCut_eventcounter_;
+  unsigned int jetpairInvMassCut_eventcounter_;
+  unsigned int jetpairDeltaEtaCut_eventcounter_;
+  unsigned int leptonEtaCut_eventcounter_;
   unsigned int leptonPtCut_eventcounter_;
   unsigned int jetNumberCut_eventVBFcounter_;
   unsigned int firstJetPtCut_eventVBFcounter_;
   unsigned int secondJetPtCut_eventVBFcounter_;
-  unsigned int invMassCut_eventVBFcounter_;
-  unsigned int deltaEtaCut_eventVBFcounter_;
+  unsigned int jetpairInvMassCut_eventVBFcounter_;
+  unsigned int jetpairDeltaEtaCut_eventVBFcounter_;
+  unsigned int leptonEtaCut_eventVBFcounter_;
   unsigned int leptonPtCut_eventVBFcounter_;
   unsigned int jetNumberCut_eventGGFcounter_;
   unsigned int firstJetPtCut_eventGGFcounter_;
   unsigned int secondJetPtCut_eventGGFcounter_;
-  unsigned int invMassCut_eventGGFcounter_;
-  unsigned int deltaEtaCut_eventGGFcounter_;
+  unsigned int jetpairInvMassCut_eventGGFcounter_;
+  unsigned int jetpairDeltaEtaCut_eventGGFcounter_;
+  unsigned int leptonEtaCut_eventGGFcounter_;
   unsigned int leptonPtCut_eventGGFcounter_;
 
 
@@ -105,8 +108,9 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   int    jetNumberCut_;
   double firstJetPtCut_;
   double secondJetPtCut_;
-  double invMassCut_;
-  double deltaEtaCut_;
+  double jetpairInvMassCut_;
+  double jetpairDeltaEtaCut_;
+  double leptonEtaCut_;
   double leptonPtCut_;
 
   TH1D * eventsNumber_;
@@ -129,6 +133,10 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
   TH1D * secondElectronPt_;
   TH1D * firstMuonPt_;
   TH1D * secondMuonPt_;
+  TH1D * firstElectronEta_;
+  TH1D * secondElectronEta_;
+  TH1D * firstMuonEta_;
+  TH1D * secondMuonEta_;
 
 };
 

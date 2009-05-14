@@ -6,6 +6,9 @@ vbfhzz2l2b::SimpleNtpleObj::EVT::EVT() :
   Run(0),                 // run number
   Event(0),               // event number
   Ilum(0.),               // instantaneous luminosity (e30)
+  eventID(0),             // event ID
+                                    // VBF:123 or 124
+                                    // ggF: 102
   nPV(0),                 // Number of vertices 
   trigpath(-1),           // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists).
                           // ex. 101 means main + 2nd test trigger where fired.
@@ -18,7 +21,11 @@ vbfhzz2l2b::SimpleNtpleObj::EVT::EVT() :
   ngoodjet(0),            // number of "good" jets in the event
   nbtag(0),               // number of tag in the event
   Zvertex(0.),            // Z of the reconstructed primary vertex
-  P2met(0.,0.)            // Missing Et vector
+  P2met(0.,0.),           // Missing Et vector
+  nmuon(0),
+  nelectron(0),
+  nZhad(0)
+
 {
 }
 
@@ -109,6 +116,7 @@ vbfhzz2l2b::SimpleNtpleObj::ZHAD::ZHAD() :
 
 // MUON
 vbfhzz2l2b::SimpleNtpleObj::MUON::MUON() :
+  P4muon(0.,0.,0.,0.), // 4-momentum of muon
   isolMuonSumPt(0.),   // sum of tracks Pt associated to isolated muon
   isolMuonTrkNumber(0) // number of tracks associated to isolated muon
 {
@@ -116,9 +124,10 @@ vbfhzz2l2b::SimpleNtpleObj::MUON::MUON() :
 
 // ELECTRON
 vbfhzz2l2b::SimpleNtpleObj::ELECTRON::ELECTRON() :
-  isolEleSumPt(0.),    // sum of tracks Pt associated to isolated electron
-  isolEleTrkNumber(0), // number of tracks associated to isolated electron
-  eleId(0)             // electron ID
+  P4electron(0.,0.,0.,0.), // 4-momentum of electron
+  isolEleSumPt(0.),        // sum of tracks Pt associated to isolated electron
+  isolEleTrkNumber(0),     // number of tracks associated to isolated electron
+  eleId(0)                 // electron ID
 {
 }
 

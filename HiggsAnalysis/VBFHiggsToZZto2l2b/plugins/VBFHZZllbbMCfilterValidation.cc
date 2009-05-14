@@ -34,12 +34,13 @@ VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterS
   signal_   ( iConfig.getParameter<bool> ( "signal"   ) ),
   genJetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
   genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
-  jetNumberCut_   ( iConfig.getParameter<int>    ( "jetNumberCut"   ) ),
-  firstJetPtCut_  ( iConfig.getParameter<double> ( "firstJetPtCut"  ) ),
-  secondJetPtCut_ ( iConfig.getParameter<double> ( "secondJetPtCut" ) ),
-  invMassCut_	  ( iConfig.getParameter<double> ( "invMassCut"     ) ),
-  deltaEtaCut_	  ( iConfig.getParameter<double> ( "deltaEtaCut"    ) ),
-  leptonPtCut_    ( iConfig.getParameter<double> ( "leptonPtCut"    ) )
+  jetNumberCut_       ( iConfig.getParameter<int>    ( "jetNumberCut"       ) ),
+  firstJetPtCut_      ( iConfig.getParameter<double> ( "firstJetPtCut"      ) ),
+  secondJetPtCut_     ( iConfig.getParameter<double> ( "secondJetPtCut"     ) ),
+  jetpairInvMassCut_  ( iConfig.getParameter<double> ( "jetpairInvMassCut"  ) ),
+  jetpairDeltaEtaCut_ ( iConfig.getParameter<double> ( "jetpairDeltaEtaCut" ) ),
+  leptonEtaCut_   ( iConfig.getParameter<double> ( "leptonEtaCut" ) ),
+  leptonPtCut_    ( iConfig.getParameter<double> ( "leptonPtCut"  ) )
 
 
 {
@@ -51,20 +52,23 @@ VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterS
   jetNumberCut_eventcounter_   = 0;
   firstJetPtCut_eventcounter_  = 0;
   secondJetPtCut_eventcounter_ = 0;
-  invMassCut_eventcounter_     = 0;
-  deltaEtaCut_eventcounter_    = 0;
+  jetpairInvMassCut_eventcounter_     = 0;
+  jetpairDeltaEtaCut_eventcounter_    = 0;
+  leptonEtaCut_eventcounter_   = 0;
   leptonPtCut_eventcounter_    = 0;
   jetNumberCut_eventVBFcounter_   = 0;
   firstJetPtCut_eventVBFcounter_  = 0;
   secondJetPtCut_eventVBFcounter_ = 0;
-  invMassCut_eventVBFcounter_     = 0;
-  deltaEtaCut_eventVBFcounter_    = 0;
+  jetpairInvMassCut_eventVBFcounter_     = 0;
+  jetpairDeltaEtaCut_eventVBFcounter_    = 0;
+  leptonEtaCut_eventVBFcounter_   = 0;
   leptonPtCut_eventVBFcounter_    = 0;
   jetNumberCut_eventGGFcounter_   = 0;
   firstJetPtCut_eventGGFcounter_  = 0;
   secondJetPtCut_eventGGFcounter_ = 0;
-  invMassCut_eventGGFcounter_     = 0;
-  deltaEtaCut_eventGGFcounter_    = 0;
+  jetpairInvMassCut_eventGGFcounter_     = 0;
+  jetpairDeltaEtaCut_eventGGFcounter_    = 0;
+  leptonEtaCut_eventGGFcounter_   = 0;
   leptonPtCut_eventGGFcounter_    = 0;
   //  gROOT->Time();
 
@@ -131,16 +135,24 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
 
   std::vector<reco::GenParticle> electronsVec;
   std::vector<reco::GenParticle> muonsVec;
+  std::vector<reco::GenParticle> leptonsVec;
 
   for ( reco::GenParticleCollection::const_iterator particle_itr = genParticlesHandle->begin();
 	particle_itr != genParticlesHandle->end(); ++particle_itr ) {
-    if ( fabs(particle_itr->pdgId()) == pythiae_  ) electronsVec.push_back (*particle_itr);
-    if ( fabs(particle_itr->pdgId()) == pythiamu_ ) muonsVec.push_back     (*particle_itr);
+    if ( fabs(particle_itr->pdgId()) == pythiae_  ) {
+      electronsVec.push_back (*particle_itr);
+      leptonsVec.push_back   (*particle_itr);
+    }
+    if ( fabs(particle_itr->pdgId()) == pythiamu_ ) {
+      muonsVec.push_back   (*particle_itr);
+      leptonsVec.push_back (*particle_itr);
+    }
   }
 
   // pt sorting
   std::sort(electronsVec.begin(),electronsVec.end(),PtGreater());
   std::sort(muonsVec.begin(),muonsVec.end(),PtGreater());
+  std::sort(leptonsVec.begin(),leptonsVec.end(),PtGreater());
 
   // fill proper histograms
   if ( IDevent == HWWFusion_ || IDevent == HZZFusion_ ) {
@@ -168,37 +180,43 @@ VBFHZZllbbMCfilterValidation::analyze(const edm::Event& iEvent, const edm::Event
   // filter efficiency
   if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventcounter_++;
   if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventcounter_++;
-  if ( maxInvMass >= invMassCut_                   ) invMassCut_eventcounter_++;
-  if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventcounter_++;
-  if ( electronsVec.size() >= 1 ) {
+  if ( maxInvMass >= jetpairInvMassCut_            ) jetpairInvMassCut_eventcounter_++;
+  if ( maxDeltaEta >= jetpairDeltaEtaCut_          ) jetpairDeltaEtaCut_eventcounter_++;
+  /*
+  if ( electronsVec.size() >= 1 ) 
     if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventcounter_++;
-  }
-  if ( muonsVec.size() >= 1 ) {
+  if ( muonsVec.size() >= 1 ) 
     if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventcounter_++;
-  }
-  
+  */
+  if ( leptonsVec.size() >= 1 )
+    if ( leptonsVec[0].pt() >= leptonPtCut_        ) leptonPtCut_eventcounter_++;
   if ( IDevent == HWWFusion_ || IDevent == HZZFusion_ ) {
     if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventVBFcounter_++;
     if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventVBFcounter_++;
-    if ( maxInvMass >= invMassCut_                   ) invMassCut_eventVBFcounter_++;
-    if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventVBFcounter_++;
-    if ( electronsVec.size() >= 1 ) {
+    if ( maxInvMass >= jetpairInvMassCut_            ) jetpairInvMassCut_eventVBFcounter_++;
+    if ( maxDeltaEta >= jetpairDeltaEtaCut_          ) jetpairDeltaEtaCut_eventVBFcounter_++;
+    /*
+    if ( electronsVec.size() >= 1 ) 
       if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventVBFcounter_++;
-    }
-    if ( muonsVec.size() >= 1 ) {
+    if ( muonsVec.size() >= 1 )
       if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventVBFcounter_++;
-    }
+    */
+    if ( leptonsVec.size() >= 1 )
+      if ( leptonsVec[0].pt() >= leptonPtCut_        ) leptonPtCut_eventVBFcounter_++;
   } else if ( IDevent == HggFusion_ ) {
     if ( genJetSortedColl[0].pt() >= firstJetPtCut_  ) firstJetPtCut_eventGGFcounter_++;
     if ( genJetSortedColl[1].pt() >= secondJetPtCut_ ) secondJetPtCut_eventGGFcounter_++;
-    if ( maxInvMass >= invMassCut_                   ) invMassCut_eventGGFcounter_++;
-    if ( maxDeltaEta >= deltaEtaCut_                 ) deltaEtaCut_eventGGFcounter_++;
-    if ( electronsVec.size() >= 1 ) {
+    if ( maxInvMass >= jetpairInvMassCut_            ) jetpairInvMassCut_eventGGFcounter_++;
+    if ( maxDeltaEta >= jetpairDeltaEtaCut_          ) jetpairDeltaEtaCut_eventGGFcounter_++;
+    /*
+    if ( electronsVec.size() >= 1 ) 
       if ( electronsVec[0].pt() >= leptonPtCut_      ) leptonPtCut_eventGGFcounter_++;
-    }
-    if ( muonsVec.size() >= 1 ) {
+    if ( muonsVec.size() >= 1 ) 
       if ( muonsVec[0].pt() >= leptonPtCut_          ) leptonPtCut_eventGGFcounter_++;
-    }
+    */
+    if ( leptonsVec.size() >= 1 )
+      if ( leptonsVec[0].pt() >= leptonPtCut_        ) leptonPtCut_eventGGFcounter_++;
+
   }
 
 }
@@ -267,13 +285,13 @@ VBFHZZllbbMCfilterValidation::endJob() {
   std::cout << "     w.r.t. VBF events: " << double(secondJetPtCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
   std::cout << "     w.r.t. ggF events: " << double(secondJetPtCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
   std::cout << "---> invariant mass cut" << std::endl;
-  std::cout << "     w.r.t. all events: " << double(invMassCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
-  std::cout << "     w.r.t. VBF events: " << double(invMassCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
-  std::cout << "     w.r.t. ggF events: " << double(invMassCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. all events: " << double(jetpairInvMassCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(jetpairInvMassCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(jetpairInvMassCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
   std::cout << "---> delta eta cut" << std::endl;
-  std::cout << "     w.r.t. all events: " << double(deltaEtaCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
-  std::cout << "     w.r.t. VBF events: " << double(deltaEtaCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
-  std::cout << "     w.r.t. ggF events: " << double(deltaEtaCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. all events: " << double(jetpairDeltaEtaCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. VBF events: " << double(jetpairDeltaEtaCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 
+  std::cout << "     w.r.t. ggF events: " << double(jetpairDeltaEtaCut_eventGGFcounter_)/double(eventGGFcounter_)*100. << "%" << std::endl; 
   std::cout << "---> lepton pt cut" << std::endl;
   std::cout << "     w.r.t. all events: " << double(leptonPtCut_eventcounter_)/double(eventcounter_)*100. << "%" << std::endl; 
   std::cout << "     w.r.t. VBF events: " << double(leptonPtCut_eventVBFcounter_)/double(eventVBFcounter_)*100. << "%" << std::endl; 

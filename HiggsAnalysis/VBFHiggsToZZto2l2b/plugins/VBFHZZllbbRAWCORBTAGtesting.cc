@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Mon Feb  2 17:31:44 CET 2009
-// $Id$
+// $Id: VBFHZZllbbRAWCORBTAGtesting.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
 //
 //
 
@@ -106,12 +106,6 @@ VBFHZZllbbRAWCORBTAGtesting::analyze(const edm::Event& iEvent, const edm::EventS
 
   edm::Handle<reco::CaloJetCollection> corrCaloJetHandle;
   iEvent.getByLabel(corrCaloJetLabel_,corrCaloJetHandle);
-
-//  for (unsigned int iModule = 0; iModule != bTagConfigLabel_.size(); ++iModule) {
-//    string dataFormatType = "JetTag";
-//    InputTag bTagLabel = bTagConfigLabel_[iModule].getParameter<InputTag>("label");
-//    bJetTagInputTags_.push_back( bTagLabel );
-//  }
 
   edm::Handle<reco::MuonCollection> muonHandle;
   iEvent.getByLabel(muonLabel_,muonHandle);

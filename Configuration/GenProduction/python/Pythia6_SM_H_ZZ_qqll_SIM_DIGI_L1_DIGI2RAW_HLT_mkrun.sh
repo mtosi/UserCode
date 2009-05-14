@@ -32,7 +32,7 @@ for k in 130; do
 	-s SIM,DIGI,L1,DIGI2RAW,HLT \
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
-	--conditions FrontierConditions_GlobalTag,IDEAL_30X::All \
+	--conditions $CONDITION \
 	--customise HLTrigger/Configuration/HLT_8E29_cff \
 	--processName SIM-RAW-HLT \
 	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \

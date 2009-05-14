@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id$
+// $Id: VBFHZZllbbMCvalidation.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
 //
 //
 
@@ -73,7 +73,7 @@ VBFHZZllbbMCvalidation::analyze(const edm::Event& iEvent, const edm::EventSetup&
 {
   using namespace edm;
   using namespace reco;
-  using namespace anaobj;
+  using namespace vbfhzz2l2b;
   using namespace std;
 
   eventcounter_++;

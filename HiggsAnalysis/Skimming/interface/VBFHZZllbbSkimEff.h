@@ -41,6 +41,14 @@ class VBFHZZllbbSkimEff : public edm::EDAnalyzer {
  private:
   // input tag
   bool debug_;
+
+  // gen particle
+  edm::InputTag MCParticleLabel_;
+  // reco samples
+  edm::InputTag muonLabel_;
+  edm::InputTag electronLabel_;
+
+  // minimum lepton Pt and number for skimming 
   double tightLeptonMinPt_;
   double softLeptonMinPt_;
   int tightLeptonMinNumber_;
@@ -51,12 +59,6 @@ class VBFHZZllbbSkimEff : public edm::EDAnalyzer {
   int nSelTwoE_, nSelTwoM_, nSelTwoL_, nSelTau_;
   int nTwoE_, nTwoM_, nTwoL_, nTau_;
   int nOutE_, nOutM_, nOutTau_;
-
-  // gen particle
-  edm::InputTag MCParticleLabel_;
-  // reco samples
-  edm::InputTag muonLabel_;
-  edm::InputTag electronLabel_;
 };
 
 #endif

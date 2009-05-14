@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id$
+// $Id: VBFHZZllbbMCvalidation.h,v 1.2 2009/04/28 16:45:01 tosi Exp $
 //
 //
 
@@ -32,9 +32,9 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-#include "AnalysisExamples/AnalysisObjects/interface/PythiaParticleIndex.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesMass.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesCharge.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesMass.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesCharge.h"
 
 // Root includes
 // -------------

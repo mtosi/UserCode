@@ -2,9 +2,9 @@
 #define LISTFASHIONATTRIBUTEDHISTO_H
 
 #include <iostream>
-#include "AnalysisExamples/AnalysisClasses/interface/FashionAttributedHisto.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/FashionAttributedHisto.h"
 
-namespace anaobj {
+namespace vbfhzz2l2b {
 
   template <class T>  
     class H160 : public FashionAttributedHisto<T> {

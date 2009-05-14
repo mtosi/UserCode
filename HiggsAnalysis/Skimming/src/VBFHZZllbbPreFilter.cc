@@ -22,7 +22,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-#include "AnalysisExamples/AnalysisObjects/interface/PythiaParticleIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
 
 // C++
 #include <iostream>
@@ -31,7 +31,7 @@
 using namespace std;
 using namespace edm;
 using namespace reco;
-using namespace anaobj;
+using namespace vbfhzz2l2b;
 
 
 // Constructor

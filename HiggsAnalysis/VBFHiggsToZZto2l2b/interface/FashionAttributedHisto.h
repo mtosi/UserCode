@@ -3,7 +3,7 @@
 
 #include "TH1.h"
 
-namespace anaobj {
+namespace vbfhzz2l2b {
   
   template <class T>
     class FashionAttributedHisto : 

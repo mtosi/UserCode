@@ -15,15 +15,15 @@
 #include "TH1.h"
 #include "Riostream.h"
 
-#include "AnalysisExamples/AnalysisClasses/interface/findObj.h"
-#include "AnalysisExamples/AnalysisClasses/interface/mergeObj.h"
-#include "AnalysisExamples/AnalysisClasses/interface/THStackLegend.h"
-#include "AnalysisExamples/AnalysisClasses/interface/ListFashionAttributedHisto.h"
-#include "AnalysisExamples/AnalysisObjects/interface/xSecLO.h"
-#include "AnalysisExamples/AnalysisObjects/interface/xSecNLO.h"
-#include "AnalysisExamples/AnalysisObjects/interface/BR.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/findObj.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/mergeObj.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/THStackLegend.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ListFashionAttributedHisto.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/xSecLO.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/xSecNLO.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BR.h"
 
-using namespace anaobj;
+using namespace vbfhzz2l2b;
 
 void plotDummy(TString outputFileName = "plotDummy.root") {
 
@@ -62,9 +62,9 @@ void plotDummy(TString outputFileName = "plotDummy.root") {
     // ************************************************************
   // List of xSec (in pb)
   // stored in 
-  // "AnalysisExamples/AnalysisObjects/interface/xSecLO.h"
-  // "AnalysisExamples/AnalysisObjects/interface/xSecNLO.h"
-  // "AnalysisExamples/AnalysisObjects/interface/BR.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/xSecLO.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/xSecNLO.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BR.h"
   std::vector<double> sgnCrossSections;
   std::vector<double> bkgZZCrossSections;
   sgnCrossSections.push_back(1000*xSec_VBFH200_*BR_H200ZZ_);

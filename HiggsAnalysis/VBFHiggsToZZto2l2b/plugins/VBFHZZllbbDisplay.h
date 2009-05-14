@@ -27,9 +27,9 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
-#include "AnalysisExamples/AnalysisObjects/interface/PythiaParticleIndex.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesMass.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesCharge.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesMass.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesCharge.h"
 
 
 //root include

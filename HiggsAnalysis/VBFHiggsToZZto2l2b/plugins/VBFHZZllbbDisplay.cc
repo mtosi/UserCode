@@ -52,7 +52,7 @@ VBFHZZllbbDisplay::analyze (const edm::Event& iEvent,
 
   using namespace reco;
   using namespace std;
-  using namespace anaobj;
+  using namespace vbfhzz2l2b;
 
   eventcounter_++;
   /*

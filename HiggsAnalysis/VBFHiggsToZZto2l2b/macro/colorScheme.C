@@ -7,12 +7,12 @@
 #include "TLegend.h"
 #include "Riostream.h"
 
-#include "AnalysisExamples/AnalysisClasses/interface/ListFashionAttributedHisto.h"
-//#include "AnalysisExamples/AnalysisClasses/interface/FashionAttributedHisto.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ListFashionAttributedHisto.h"
+//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/FashionAttributedHisto.h"
 
 void colorScheme() {
 
-  using namespace anaobj;
+  using namespace vbfhzz2l2b;
 
   // general root setting
   gROOT->Reset(); 

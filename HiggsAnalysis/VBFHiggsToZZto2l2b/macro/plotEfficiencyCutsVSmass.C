@@ -6,14 +6,14 @@
 #include "TLine.h"
 #include "Riostream.h"
 
-#include "AnalysisExamples/AnalysisClasses/interface/findObj.h"
-#include "AnalysisExamples/AnalysisClasses/interface/THStackLegend.h"
-#include "AnalysisExamples/AnalysisClasses/interface/ListFashionAttributedHisto.h"
-#include "AnalysisExamples/AnalysisObjects/interface/xSecLO.h"
-#include "AnalysisExamples/AnalysisObjects/interface/xSecNLO.h"
-#include "AnalysisExamples/AnalysisObjects/interface/BR.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/findObj.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/THStackLegend.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ListFashionAttributedHisto.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/xSecLO.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/xSecNLO.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/BR.h"
 
-using namespace anaobj;
+using namespace vbfhzz2l2b;
 
 void plotEfficiencyCutsVSmass(TString outputFileName = "plotEfficiencyVSmassOutput.root") {
 
@@ -50,9 +50,9 @@ void plotEfficiencyCutsVSmass(TString outputFileName = "plotEfficiencyVSmassOutp
     // ************************************************************
   // List of xSec (in pb)
   // stored in 
-  // "AnalysisExamples/AnalysisObjects/interface/xSecLO.h"
-  // "AnalysisExamples/AnalysisObjects/interface/xSecNLO.h"
-  // "AnalysisExamples/AnalysisObjects/interface/BR.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/xSecLO.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/xSecNLO.h"
+  // "HiggsAnalysis/VBFHiggsToZZto2l2bs/interface/BR.h"
   std::vector<double> crossSections;
   crossSections.push_back(1000*xSec_VBFH160_*BR_H160ZZ_);
   crossSections.push_back(1000*xSec_VBFH200_*BR_H200ZZ_);

@@ -29,19 +29,19 @@
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 
 // Classes to be stored
-#include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
-#include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
-#include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BaseJet.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BaseMEt.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/OfflineMEt.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/OfflineJet.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/MCParticle.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/GlobalMuon.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleElectron.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleTau.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/Summary.h"
 
-#include "AnalysisExamples/AnalysisObjects/interface/PythiaParticleIndex.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesMass.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesCharge.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesMass.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesCharge.h"
 
 #endif
 
@@ -49,7 +49,7 @@ int plotGlobalMuons ( int sample = 0 ) {
 
   using namespace std;
   using namespace edm;
-  using namespace anaobj;
+  using namespace vbfhzz2l2b;
 
   // general root setting
   gROOT->Reset(); 
@@ -100,7 +100,7 @@ int plotGlobalMuons ( int sample = 0 ) {
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS160_ZZ_8.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS160_ZZ_9.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS160_ZZ_10.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(2):
     sampleName = "VBFH200ZZ";
@@ -115,7 +115,7 @@ int plotGlobalMuons ( int sample = 0 ) {
     events.Add("eventRootFile/VBFHIGGS200_ZZ_8.root");
     events.Add("eventRootFile/VBFHIGGS200_ZZ_9.root");
     events.Add("eventRootFile/VBFHIGGS200_ZZ_10.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(3):
     sampleName = "VBFH400ZZ";
@@ -130,7 +130,7 @@ int plotGlobalMuons ( int sample = 0 ) {
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS400_ZZ_8.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS400_ZZ_9.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS400_ZZ_10.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(4):
     sampleName = "VBFH800ZZ";
@@ -145,7 +145,7 @@ int plotGlobalMuons ( int sample = 0 ) {
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS800_ZZ_8.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS800_ZZ_9.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/HIGGS_ZZ/VBFHIGGS800_ZZ_10.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(10):
     sampleName = "ZZ_0JETS";
@@ -153,28 +153,28 @@ int plotGlobalMuons ( int sample = 0 ) {
     // input files
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_0JETS/ZZ_0JETS_1.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_0JETS/ZZ_0JETS_2.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(11):
     sampleName = "ZZ_1JETS";
     castorSubDirectory = sampleName+"/";
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_1JETS/ZZ_1JETS_1.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_1JETS/ZZ_1JETS_2.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(12):
     sampleName = "ZZ_2JETS";
     castorSubDirectory = sampleName+"/";
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_2JETS/ZZ_2JETS_1.root");
     //    events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_2JETS/ZZ_2JETS_2.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
     break;
   case(13):
     sampleName = "ZZ_3JETS";
     castorSubDirectory = sampleName+"/";
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_3JETS/ZZ_3JETS_1.root");
     events.Add("castor:/castor/cern.ch/user/t/tosi/FastSim/NOPU/ZZ_3JETS/ZZ_3JETS_2.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD1.obj",&gloMuon_vec,&gloMuon_B);
     break;
   default:
     sampleName = "VBFH200ZZ";
@@ -189,7 +189,7 @@ int plotGlobalMuons ( int sample = 0 ) {
     events.Add("eventRootFile/VBFHIGGS200_ZZ_8.root");
     events.Add("eventRootFile/VBFHIGGS200_ZZ_9.root");
     events.Add("eventRootFile/VBFHIGGS200_ZZ_10.root");
-    events.SetBranchAddress("anaobjGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
+    events.SetBranchAddress("vbfhzz2l2bGlobalMuons_offlineProd_globalMuons_PROD.obj",&gloMuon_vec,&gloMuon_B);
   }
 
   // output file

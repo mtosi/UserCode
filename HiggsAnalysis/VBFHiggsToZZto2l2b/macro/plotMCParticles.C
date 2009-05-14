@@ -28,17 +28,17 @@
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 
 // Classes to be stored
-#include "AnalysisExamples/AnalysisObjects/interface/BaseJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/BaseMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineMEt.h"
-#include "AnalysisExamples/AnalysisObjects/interface/OfflineJet.h"
-#include "AnalysisExamples/AnalysisObjects/interface/MCParticle.h"
-#include "AnalysisExamples/AnalysisObjects/interface/GlobalMuon.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleElectron.h"
-#include "AnalysisExamples/AnalysisObjects/interface/SimpleTau.h"
-#include "AnalysisExamples/AnalysisObjects/interface/Summary.h"
-#include "AnalysisExamples/AnalysisObjects/interface/PythiaParticleIndex.h"
-#include "AnalysisExamples/AnalysisObjects/interface/ParticlesMass.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BaseJet.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/BaseMEt.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/OfflineMEt.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/OfflineJet.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/MCParticle.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/GlobalMuon.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleElectron.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleTau.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/Summary.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ParticlesMass.h"
 
 #endif
 
@@ -46,7 +46,7 @@ int plotMCParticles () {
 
   using namespace std;
   using namespace edm;
-  using namespace anaobj;
+  using namespace vbfhzz2l2b;
 
   // setting overflow, underflow and other options
   gStyle->SetOptStat("nemrou");
@@ -79,7 +79,7 @@ int plotMCParticles () {
   //MCParticles
   std::vector<MCParticle> mcparticle_vec;
   TBranch* mcparticle_B;
-  events.SetBranchAddress("anaobjMCParticles_offlineProd_MCParticles_PROD.obj",&mcparticle_vec,&mcparticle_B);
+  events.SetBranchAddress("vbfhzz2l2bMCParticles_offlineProd_MCParticles_PROD.obj",&mcparticle_vec,&mcparticle_B);
 
   // MC particles  histogram
   TH1F * histo_mcPid  = new TH1F ("mcPid",  "MC particle id",                                42, -16.,   26.);

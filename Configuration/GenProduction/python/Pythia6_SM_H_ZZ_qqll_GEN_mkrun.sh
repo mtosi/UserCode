@@ -50,11 +50,10 @@ for k in ${HIGGSMASSLIST}; do
 	-n 10 \
 	--no_exec 
 
-    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
+#    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
     cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py ${DIROUT}
     cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py* ${DIROUT}
-
 done
 echo '****************************************************************************************************************'
-done
-cvs commit
+
+#cvs commit

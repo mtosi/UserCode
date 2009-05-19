@@ -42,10 +42,11 @@
 <use name=TrackingTools/TransientTrack>
 <use name=rootgraphics>
 <use name=rootmath>
+<use name=rootrflx>
 <use name=clhep>
 <use name=hepmc>
 <use name=heppdt>
-#<flags EDM_PLUGIN=1>
+<Flags CXXFLAGS="-ggdb">
 <export>
    <lib name=HiggsAnalysisVBFHiggsToZZto2l2b>
    <use name=FWCore/Framework>

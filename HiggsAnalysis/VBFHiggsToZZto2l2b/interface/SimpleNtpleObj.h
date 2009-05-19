@@ -13,13 +13,12 @@ namespace vbfhzz2l2b {
 
   namespace SimpleNtpleObj {
 
-    /*
     class EVT;
     class JET;
     class MUON;
     class ELECTRON;
     class ZHAD;
-    */
+
     // event variables
     class EVT : public TObject {
     public:

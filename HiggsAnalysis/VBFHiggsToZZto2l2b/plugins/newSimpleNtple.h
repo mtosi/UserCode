@@ -66,10 +66,12 @@ class newSimpleNtple : public edm::EDAnalyzer {
 
   // ----------member data ---------------------------
   TTree *mytree_;
-
   int evtID_;
+
   // tag jets
-  float invMassTagJet_;
+  std::vector<double> * invMassTagJet_;
+  std::vector<double> * deltaEtaTagJet_;
+  std::vector<double> * zeppenfeldTagJet_;
 
 
   TLorentzVector myvector_ ;

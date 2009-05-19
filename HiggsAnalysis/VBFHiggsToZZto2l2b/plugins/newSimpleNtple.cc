@@ -99,14 +99,9 @@ newSimpleNtple::newSimpleNtple(const edm::ParameterSet& iConfig) :
   if ( corIC5PFJetsWithBTagFlag_ ) 
     corIC5PFJetsWithBTagLabel_ = iConfig.getParameter<std::string> ( "corIC5PFJetsWithBTagLabel" );
  
-  std::cout << "[newSimpleNtple::newSimpleNtple]" << std::endl;
   //now do what ever initialization is needed
-  /*
   edm::Service<TFileService> fs ;
   mytree_  = fs->make <TTree>("VBFSimpleTree","VBFSimpleTree"); 
-  */
-  mytree_  = new TTree("VBFSimpleTree","VBFSimpleTree"); 
-  std::cout << "[newSimpleNtple::newSimpleNtple] DONE" << std::endl;
 
 }
 
@@ -120,12 +115,15 @@ newSimpleNtple::~newSimpleNtple()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
-//  delete CloneEvt_;
-//  delete CloneJet_;
-//  delete CloneMuon_;
-//  delete CloneElectron_;
-//  delete CloneZhad_;
+  delete CloneEvt_;
+  delete CloneJet_;
+  delete CloneMuon_;
+  delete CloneElectron_;
+  delete CloneZhad_;
 
+  delete invMassTagJet_;   
+  delete deltaEtaTagJet_;  
+  delete zeppenfeldTagJet_;
   delete m_tagJets;
   delete m_MET;
   delete m_tracks;
@@ -157,12 +155,12 @@ newSimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   FillZhad                   (iEvent, iSetup);
   FillZlep                   (iEvent, iSetup);
   FillMet                    (iEvent, iSetup);
-  FillTagJet                 (iEvent, iSetup);
+  FillTagJet                 (iEvent, iSetup); // not implemented yet
   if ( corIC5PFJetsWithBTagFlag_ )
     FillcorIC5PFJetsWithBTag (iEvent, iSetup);   
   if ( whichSim_ == FULLSIM )
     FillTracks (iEvent, iSetup);
-  FillGenParticles (iEvent, iSetup);
+  FillGenParticles (iEvent, iSetup); // got an error message in execution
   FillGenJet       (iEvent, iSetup);
   FillGenMet       (iEvent, iSetup);
   
@@ -176,11 +174,10 @@ newSimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 void newSimpleNtple::InitObjs() {
   evtID_ = 0;
 
-  /*
   // event obj
   CloneEvt_->Clear();
   evt_ = new ((*CloneEvt_)[0]) EVT();
-
+  
   // jet objs
   CloneJet_->Clear();
   for ( unsigned int index = 0; index < 100; index++ ) 
@@ -200,7 +197,12 @@ void newSimpleNtple::InitObjs() {
   CloneZhad_->Clear();
   for ( unsigned int index = 0; index < 10; index++ ) 
     Zhad_ =new ((*CloneZhad_)[index]) ZHAD();
-  */
+  
+
+  invMassTagJet_    -> clear () ;
+  deltaEtaTagJet_   -> clear () ;
+  zeppenfeldTagJet_ -> clear () ;
+
   m_tagJets      -> Clear () ;
   m_MET          -> Clear () ;
   m_tracks       -> Clear () ;
@@ -212,9 +214,10 @@ void newSimpleNtple::InitObjs() {
 
 void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  edm::Handle<edm::EventAuxiliary> eventAuxiliaryHandle;
-  iEvent.getByLabel("EventAuxiliary",eventAuxiliaryHandle);
-  std::cout << "eventAuxiliaryHandle->run(): " << eventAuxiliaryHandle->run() << std::endl;
+  //  edm::Handle<edm::EventAuxiliary> eventAuxiliaryHandle;
+  //  iEvent.getByLabel("EventAuxiliary",eventAuxiliaryHandle);
+  //  std::cout << "eventAuxiliaryHandle->run(): " << eventAuxiliaryHandle->run() << std::endl;
+
 
   std::cout << "[newSimpleNtple::FillEvent]" << std::endl;
   if ( whichSim_ == FULLSIM ) {
@@ -239,11 +242,13 @@ void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& 
     std::cout << "--> WARNING: simulation not specificied!!" << std::endl;
   }
 
-
-//  evt_->Run     = eventAuxiliaryHandle->run();             // run number
-//  evt_->Event   = eventAuxiliaryHandle->event();           // event number
+  int run   = iEvent.id().run();
+  int event = iEvent.id().event();
+  std::cout << "event id: " << iEvent.id() << " -->run: " << run << " and event: " << event <<std::endl;
+  evt_->Run     = iEvent.id().run();             // run number
+  evt_->Event   = iEvent.id().event();           // event number
 //  evt_->Ilum    = eventAuxiliaryHandle->luminosityBlock(); // instantaneous luminosity (e30)
-//  evt_->eventID = evtID;
+  evt_->eventID = evtID_;
 //  evt_->nPV;            // number of primary vertex
 //  evt_->trigpath;       // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists). Ex 101 means main + 2nd test trigger where fired.
 //  
@@ -338,13 +343,55 @@ void newSimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup&
 
   std::cout << "[newSimpleNtple::FillTagJet]" << std::endl;
 
-  edm::Handle<reco::RecoChargedCandidateCollection> tagJetHandle;
+  //  edm::Handle<reco::RecoChargedCandidateCollection> tagJetHandle;
+  edm::Handle<reco::CaloJetCollection> tagJetHandle;
   iEvent.getByLabel (tagJetLabel_, tagJetHandle) ;
-  
-  math::XYZTLorentzVector sumLV = (*tagJetHandle)[0].p4() + (*tagJetHandle)[1].p4() ;
-  invMassTagJet_ = sumLV.M();
+
+  typedef reco::CaloJetCollection::const_iterator tagJetItr;  
+
+  // looking for the highest invariant mass jets pair
+  std::pair<tagJetItr,tagJetItr> maxInvMassPair = 
+    vbfhzz2l2b::findPair_maxInvMass_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							20., 15.);
+
+  double invMass    = -99.;
+  double deltaEta   = -99.;
+  double zeppenfeld = -999.;
+  if (maxInvMassPair.first != maxInvMassPair.second) {
+    invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
+    zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+  }
+  invMassTagJet_->push_back(invMass);
+  deltaEtaTagJet_->push_back(deltaEta);
+  zeppenfeldTagJet_->push_back(zeppenfeld);
+
+  // looking for the highest delta eta jets pair
+  std::pair<tagJetItr,tagJetItr> maxDeltaEtaPair = 
+    vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							 20., 15.);
+  invMass    = -99.;
+  deltaEta   = -99.;
+  zeppenfeld = -999.;
+  if(maxDeltaEtaPair.first != maxDeltaEtaPair.second) {
+    invMass    =  (     (maxDeltaEtaPair.first)->p4() + ((maxDeltaEtaPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
+    zeppenfeld =  (     (maxDeltaEtaPair.first)->pz() * (maxDeltaEtaPair.second)->pz() );
+  }
+
 
   TClonesArray &jetTag = *m_tagJets;
+  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
+  new (jetTag[0]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
+  new (jetTag[1]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
+  new (jetTag[2]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
+  new (jetTag[3]) TLorentzVector (myvector_);
+  
+
+  /*
   int counter = 0;
   for (RecoChargedCandidateCollection::const_iterator jet_itr = tagJetHandle->begin (); 
        jet_itr != tagJetHandle->end (); ++jet_itr ) { 
@@ -353,6 +400,7 @@ void newSimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup&
     new (jetTag[counter]) TLorentzVector (myvector_);
     counter++;
   }
+  */
 }
 // --------------------------------------------------------------------
 
@@ -510,8 +558,8 @@ void newSimpleNtple::FillGenJet(const edm::Event& iEvent, const edm::EventSetup&
 void newSimpleNtple::FillGenMet(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-  std::cout << "newSimpleNtple::FillGenMet" << std::endl;
- edm::Handle< reco::GenMETCollection > genMetHandle ;
+  std::cout << "[newSimpleNtple::FillGenMet]" << std::endl;
+  edm::Handle< reco::GenMETCollection > genMetHandle ;
  iEvent.getByLabel( genMetLabel_, genMetHandle ) ;
 
  TClonesArray &genMets = *m_genMet;
@@ -527,6 +575,7 @@ void newSimpleNtple::FillGenMet(const edm::Event& iEvent, const edm::EventSetup&
   new (genMets[counter]) TLorentzVector (myvector_);
   counter++;
  }
+  std::cout << "[newSimpleNtple::FillGenMet] DONE" << std::endl;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -537,24 +586,27 @@ void newSimpleNtple::beginJob(const edm::EventSetup& iSetup)
 
   std::cout << "[newSimpleNtple::beginJob]" << std::endl;
 
-  //  CloneEvt_ = new TClonesArray("EVT");
-  std::cout << "[newSimpleNtple::beginJob] DONE w/ CloneEvt_" << std::endl;
-  /*
+  CloneEvt_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::EVT");
   mytree_->Branch("EVT","TClonesArray",&CloneEvt_,256000,0);
-  std::cout << "[newSimpleNtple::beginJob] DONE w/ CloneEvt_" << std::endl;
-  CloneJet_ = new TClonesArray("JET");
+  CloneJet_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::JET");
   mytree_->Branch("JET","TClonesArray",&CloneJet_,256000,0);
-  CloneMuon_ = new TClonesArray("MUON");
+  CloneMuon_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::MUON");
   mytree_->Branch("MUON","TClonesArray",&CloneMuon_,256000,0);
-  CloneElectron_ = new TClonesArray("ELECTRON");
+  CloneElectron_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::ELECTRON");
   mytree_->Branch("ELECTRON","TClonesArray",&CloneElectron_,256000,0);
-  CloneZhad_ = new TClonesArray("ZHAD");
+  CloneZhad_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::ZHAD");
   mytree_->Branch("ZHAD","TClonesArray",&CloneZhad_,256000,0);
-  */
+  
 
   // vector with the 2 tag TLorentzVectors
   m_tagJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("tagJets", "TClonesArray", &m_tagJets, 256000,0);
+  invMassTagJet_    = new std::vector<double>;  
+  deltaEtaTagJet_   = new std::vector<double>;
+  zeppenfeldTagJet_ = new std::vector<double>;
+  mytree_->Branch("tagJets", "TClonesArray", &m_tagJets, 256000,0);
+  mytree_->Branch("invMassTagJet",   "std::vector<double>",&invMassTagJet_   );
+  mytree_->Branch("deltaEtaTagJet",  "std::vector<double>",&deltaEtaTagJet_  );
+  mytree_->Branch("zeppenfeldTagJet","std::vector<double>",&zeppenfeldTagJet_);
 
   // vector of the TLorentz Vectors of other jets
   m_MET = new TClonesArray ("TLorentzVector");

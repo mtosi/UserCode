@@ -158,18 +158,14 @@ SimpleNtple::~SimpleNtple()
   delete tagjetEmFrac_;
   delete tagjetChFrac_;
   delete tagjetCorEt_;
-  delete tagjetEt_;
   delete tagjetCorPt_;
-  delete tagjetPt_;
 
   delete btagjetP4_;
   delete btagjetVtxP3_; 
   delete btagjetEmFrac_;
   delete btagjetChFrac_;
   delete btagjetCorEt_;
-  delete btagjetEt_;
   delete btagjetCorPt_;
-  delete btagjetPt_;
   delete btagjetCompoSVbTagDiscr_;
   delete btagjetHighEFFbTagDiscr_;
   delete btagjetHighPURbTagDiscr_;

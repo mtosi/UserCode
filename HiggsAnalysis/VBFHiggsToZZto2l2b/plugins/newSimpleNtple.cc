@@ -218,7 +218,6 @@ void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& 
   //  iEvent.getByLabel("EventAuxiliary",eventAuxiliaryHandle);
   //  std::cout << "eventAuxiliaryHandle->run(): " << eventAuxiliaryHandle->run() << std::endl;
 
-
   std::cout << "[newSimpleNtple::FillEvent]" << std::endl;
   if ( whichSim_ == FULLSIM ) {
     edm::Handle<edm::HepMCProduct> evtMC;
@@ -247,6 +246,7 @@ void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& 
   std::cout << "event id: " << iEvent.id() << " -->run: " << run << " and event: " << event <<std::endl;
   evt_->Run     = iEvent.id().run();             // run number
   evt_->Event   = iEvent.id().event();           // event number
+  std::cout << "evt_->Run: " << evt_->Run << " and evt_->Event: " << evt_->Event << std::endl;
 //  evt_->Ilum    = eventAuxiliaryHandle->luminosityBlock(); // instantaneous luminosity (e30)
   evt_->eventID = evtID_;
 //  evt_->nPV;            // number of primary vertex
@@ -410,25 +410,25 @@ void newSimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const 
 
   edm::Handle<vbfhzz2l2b::CorJetWithBTagDiscrCollection> corJetWithBTagHandle;
   iEvent.getByLabel(corIC5CaloJetsWithBTagLabel_,"corJetWithBTagDiscr",corJetWithBTagHandle);
-  std::cout << "corJetWithBTagHandle->size(): " << corJetWithBTagHandle->size() << std::endl;
+  //  std::cout << "corJetWithBTagHandle->size(): " << corJetWithBTagHandle->size() << std::endl;
 
   int jetIndex = 0;    
   std::vector<reco::JetBaseRef> jets = vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets(*corJetWithBTagHandle);
   for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin(); 
 	jet != jets.end();
 	++jet, jetIndex++ ) {
-    std::cout << "jetIndex: " << jetIndex << std::endl;
+    //    std::cout << "jetIndex: " << jetIndex << std::endl;
     
     std::vector<double> discrVec = (*corJetWithBTagHandle)[*jet].discrVec_;
     double corrEt = (*corJetWithBTagHandle)[*jet].corEt_;
     double uncorrEt = (*jet)->et();
-    std::cout << "uncorrEt: " << uncorrEt << std::endl;
-    std::cout << "corrEt: " << corrEt << std::endl;
-    for ( unsigned int index = 0; index != discrVec.size(); index++) 
-      std::cout << "discr[" << index << "]: " << discrVec[index] << std::endl;
+    //    std::cout << "uncorrEt: " << uncorrEt << std::endl;
+    //    std::cout << "corrEt: " << corrEt << std::endl;
+    //    for ( unsigned int index = 0; index != discrVec.size(); index++) 
+    //      std::cout << "discr[" << index << "]: " << discrVec[index] << std::endl;
 
     double emFrac = (dynamic_cast<const reco::CaloJet*>(&**jet))->emEnergyFraction();
-    std::cout << "emFrac: " << emFrac << std::endl;
+    //    std::cout << "emFrac: " << emFrac << std::endl;
 
 //     std::cout << "corJetWithBTag highEffDiscr: "       << corJet->discriminators().discriminatorHighEff()       << std::endl;
 //     std::cout << "corJetWithBTag highPurDiscr: "       << corJet->discriminators().discriminatorHighPur()       << std::endl;
@@ -641,6 +641,7 @@ void newSimpleNtple::beginJob(const edm::EventSetup& iSetup)
 
 void 
 newSimpleNtple::endJob() {
+  mytree_->Write();
   std::cout << "[newSimpleNtple::endJob]" << std::endl;
 }
 

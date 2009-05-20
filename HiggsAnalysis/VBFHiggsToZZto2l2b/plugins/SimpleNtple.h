@@ -48,102 +48,108 @@ class SimpleNtple : public edm::EDAnalyzer {
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
-  void Init();
-  void FillEle          (const edm::Event&, const edm::EventSetup&);
-  void FillMu           (const edm::Event&, const edm::EventSetup&);
+  void InitObjs();
+  void FillEvent        (const edm::Event&, const edm::EventSetup&);
+  void FillElectron     (const edm::Event&, const edm::EventSetup&);
+  void FillMuon         (const edm::Event&, const edm::EventSetup&);
   void FillMet          (const edm::Event&, const edm::EventSetup&);
   void FillTagJet       (const edm::Event&, const edm::EventSetup&);
-  void FillJet          (const edm::Event&, const edm::EventSetup&);
-  void FillCaloJet      (const edm::Handle<reco::CaloJetCollection>&, TClonesArray &);
-  void FillPFJet        (const edm::Handle<reco::PFJetCollection>&, TClonesArray &);
-  void FillIC5CaloJets            (const edm::Event&, const edm::EventSetup&);	       
-  void FillIC5PFJets              (const edm::Event&, const edm::EventSetup&);	       
+  void FillZhad         (const edm::Event&, const edm::EventSetup&);
+  void FillZlep         (const edm::Event&, const edm::EventSetup&);
   void FillcorIC5CaloJetsWithBTag (const edm::Event&, const edm::EventSetup&); 
   void FillcorIC5PFJetsWithBTag   (const edm::Event&, const edm::EventSetup&);   
-  void FillSC5CaloJets            (const edm::Event&, const edm::EventSetup&);	       
-  void FillSC5PFJets              (const edm::Event&, const edm::EventSetup&);	       
-  void FillcorSC5CaloJetsWithBTag (const edm::Event&, const edm::EventSetup&); 
-  void FillcorSC5PFJetsWithBTag   (const edm::Event&, const edm::EventSetup&);   
-
-  void FillTracks       (const edm::Event&, const edm::EventSetup&);
-  void FillKindEvent    (const edm::Event&, const edm::EventSetup&);
-  void FillGenParticles (const edm::Event&, const edm::EventSetup&);
+  void FillTrack        (const edm::Event&, const edm::EventSetup&);
+  void FillGenParticle  (const edm::Event&, const edm::EventSetup&);
   void FillGenJet       (const edm::Event&, const edm::EventSetup&);
   void FillGenMet       (const edm::Event&, const edm::EventSetup&);
 
-  void setMomentum (TLorentzVector &myvector, const LorentzVector & mom) ;
-  
+  void setVertex (TVector3 &, const TVector3 &);
   // ----------member data ---------------------------
   TTree *mytree_;
+
+  // event
+  int evtID_;
+  int evtRun_, evtEvent_;
+  std::vector<double> * tagjetInvMass_;    // depends on the tag jet definition
+  std::vector<double> * tagjetDeltaEta_;
+  std::vector<double> * tagjetZeppenfeld_;
+  std::vector<double> * zjetInvMass_;    // depends on the z jet definition => btagger?
+  std::vector<double> * zjetDeltaEta_;
+  std::vector<double> * zjetZeppenfeld_;
   //electrons;
-  int nEle;
-  float IsolEleSumPt[30],IsolEleNTracks[30];
-  int EleId[30];
+  int eleN_;
+  TClonesArray        * eleP4_ ;
+  std::vector<double> * eleEt_;
+  std::vector<double> * elePt_;
+  std::vector<double> * eleIsoSumPt_;
+  std::vector<double> * eleIsoNtrack_;
+  std::vector<double> * eleD0_;
+  std::vector<double> * eleDxy_;
+  std::vector<double> * eleDxyError_;
+  std::vector<int>    * eleID_;
+  TClonesArray        * eleVtxP3_;
   //muons
-  int nMu;
-  int IdEvent;
-  float IsolMuSumPt[30],IsolMuNTracks[30];
+  int muN_;
+  TClonesArray        * muP4_ ;
+  std::vector<double> * muEt_;
+  std::vector<double> * muPt_;
+  std::vector<double> * muIsoSumPt_;
+  std::vector<double> * muIsoNtrack_;
+  std::vector<double> * muNormChi2_;
+  std::vector<double> * muD0_;
+  std::vector<double> * muDxy_;
+  std::vector<double> * muDxyError_;
+  std::vector<int>    * muID_;
+  TClonesArray        * muVtxP3_;
   // tag jets
-  float MinvTags;
-  //other jets
-  std::vector<double> * emFrac_;
+  int tagjetN_;
+  int tagjetNtrack_;
+  TClonesArray        * tagjetP4_;
+  std::vector<double> * tagjetEmFrac_;
+  std::vector<double> * tagjetChFrac_;
+  std::vector<double> * tagjetCorEt_;
+  std::vector<double> * tagjetCorPt_;
+  TClonesArray        * tagjetVtxP3_;
   // other jets with b tag
-  std::vector<double> * emFracWithBTag_;
-  std::vector<double> * corEtWithBTag_;
-  std::vector<double> * compoSVbTagDiscrWithBTag_;
-  std::vector<double> * highEFFbTagDiscrWithBTag_;
-  std::vector<double> * highPURbTagDiscrWithBTag_;
-  std::vector<std::vector<double> > * discriminatorVecWithBTag_;
+  int btagjetN_;
+  int btagjetNtrack_;
+  TClonesArray        * btagjetP4_;
+  std::vector<double> * btagjetEmFrac_;
+  std::vector<double> * btagjetChFrac_;
+  std::vector<double> * btagjetCorEt_;
+  std::vector<double> * btagjetCorPt_;
+  std::vector<double> * btagjetCompoSVbTagDiscr_;
+  std::vector<double> * btagjetHighEFFbTagDiscr_;
+  std::vector<double> * btagjetHighPURbTagDiscr_;
+  TClonesArray        * btagjetVtxP3_;
  
 
-  TClonesArray * m_tagJets ;
-  TClonesArray * m_otherJets ;
-  TClonesArray * m_otherJets_IterativeCone5CaloJets ;
-  TClonesArray * m_otherJets_IterativeCone5PFJets;
-  TClonesArray * m_otherJets_corIterativeCone5CaloJetsWithBTag ;
-  TClonesArray * m_otherJets_corIterativeCone5PFJetsWithBtag;
-  TClonesArray * m_otherJets_SisCone5CaloJets ;
-  TClonesArray * m_otherJets_SisCone5PFJets;
-  TClonesArray * m_otherJets_corSisCone5CaloJetsWithBTag ;
-  TClonesArray * m_otherJets_corSisCone5PFJetsWithBtag;            
-  TClonesArray * m_electrons ;
-  TClonesArray * m_muons ;
-  TClonesArray * m_MET ;
-  TClonesArray * m_tracks ;
-  TClonesArray * m_genParticles ;
-  TClonesArray * m_genJets;
-  TClonesArray * m_genMet;
-  
-  TLorentzVector myvector ;
-  
-  int           whichSim_;
-  edm::InputTag TracksTag_;
-  edm::InputTag EleTag_;
-  edm::InputTag IsolEleTag_;
-  edm::InputTag MuTag_;
-  edm::InputTag IsolMuTag_;
-  edm::InputTag MetTag_;
-  edm::InputTag TagJetTag_;
-  edm::InputTag JetTag_;
-  bool          bool_IterativeCone5CaloJetsTag_;
-  bool          bool_IterativeCone5PFJetsTag_;
-  bool          bool_corIterativeCone5CaloJetsWithBTag_;
-  bool          bool_corIterativeCone5PFJetsWithBTag_;
-  bool          bool_SisCone5CaloJetsTag_;
-  bool          bool_SisCone5PFJetsTag_;
-  bool          bool_corSisCone5CaloJetsWithBTag_;
-  bool          bool_corSisCone5PFJetsWithBTag_;
-  edm::InputTag IterativeCone5CaloJetsTag_;
-  edm::InputTag IterativeCone5PFJetsTag_;
-  std::string   corIterativeCone5CaloJetsWithBTag_;
-  std::string   corIterativeCone5PFJetsWithBTag_;
-  edm::InputTag SisCone5CaloJetsTag_;
-  edm::InputTag SisCone5PFJetsTag_;
-  std::string   corSisCone5CaloJetsWithBTag_;
-  std::string   corSisCone5PFJetsWithBTag_;
+  // met
+  TClonesArray        * metP4_ ;
+  std::vector<double> * metSig_ ;
 
-  edm::InputTag MCtruthTag_;
-  edm::InputTag genJetTag_;
-  edm::InputTag genMetTag_;
+  TClonesArray * trackP4_ ;
+  TClonesArray * genparticleP4_ ;
+  TClonesArray * genjetP4_;
+  TClonesArray * genmetP4_;
+
+  // utils  
+  TLorentzVector myvector_ ;
+  TVector3       myvertex_ ;
+
+  // input parameter and tag label
+  int           whichSim_;
+  edm::InputTag trackLabel_;
+  edm::InputTag muonLabel_;
+  edm::InputTag electronLabel_;
+  edm::InputTag metLabel_;
+  edm::InputTag tagJetLabel_;
+  std::string   corIC5CaloJetsWithBTagLabel_;
+  std::string   corIC5PFJetsWithBTagLabel_;
+  bool          corIC5PFJetsWithBTagFlag_;
+
+  edm::InputTag genParticleLabel_;
+  edm::InputTag genJetLabel_;
+  edm::InputTag genMetLabel_;
 
 };

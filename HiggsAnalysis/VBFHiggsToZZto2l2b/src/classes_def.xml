@@ -21,7 +21,6 @@
 
   <class name="vbfhzz2l2b::SimpleNtpleObj::EVT"/>
   <class name="edm::Wrapper<vbfhzz2l2b::SimpleNtpleObj::EVT>"/>
-  <function name="vbfhzz2l2b::SimpleNtpleObj::EVT::Run"/>
   <class name="vbfhzz2l2b::SimpleNtpleObj::JET"/>
   <class name="edm::Wrapper<vbfhzz2l2b::SimpleNtpleObj::JET>"/>
   <class name="vbfhzz2l2b::SimpleNtpleObj::MUON"/>

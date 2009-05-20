@@ -10,13 +10,6 @@
  Implementation:
      <Notes on implementation>
 */
-//
-// Original Author:  Alessio Ghezzi
-//         Created:  Tue Jun  5 19:34:31 CEST 2007
-// $Id: SimpleNtple.cc,v 1.3 2009/02/23 15:42:58 amassiro Exp $
-//
-//
-
 
 // system include files
 #include <memory>
@@ -83,6 +76,10 @@
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetWithBTagDiscr.h"
 
+// utilities
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ProcessIndex.h"
+
 using namespace std;
 using namespace edm;
 using namespace reco;
@@ -91,46 +88,30 @@ using namespace vbfhzz2l2b;
 
 enum { FASTSIM = 0,
        FULLSIM = 1
-};
+}; // to be added to VBFHZZllbbUtils
 
 SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig) :
-  whichSim_   ( iConfig.getParameter<int>           ( "whichSim"  ) ), // 0:FastSim, 1:FullSim
-  TracksTag_  ( iConfig.getParameter<edm::InputTag> ( "TracksTag" ) ),
-  EleTag_     ( iConfig.getParameter<edm::InputTag> ( "EleTag"    ) ),
-  IsolEleTag_ ( iConfig.getParameter<edm::InputTag> ( "IsolEleTag") ),
-  MuTag_      ( iConfig.getParameter<edm::InputTag> ( "MuTag"     ) ),
-  IsolMuTag_  ( iConfig.getParameter<edm::InputTag> ( "IsolMuTag" ) ),
-  MetTag_     ( iConfig.getParameter<edm::InputTag> ( "MetTag"    ) ),
-  TagJetTag_  ( iConfig.getParameter<edm::InputTag> ( "TagJetTag" ) ),
-  JetTag_     ( iConfig.getParameter<edm::InputTag> ( "JetTag"    ) ),
-  bool_IterativeCone5CaloJetsTag_         (iConfig.getParameter<bool>( "bool_IterativeCone5CaloJetsTag"         ) ),
-  bool_IterativeCone5PFJetsTag_           (iConfig.getParameter<bool>( "bool_IterativeCone5PFJetsTag"           ) ),
-  bool_corIterativeCone5CaloJetsWithBTag_ (iConfig.getParameter<bool>( "bool_corIterativeCone5CaloJetsWithBTag" ) ),
-  bool_corIterativeCone5PFJetsWithBTag_   (iConfig.getParameter<bool>( "bool_corIterativeCone5PFJetsWithBTag"   ) ),
-  bool_SisCone5CaloJetsTag_               (iConfig.getParameter<bool>( "bool_SisCone5CaloJetsTag"               ) ),
-  bool_SisCone5PFJetsTag_                 (iConfig.getParameter<bool>( "bool_SisCone5PFJetsTag"                 ) ),
-  bool_corSisCone5CaloJetsWithBTag_       (iConfig.getParameter<bool>( "bool_corSisCone5CaloJetsWithBTag"       ) ),
-  bool_corSisCone5PFJetsWithBTag_         (iConfig.getParameter<bool>( "bool_corSisCone5PFJetsWithBTag"         ) ),
+  whichSim_ ( iConfig.getParameter<int> ( "whichSim"  ) ), // 0:FastSim, 1:FullSim
+  trackLabel_    ( iConfig.getParameter<edm::InputTag> ( "trackLabel"    ) ),
+  muonLabel_     ( iConfig.getParameter<edm::InputTag> ( "muonLabel"     ) ),
+  electronLabel_ ( iConfig.getParameter<edm::InputTag> ( "electronLabel" ) ),
+  metLabel_      ( iConfig.getParameter<edm::InputTag> ( "metLabel"      ) ),
+  tagJetLabel_   ( iConfig.getParameter<edm::InputTag> ( "tagJetLabel"   ) ),
+  corIC5CaloJetsWithBTagLabel_ ( iConfig.getParameter<std::string> ( "corIC5CaloJetsWithBTagLabel" ) ),
+  corIC5PFJetsWithBTagFlag_    ( iConfig.getParameter<bool>        ( "corIC5PFJetsWithBTagFlag"    ) ),
+  genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
+  genJetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
+  genMetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genMetLabel"      ) ) {
 
-  MCtruthTag_ ( iConfig.getParameter<edm::InputTag> ( "MCtruthTag" ) ),
-  genJetTag_  ( iConfig.getParameter<edm::InputTag> ( "genJetTag"  ) ),
-  genMetTag_  ( iConfig.getParameter<edm::InputTag> ( "genMetTag"  ) ) {
-
-  //  corJetWithBTag_( iConfig.getParameter<std::string>( "corJetWithBTag" ) )
-  if ( bool_IterativeCone5CaloJetsTag_         ) IterativeCone5CaloJetsTag_         = iConfig.getParameter<edm::InputTag>( "IterativeCone5CaloJetsTag"         );
-  if ( bool_IterativeCone5PFJetsTag_           ) IterativeCone5PFJetsTag_           = iConfig.getParameter<edm::InputTag>( "IterativeCone5PFJetsTag"           );
-  if ( bool_corIterativeCone5CaloJetsWithBTag_ ) corIterativeCone5CaloJetsWithBTag_ = iConfig.getParameter<std::string>  ( "corIterativeCone5CaloJetsWithBTag" );
-  if ( bool_corIterativeCone5PFJetsWithBTag_   ) corIterativeCone5PFJetsWithBTag_   = iConfig.getParameter<std::string>  ( "corIterativeCone5PFJetsWithBTag"   );
-  if ( bool_SisCone5CaloJetsTag_               ) SisCone5CaloJetsTag_               = iConfig.getParameter<edm::InputTag>( "SisCone5CaloJetsTag"               );
-  if ( bool_SisCone5PFJetsTag_                 ) SisCone5PFJetsTag_                 = iConfig.getParameter<edm::InputTag>( "SisCone5PFJetsTag"                 );
-  if ( bool_corSisCone5CaloJetsWithBTag_       ) corSisCone5CaloJetsWithBTag_       = iConfig.getParameter<std::string>  ( "corSisCone5CaloJetsWithBTag"       );
-  if ( bool_corSisCone5PFJetsWithBTag_         ) corSisCone5PFJetsWithBTag_         = iConfig.getParameter<std::string>  ( "corSisCone5PFJetsWithBTag"         );
+  if ( corIC5PFJetsWithBTagFlag_ ) 
+    corIC5PFJetsWithBTagLabel_ = iConfig.getParameter<std::string> ( "corIC5PFJetsWithBTagLabel" );
  
-  std::cout << "SimpleNtple::SimpleNtple" << std::endl;
   //now do what ever initialization is needed
   edm::Service<TFileService> fs ;
   mytree_  = fs->make <TTree>("VBFSimpleTree","VBFSimpleTree"); 
   
+  std::cout << "[SimpleNtple::SimpleNtple] DONE" << std::endl;
+
 }
 
 
@@ -143,35 +124,65 @@ SimpleNtple::~SimpleNtple()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
-  delete emFrac_;
+  delete tagjetInvMass_;    // depends on the tag jet definition
+  delete tagjetDeltaEta_;
+  delete tagjetZeppenfeld_;
+  delete zjetInvMass_;    // depends on the z jet definition => btagger?
+  delete zjetDeltaEta_;
+  delete zjetZeppenfeld_;
 
-  delete emFracWithBTag_;
-  delete corEtWithBTag_;
-  delete compoSVbTagDiscrWithBTag_;
-  delete highEFFbTagDiscrWithBTag_;
-  delete highPURbTagDiscrWithBTag_;
-  delete discriminatorVecWithBTag_;
+  delete eleP4_ ;
+  delete eleVtxP3_;
+  delete eleEt_;
+  delete elePt_;
+  delete eleIsoSumPt_;
+  delete eleIsoNtrack_;
+  delete eleD0_;
+  delete eleDxy_;
+  delete eleDxyError_;
+  delete eleID_;
 
-  delete m_tagJets ;
-  delete m_otherJets ;
-  delete m_otherJets_IterativeCone5CaloJets ;
-  delete m_otherJets_IterativeCone5PFJets;
-  delete m_otherJets_corIterativeCone5CaloJetsWithBTag ;
-  delete m_otherJets_corIterativeCone5PFJetsWithBtag;
-  delete m_otherJets_SisCone5CaloJets ;
-  delete m_otherJets_SisCone5PFJets;
-  delete m_otherJets_corSisCone5CaloJetsWithBTag ;
-  delete m_otherJets_corSisCone5PFJetsWithBtag;            
+  delete muP4_ ;
+  delete muVtxP3_;
+  delete muEt_;
+  delete muPt_;
+  delete muIsoSumPt_;
+  delete muIsoNtrack_;
+  delete muD0_;
+  delete muDxy_;
+  delete muDxyError_;
+  delete muID_;
 
-  delete m_electrons ;
-  delete m_muons ;
-  delete m_MET ;
-  delete m_tracks ;
-  delete m_genParticles ;
-  delete m_genJets;
-  delete m_genMet;
+  delete tagjetP4_;
+  delete tagjetVtxP3_;
+  delete tagjetEmFrac_;
+  delete tagjetChFrac_;
+  delete tagjetCorEt_;
+  delete tagjetEt_;
+  delete tagjetCorPt_;
+  delete tagjetPt_;
 
-  std::cout << "SimpleNtple::~SimpleNtple" << std::endl;
+  delete btagjetP4_;
+  delete btagjetVtxP3_; 
+  delete btagjetEmFrac_;
+  delete btagjetChFrac_;
+  delete btagjetCorEt_;
+  delete btagjetEt_;
+  delete btagjetCorPt_;
+  delete btagjetPt_;
+  delete btagjetCompoSVbTagDiscr_;
+  delete btagjetHighEFFbTagDiscr_;
+  delete btagjetHighPURbTagDiscr_;
+
+  delete metP4_ ;
+  delete metSig_ ;
+
+  delete trackP4_ ;
+  delete genparticleP4_ ;
+  delete genjetP4_;
+  delete genmetP4_;
+
+  std::cout << "[SimpleNtple::~SimpleNtple]" << std::endl;
   
 }
 
@@ -184,63 +195,106 @@ SimpleNtple::~SimpleNtple()
 void
 SimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  Init();
-  FillKindEvent (iEvent, iSetup);
-
-  FillEle (iEvent, iSetup);
-  FillMu (iEvent, iSetup);
-  FillMet (iEvent, iSetup);
-  //   FillTagJet (iEvent, iSetup); //---- AM --- not now!
-  FillJet (iEvent, iSetup);
-  if ( bool_IterativeCone5CaloJetsTag_         ) FillIC5CaloJets            (iEvent, iSetup);	       
-  if ( bool_IterativeCone5PFJetsTag_           ) FillIC5PFJets              (iEvent, iSetup);	       	 
-  if ( bool_corIterativeCone5CaloJetsWithBTag_ ) FillcorIC5CaloJetsWithBTag (iEvent, iSetup); 
-  if ( bool_corIterativeCone5PFJetsWithBTag_   ) FillcorIC5PFJetsWithBTag   (iEvent, iSetup);   
-  if ( bool_SisCone5CaloJetsTag_               ) FillSC5CaloJets            (iEvent, iSetup);	       
-  if ( bool_SisCone5PFJetsTag_                 ) FillSC5PFJets              (iEvent, iSetup);     
-  if ( bool_corSisCone5CaloJetsWithBTag_       ) FillcorSC5CaloJetsWithBTag (iEvent, iSetup); 
-  if ( bool_corSisCone5PFJetsWithBTag_         ) FillcorSC5PFJetsWithBTag   (iEvent, iSetup);
-  if ( whichSim_ == FULLSIM ) FillTracks (iEvent, iSetup);
-  FillGenParticles (iEvent, iSetup); //---- AM --- to call after FillKindEvent
-  FillGenJet (iEvent, iSetup);
-  FillGenMet (iEvent, iSetup);
+  InitObjs();
+  std::cout << "SimpleNtple::analyze] InitObjs DONE" << std::endl;
+  FillEvent                  (iEvent, iSetup);
+  FillcorIC5CaloJetsWithBTag (iEvent, iSetup);
+  FillMuon                   (iEvent, iSetup);
+  FillElectron               (iEvent, iSetup);
+  FillZhad                   (iEvent, iSetup);
+  FillZlep                   (iEvent, iSetup);
+  FillMet                    (iEvent, iSetup);
+  FillTagJet                 (iEvent, iSetup); // not implemented yet
+  if ( corIC5PFJetsWithBTagFlag_ )
+    FillcorIC5PFJetsWithBTag (iEvent, iSetup);   
+  if ( whichSim_ == FULLSIM )
+    FillTrack (iEvent, iSetup);
+  FillGenParticle  (iEvent, iSetup); // got an error message in execution
+  FillGenJet       (iEvent, iSetup);
+  FillGenMet       (iEvent, iSetup);
   
   mytree_->Fill();
-  
-  emFrac_->clear();
 
-  emFracWithBTag_->clear();
-  corEtWithBTag_->clear();
-  compoSVbTagDiscrWithBTag_->clear();
-  highEFFbTagDiscrWithBTag_->clear();
-  highPURbTagDiscrWithBTag_->clear();
-  discriminatorVecWithBTag_->clear();
-
-  m_tagJets      -> Clear () ;
-  m_otherJets    -> Clear () ;  
-  m_otherJets_IterativeCone5CaloJets            -> Clear();
-  m_otherJets_IterativeCone5PFJets              -> Clear();
-  m_otherJets_corIterativeCone5CaloJetsWithBTag -> Clear();
-  m_otherJets_corIterativeCone5PFJetsWithBtag   -> Clear();
-  m_otherJets_SisCone5CaloJets                  -> Clear();
-  m_otherJets_SisCone5PFJets                    -> Clear();
-  m_otherJets_corSisCone5CaloJetsWithBTag       -> Clear();
-  m_otherJets_corSisCone5PFJetsWithBtag         -> Clear();            
-  m_electrons    -> Clear () ;
-  m_muons        -> Clear () ;
-  m_MET          -> Clear () ;
-  m_tracks       -> Clear () ;
-  m_genParticles -> Clear () ;
-  m_genJets      -> Clear () ;
-  m_genMet       -> Clear () ;
+  std::cout << "[SimpleNtple::analyze] DONE" << std::endl;
   
 }
 
 
 // --------------------------------------------------------------------
 
-void SimpleNtple::FillKindEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  std::cout << "SimpleNtple::FillKindEvent" << std::endl;
+void SimpleNtple::InitObjs() {
+
+  // event obj
+  evtID_    = 0;
+  evtRun_   = 0;
+  evtEvent_ = 0;
+  tagjetInvMass_    -> clear ();    // depends on the tag jet definition
+  tagjetDeltaEta_   -> clear ();
+  tagjetZeppenfeld_ -> clear ();
+  zjetInvMass_      -> clear ();    // depends on the z jet definition => btagger?
+  zjetDeltaEta_     -> clear ();
+  zjetZeppenfeld_   -> clear ();
+  //electrons;
+  eleN_ = 0;
+  eleP4_        -> Clear ();
+  eleEt_        -> clear ();
+  elePt_        -> clear ();
+  eleIsoSumPt_  -> clear ();
+  eleIsoNtrack_ -> clear ();
+  eleD0_        -> clear ();
+  eleDxy_       -> clear ();
+  eleDxyError_  -> clear ();
+  eleID_        -> clear ();
+  eleVtxP3_     -> Clear ();
+  //muons
+  muN_ = 0;
+  muP4_        -> Clear ();
+  muEt_        -> clear ();
+  muPt_        -> clear ();
+  muIsoSumPt_  -> clear ();
+  muIsoNtrack_ -> clear ();
+  muD0_        -> clear ();
+  muDxy_       -> clear ();
+  muDxyError_  -> clear ();
+  muID_        -> clear ();
+  muVtxP3_     -> Clear ();
+  // tag jets
+  tagjetN_      = 0;
+  tagjetNtrack_ = 0;
+  tagjetP4_     -> Clear ();
+  tagjetEmFrac_ -> clear ();
+  tagjetChFrac_ -> clear ();
+  tagjetCorEt_  -> clear ();
+  tagjetCorPt_  -> clear ();
+  tagjetEmFrac_ -> clear ();
+  tagjetVtxP3_  -> Clear ();
+  // other jets with b tag
+  btagjetN_      = 0;
+  btagjetNtrack_ = 0;
+  btagjetP4_               -> Clear ();
+  btagjetEmFrac_           -> clear ();
+  btagjetChFrac_           -> clear ();
+  btagjetCorEt_            -> clear ();
+  btagjetCorPt_            -> clear ();
+  btagjetCompoSVbTagDiscr_ -> clear ();
+  btagjetHighEFFbTagDiscr_ -> clear ();
+  btagjetHighPURbTagDiscr_ -> clear ();
+  btagjetVtxP3_            -> Clear ();
+ 
+  // met
+  metP4_  -> Clear ();
+  metSig_ -> clear ();
+
+  trackP4_       -> Clear () ;
+  genparticleP4_ -> Clear () ;
+  genjetP4_	 -> Clear () ;
+  genmetP4_	 -> Clear () ;
+  
+}
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+  //  std::cout << "SimpleNtple::FillEvent" << std::endl;
 
   if ( whichSim_ == FULLSIM ) {
     edm::Handle<edm::HepMCProduct> evtMC;
@@ -249,7 +303,7 @@ void SimpleNtple::FillKindEvent(const edm::Event& iEvent, const edm::EventSetup&
     catch(...) {
       std::cerr << "[SimpleNtple::FillKindEvent] defined as FullSim, but HepMCProduct::source not found" << std::endl; }
     const HepMC::GenEvent * mcEv = evtMC->GetEvent();
-    IdEvent = mcEv->signal_process_id();
+    evtID_ = mcEv->signal_process_id();
   }
   else if ( whichSim_ == FASTSIM ) {
     edm::Handle<int> genProcessID;
@@ -258,7 +312,7 @@ void SimpleNtple::FillKindEvent(const edm::Event& iEvent, const edm::EventSetup&
     catch(...) {
       std::cerr << "[SimpleNtple::FillKindEvent] defined as FastSim, but genEventProcID not found" << std::endl; }
 
-    IdEvent = *genProcessID;
+    evtID_ = *genProcessID;
   }
   else {
     std::cout << "--> WARNING: simulation not specificied!!" << std::endl;
@@ -267,352 +321,251 @@ void SimpleNtple::FillKindEvent(const edm::Event& iEvent, const edm::EventSetup&
 
 }
 
+// --------------------------------------------------------------------
+void SimpleNtple::FillZhad(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+}
 
 // --------------------------------------------------------------------
+void SimpleNtple::FillZlep(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+}
 
-void SimpleNtple::FillEle(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+// --------------------------------------------------------------------
+void SimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  std::cout << "SimpleNtple::FillEle" << std::endl;
-  edm::Handle<edm::View<reco::PixelMatchGsfElectron> > EleHandle ;
-  //  edm::Handle<reco::PixelMatchGsfElectronCollection> EleHandle ;
-  iEvent.getByLabel (EleTag_,EleHandle) ;
+  std::cout << "[SimpleNtple::FillcorIC5CaloJetsWithBTag]" << std::endl;
 
-  if(EleHandle->size() < 30 ) nEle = EleHandle->size();
-  else nEle = 30;
+  edm::Handle<vbfhzz2l2b::CorJetWithBTagDiscrCollection> corJetWithBTagHandle;
+  iEvent.getByLabel(corIC5CaloJetsWithBTagLabel_,"corJetWithBTagDiscr",corJetWithBTagHandle);
+  //  std::cout << "corJetWithBTagHandle->size(): " << corJetWithBTagHandle->size() << std::endl;
 
-  TClonesArray &electrons = *m_electrons;
-  int counter = 0;
-  for (int i=0; i< nEle; i++)
-    {
-      setMomentum (myvector, (*EleHandle)[i].p4());
-      new (electrons[counter]) TLorentzVector (myvector);
-      counter++;
-    }
+  TClonesArray &jetP4 = *btagjetP4_;
+  int jetIndex = 0;
+  std::vector<reco::JetBaseRef> jets = vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets(*corJetWithBTagHandle);  
+  for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin(); 
+	jet != jets.end(); ++jet, jetIndex++ ) {
+    //    std::cout << "jetIndex: " << jetIndex << std::endl;
+    
+    std::vector<double> discrVec = (*corJetWithBTagHandle)[*jet].discrVec_;
+//    std::cout << "corJetWithBTag highEffDiscr: "       << discrVec[vbfhzz2l2b::HIGHEFF]    << std::endl;
+//    std::cout << "corJetWithBTag highPurDiscr: "       << discrVec[vbfhzz2l2b::HIGHPUR]    << std::endl;
+//    std::cout << "corJetWithBTag combSecVtxDiscr: "    << discrVec[vbfhzz2l2b::COMBSECVTX] << std::endl;
+    double corrEt = (*corJetWithBTagHandle)[*jet].corEt_;
+    double uncorrEt = (*jet)->et();
+    double uncorrPt = (*jet)->pt();
+    double corPt    = (corrEt/uncorrEt)*uncorrPt;
+    double emFrac = (dynamic_cast<const reco::CaloJet*>(&**jet))->emEnergyFraction();
+
+    vbfhzz2l2b::setMomentum (myvector_, (*jet)->p4());
+    new (jetP4[jetIndex]) TLorentzVector (myvector_);
+    //    btagjetNtrack_ = ;
+    btagjetEmFrac_  -> push_back (emFrac);
+    //    btagjetChFrac_ -> push_back ();
+    btagjetCorEt_            -> push_back (corrEt);
+    btagjetCorPt_	     -> push_back (corPt);
+    btagjetHighPURbTagDiscr_ -> push_back (discrVec[vbfhzz2l2b::HIGHEFF]   );
+    btagjetHighEFFbTagDiscr_ -> push_back (discrVec[vbfhzz2l2b::HIGHPUR]   );
+    btagjetCompoSVbTagDiscr_ -> push_back (discrVec[vbfhzz2l2b::COMBSECVTX]);
+    //  btagjetVtxP3_;  
+
+  }
+  btagjetN_ = jets.size();
+}
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillcorIC5PFJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+}
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillMuon(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+
+  //  std::cout << "SimpleNtple::FillMu" << std::endl;
+  edm::Handle<reco::MuonCollection> muonHandle;
+  iEvent.getByLabel (muonLabel_,muonHandle);
+
+
+  TClonesArray &muonP4 = *muP4_;
+  TClonesArray &muonVtxP3 = *muVtxP3_;
+
+  int muonIndex = 0;
+  for ( reco::MuonCollection::const_iterator muon_itr = muonHandle->begin();
+	muon_itr != muonHandle->end(); ++muon_itr, muonIndex++ ) {
+    vbfhzz2l2b::setMomentum (myvector_, muon_itr->p4());
+    //    setVertex(myvertex_,muon_itr->Vertex());
+    new (muonP4[muonIndex]) TLorentzVector (myvector_);
+    new (muonVtxP3[muonIndex]) TVector3 (myvertex_);
+
+    //    muEt_        -> push_back ();
+    muPt_        -> push_back (muon_itr->pt());
+    //    muIsoSumPt_  -> push_back ();
+    //    muIsoNtrack_ -> push_back ();
+    //    muD0_        -> push_back ();
+    //    muDxy_       -> push_back ();
+    //    muDxyError_  -> push_back ();
+    //    muID_        -> push_back ();
+
+  }
+  muN_ = muonHandle->size(); 
+
+}
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillElectron(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
+  std::cout << "[SimpleNtple::FillElectron]" << std::endl;
+
+  edm::Handle<reco::PixelMatchGsfElectronCollection> electronHandle ;
+  iEvent.getByLabel (electronLabel_,electronHandle) ;
+
+  TClonesArray &electronP4 = *eleP4_;
+  TClonesArray &electronVtxP3 = *eleVtxP3_;
+  int electronIndex = 0;
+  for ( reco::PixelMatchGsfElectronCollection::const_iterator electron_itr = electronHandle->begin();
+	electron_itr != electronHandle->end(); ++electron_itr, electronIndex++ ) {
+    vbfhzz2l2b::setMomentum (myvector_, electron_itr->p4());
+    new (electronP4[electronIndex]) TLorentzVector (myvector_);
+  }
+
+  eleN_ = electronHandle->size(); 
   
 }
 
-
 // --------------------------------------------------------------------
-
-
-void SimpleNtple::FillMu(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  std::cout << "SimpleNtple::FillMu" << std::endl;
-  edm::Handle<reco::MuonCollection> MuHandle;
-  iEvent.getByLabel (MuTag_,MuHandle);
-  
-  if(MuHandle->size() < 30 ) nMu = MuHandle->size(); 
-  else nMu = 30;
-
-  TClonesArray &muons = *m_muons;
-  int counter = 0;
-  for (int i=0; i< nMu; i++)
-    {
-      setMomentum (myvector, (*MuHandle)[i].p4());
-      new (muons[counter]) TLorentzVector (myvector);
-      counter++;
-    }
-
-
-}
-
-
-// --------------------------------------------------------------------
-
-
 void SimpleNtple::FillMet(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  std::cout << "SimpleNtple::FillMet" << std::endl;
+  //  std::cout << "SimpleNtple::FillMet" << std::endl;
   edm::Handle<reco::CaloMETCollection> metCollectionHandle;
-  iEvent.getByLabel (MetTag_ , metCollectionHandle);
+  iEvent.getByLabel (metLabel_ , metCollectionHandle);
   const CaloMETCollection *calometcol = metCollectionHandle.product();
   const CaloMET *calomet = &(calometcol->front());
 
-  TClonesArray &MET = *m_MET;
-  setMomentum (myvector, calomet->p4());
-  new (MET[0]) TLorentzVector (myvector);
+  TClonesArray &MET = *metP4_;
+  vbfhzz2l2b::setMomentum (myvector_, calomet->p4());
+  new (MET[0]) TLorentzVector (myvector_);
   
 }
 
 
 // --------------------------------------------------------------------
-
-
 void SimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  std::cout << "SimpleNtple::FillTagJet" << std::endl;
+  //  std::cout << "SimpleNtple::FillTagJet" << std::endl;
 
-  edm::Handle<reco::RecoChargedCandidateCollection> jetTagsHandle;
+  // edm::Handle<reco::RecoChargedCandidateCollection> tagJetHandle;
   // edm::Handle<reco::CandidateCollection> jetTagsHandle ;
-  iEvent.getByLabel (TagJetTag_, jetTagsHandle) ;
-  
-  if (jetTagsHandle->size () != 2) return ;
-  math::XYZTLorentzVector sumLV = (*jetTagsHandle)[0].p4() + (*jetTagsHandle)[1].p4() ;
-  MinvTags = sumLV.M();
+  edm::Handle<reco::CaloJetCollection> tagJetHandle;
+  iEvent.getByLabel (tagJetLabel_, tagJetHandle) ;
 
-  TClonesArray &jetTag = *m_tagJets;
-  int counter = 0;
-  for (RecoChargedCandidateCollection::const_iterator jet = jetTagsHandle->begin (); 
-       jet != jetTagsHandle->end (); 
-       ++jet )
-    { 
-      setMomentum (myvector, jet->p4());
-      new (jetTag[counter]) TLorentzVector (myvector);
-      counter++;
+  typedef reco::CaloJetCollection::const_iterator tagJetItr;  
+
+  // looking for the highest invariant mass jets pair
+  std::pair<tagJetItr,tagJetItr> maxInvMassPair = 
+    vbfhzz2l2b::findPair_maxInvMass_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							20., 15.);
+
+  double invMass    = -99.;
+  double deltaEta   = -99.;
+  double zeppenfeld = -999.;
+  if (maxInvMassPair.first != maxInvMassPair.second) {
+    invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
+    zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+  }
+  tagjetInvMass_->push_back(invMass);
+  tagjetDeltaEta_->push_back(deltaEta);
+  tagjetZeppenfeld_->push_back(zeppenfeld);
+
+  // looking for the highest delta eta jets pair
+  std::pair<tagJetItr,tagJetItr> maxDeltaEtaPair = 
+    vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							 20., 15.);
+  invMass    = -99.;
+  deltaEta   = -99.;
+  zeppenfeld = -999.;
+  if(maxDeltaEtaPair.first != maxDeltaEtaPair.second) {
+    invMass    =  (     (maxDeltaEtaPair.first)->p4() + ((maxDeltaEtaPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
+    zeppenfeld =  (     (maxDeltaEtaPair.first)->pz() * (maxDeltaEtaPair.second)->pz() );
+  }
+  tagjetInvMass_->push_back(invMass);
+  tagjetDeltaEta_->push_back(deltaEta);
+  tagjetZeppenfeld_->push_back(zeppenfeld);
+
+
+  TClonesArray &jetTag = *tagjetP4_;
+  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
+  new (jetTag[0]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
+  new (jetTag[1]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
+  new (jetTag[2]) TLorentzVector (myvector_);
+  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
+  new (jetTag[3]) TLorentzVector (myvector_);
+
+}
+
+// --------------------------------------------------------------------
+void  SimpleNtple::FillTrack(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+
+  std::cout << "[SimpleNtple::FillTrack]" << std::endl;
+  edm::Handle<reco::TrackCollection> trackHandle ;
+  iEvent.getByLabel (trackLabel_, trackHandle) ;
+
+  TClonesArray &track = *trackP4_;
+  int trackIndex = 0;
+  for (reco::TrackCollection::const_iterator track_itr = trackHandle->begin (); 
+       track_itr != trackHandle->end (); ++track_itr, trackIndex++ ) { 
+
+    math::XYZVector mom = track_itr->innerMomentum () ; 
+    myvector_.SetPx (mom.x ()) ;
+    myvector_.SetPy (mom.y ()) ;
+    myvector_.SetPz (mom.z ()) ;
+    
+    new (track[trackIndex]) TLorentzVector (myvector_);
+  }
+}
+
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillGenParticle(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+
+  std::cout << "[SimpleNtple::FillGenParticle]" << std::endl;
+  edm::Handle<reco::GenParticleCollection> genParticleHandle; 
+  iEvent.getByLabel (genParticleLabel_,genParticleHandle);
+ 
+  TClonesArray &genParticle = *genparticleP4_;
+  int particleIndex = 0;
+  if ( evtID_ == HWWFusion_ || evtID_ == HZZFusion_ ){ //---- only if VBF
+    for (reco::GenParticleCollection::const_iterator particle_itr = genParticleHandle->begin(); 
+	 particle_itr != genParticleHandle->end(); ++particle_itr, particleIndex++ ) {
+      
+      int pdg = particle_itr->pdgId();
+      int status = particle_itr->status();
+      int mother1 = 0;
+      if ( particle_itr->numberOfMothers() > 0 ) mother1 = particle_itr->mother(0)->pdgId();
+      int mother2 = 0;
+      if ( particle_itr->numberOfMothers() > 1 ) mother2 = particle_itr->mother(1)->pdgId();
+      int daughter1 = 0;
+      if ( particle_itr->numberOfDaughters() > 0 ) daughter1 = particle_itr->daughter(0)->pdgId();
+      int daughter2 = 0;
+      if ( particle_itr->numberOfDaughters() > 1 ) daughter2 = particle_itr->daughter(1)->pdgId();
+      double px = particle_itr->px();
+      double py = particle_itr->py();
+      double pz = particle_itr->pz();
+      double e  = particle_itr->energy();
+      double vx = 0.;
+      double vy = 0.;
+      double vz = 0.;
+      double time = 0.;
+  
+      new (genParticle[particleIndex]) TParticle (pdg, status, 
+						  mother1, mother2,
+						  daughter1, daughter2,
+						  px, py, pz, e,
+						  vx, vy, vz, time);
     }
-}
-
-
-// --------------------------------------------------------------------
-
-
-void SimpleNtple::FillJet(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  std::cout << "SimpleNtple::FillJet" << std::endl;
-
-  edm::Handle<reco::CaloJetCollection> JetHandle ;
-  iEvent.getByLabel (JetTag_, JetHandle) ;
-
-  TClonesArray &jetOther = *m_otherJets;
-
-  FillCaloJet(JetHandle,jetOther);
-
-//  int counter = 0;
-//  for (CaloJetCollection::const_iterator jet = JetHandle->begin (); 
-//       jet != JetHandle->end (); 
-//       ++jet, counter++ ) { 
-//      setMomentum (myvector, jet->p4());        
-//      new (jetOther[counter]) TLorentzVector (myvector);
-//
-//      emFrac_->push_back(jet->emEnergyFraction());
-//  }
-
-}
-
-void SimpleNtple::FillCaloJet(const edm::Handle<reco::CaloJetCollection>& caloJetHandle, TClonesArray &caloJetClonesArray) {
-
-  std::cout << "SimpleNtple::FillCaloJet" << std::endl;
-
-  int counter = 0;
-  for (CaloJetCollection::const_iterator jet = caloJetHandle->begin (); 
-       jet != caloJetHandle->end (); 
-       ++jet, counter++ ) { 
-    setMomentum (myvector, jet->p4());        
-    new (caloJetClonesArray[counter]) TLorentzVector (myvector);
-    
-    emFrac_->push_back(jet->emEnergyFraction());
   }
-  
-  
-}
-
-void SimpleNtple::FillPFJet(const edm::Handle<reco::PFJetCollection>& pfJetHandle, TClonesArray &pfJetClonesArray) {
-
-  std::cout << "SimpleNtple::FillPFJet" << std::endl;
-
-  int counter = 0;
-  for (PFJetCollection::const_iterator jet = pfJetHandle->begin (); 
-       jet != pfJetHandle->end (); 
-       ++jet, counter++ ) { 
-    setMomentum (myvector, jet->p4());        
-    new (pfJetClonesArray[counter]) TLorentzVector (myvector);
-    
-  }
-  
-  
-}
-
-void SimpleNtple::FillIC5CaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::cout << "SimpleNtple::FillIC5CaloJets" << std::endl;
-
-  edm::Handle<reco::CaloJetCollection> JetHandle ;
-  iEvent.getByLabel (IterativeCone5CaloJetsTag_, JetHandle) ;
-
-  TClonesArray &jetOther = *m_otherJets_IterativeCone5CaloJets;
-
-  FillCaloJet(JetHandle,jetOther);
-
-}            
-
-void SimpleNtple::FillIC5PFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::cout << "SimpleNtple::FillIC5PFJets" << std::endl;
-
-  edm::Handle<reco::PFJetCollection> JetHandle ;
-  iEvent.getByLabel (IterativeCone5PFJetsTag_, JetHandle) ;
-
-  TClonesArray &jetOther = *m_otherJets_IterativeCone5PFJets;
-
-  FillPFJet(JetHandle,jetOther);
-
-}
-// --------------------------------------------------------------------
-
-void SimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  std::cout << "SimpleNtple::FillcorIC5CaloJetsWithBTag" << std::endl;
-
-  TClonesArray &jetOtherWithBTag = *m_otherJets_corIterativeCone5CaloJetsWithBTag;
-
-  int counter = 0;
-
-  edm::Handle<vbfhzz2l2b::CorJetWithBTagDiscrCollection> corJetWithBTagHandle;
-  iEvent.getByLabel(corIterativeCone5CaloJetsWithBTag_,"corJetWithBTagDiscr",corJetWithBTagHandle);
-  std::cout << "corJetWithBTagHandle->size(): " << corJetWithBTagHandle->size() << std::endl;
-
-  int jetIndex = 0;    
-  std::vector<reco::JetBaseRef> jets = vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets(*corJetWithBTagHandle);
-  for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin(); 
-	jet != jets.end();
-	++jet, jetIndex++ ) {
-    std::cout << "jetIndex: " << jetIndex << std::endl;
-    
-    std::vector<double> discrVec = (*corJetWithBTagHandle)[*jet].discrVec_;
-    double corrEt = (*corJetWithBTagHandle)[*jet].corEt_;
-    double uncorrEt = (*jet)->et();
-    std::cout << "uncorrEt: " << uncorrEt << std::endl;
-    std::cout << "corrEt: " << corrEt << std::endl;
-    for ( unsigned int index = 0; index != discrVec.size(); index++) 
-      std::cout << "discr[" << index << "]: " << discrVec[index] << std::endl;
-
-    double emFrac = (dynamic_cast<const reco::CaloJet*>(&**jet))->emEnergyFraction();
-    std::cout << "emFrac: " << emFrac << std::endl;
-
-//     std::cout << "corJetWithBTag highEffDiscr: "       << corJet->discriminators().discriminatorHighEff()       << std::endl;
-//     std::cout << "corJetWithBTag highPurDiscr: "       << corJet->discriminators().discriminatorHighPur()       << std::endl;
-//     std::cout << "corJetWithBTag combSecVtxDiscr: "    << corJet->discriminators().discriminatorCombSecVtx()    << std::endl;
-//     //  std::cout << "corJetWithBTag combSecVtxMVADiscr: " << corJet->discriminators().discriminatorCombSecVtxMVA() << std::endl;
-//     //  std::cout << "corJetWithBTag softMuonDiscr: "      << corJet->discriminators().discriminatorSoftMuon()      << std::endl;
-//     //  std::cout << "corJetWithBTag softElectronDiscr: "  << corJet->discriminators().discriminatorSoftElectron()  << std::endl;
-//     std::cout << "corJetWithBTag jetProbDiscr: "       << corJet->discriminators().discriminatorJetProb()       << std::endl;
-//     
-
-    setMomentum (myvector, (*jet)->p4());      
-    new (jetOtherWithBTag[counter]) TLorentzVector (myvector);
-    std::cout << "jetOtherWithBTag set" << std::endl;
-
-    compoSVbTagDiscrWithBTag_->push_back(discrVec[0]);
-    std::cout << "compoSVbTagDiscrWithBTag set" << std::endl;
-    highPURbTagDiscrWithBTag_->push_back(discrVec[1]);
-    std::cout << "highPURbTagDiscrWithBTag set" << std::endl;
-    highEFFbTagDiscrWithBTag_->push_back(discrVec[2]);
-    std::cout << "highEFFbTagDiscrWithBTag set" << std::endl;
-    discriminatorVecWithBTag_->push_back(discrVec);
-    std::cout << "discriminatorVecWithBTag set" << std::endl;
-    corEtWithBTag_->push_back(corrEt);
-    std::cout << "corEtWithBTag set" << std::endl;
-    emFracWithBTag_->push_back(emFrac);
-    std::cout << "emFrac set" << std::endl;
-    
-    counter++;    
-
-  }
-
-}
-
-void SimpleNtple::FillcorIC5PFJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-}
-void SimpleNtple::FillSC5CaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  std::cout << "SimpleNtple::FillSC5CaloJets" << std::endl;
-
-  edm::Handle<reco::CaloJetCollection> JetHandle ;
-  iEvent.getByLabel (SisCone5CaloJetsTag_, JetHandle) ;
-
-  TClonesArray &jetOther = *m_otherJets_SisCone5CaloJets;
-
-  FillCaloJet(JetHandle,jetOther);
-}
-void SimpleNtple::FillSC5PFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  std::cout << "SimpleNtple::FillIC5PFJets" << std::endl;
-
-  edm::Handle<reco::PFJetCollection> JetHandle ;
-  iEvent.getByLabel (SisCone5PFJetsTag_, JetHandle) ;
-
-  TClonesArray &jetOther = *m_otherJets_SisCone5PFJets;
-
-  FillPFJet(JetHandle,jetOther);
-
-}
-void SimpleNtple::FillcorSC5CaloJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-}
-void SimpleNtple::FillcorSC5PFJetsWithBTag(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-}
-// --------------------------------------------------------------------
-
-
-void  SimpleNtple::FillTracks(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-
-  std::cout << "SimpleNtple::FillTracks" << std::endl;
-  //  edm::Handle<trackCollection> TracksHandle ;
-  edm::Handle<reco::TrackCollection> TracksHandle ;
-  iEvent.getByLabel (TracksTag_, TracksHandle) ;
-  std::cout << "TracksHandle DONE" << std::endl;
-
-  TClonesArray &tracks = *m_tracks;
-  int counter = 0;
-  int index = 0;
-  //  for (trackCollection::const_iterator tkIt = TracksHandle->begin (); 
-  for (reco::TrackCollection::const_iterator tkIt = TracksHandle->begin (); 
-       tkIt != TracksHandle->end (); 
-       ++tkIt, index++ ) 
-    { 
-      std::cout << "index: " << index << std::endl;
-      //      math::XYZVector mom = (*tkIt).innerMomentum () ; 
-      math::XYZVector mom = tkIt->innerMomentum () ; 
-      myvector.SetPx (mom.x ()) ;
-      myvector.SetPy (mom.y ()) ;
-      myvector.SetPz (mom.z ()) ;
-      new (tracks[counter]) TLorentzVector (myvector);
-      counter++;
-     }
-}
-
-
-// --------------------------------------------------------------------
-
-
-void SimpleNtple::FillGenParticles(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-
-  std::cout << "SimpleNtple::FillGenParticles" << std::endl;
- edm::Handle<reco::GenParticleCollection> genParticlesHandle; 
- iEvent.getByLabel (MCtruthTag_,genParticlesHandle);
- 
- TClonesArray &genParticles = *m_genParticles;
- int counter = 0;
- 
- if (IdEvent==123 || IdEvent==124){//---- only if VBF
-  for (reco::GenParticleCollection::const_iterator genIt = genParticlesHandle->begin (); 
-       genIt != genParticlesHandle->end (); 
-       ++genIt ) 
-  {
-   
-   Int_t pdg = genIt->pdgId();
-   Int_t status = genIt->status();
-   Int_t mother1 = 0;
-   if (genIt->numberOfMothers()>0) mother1 = genIt->mother(0)->pdgId();
-   Int_t mother2 = 0;
-   if (genIt->numberOfMothers()>1) mother2 = genIt->mother(1)->pdgId();
-   Int_t daughter1 = 0;
-   if (genIt->numberOfDaughters()>0) daughter1 = genIt->daughter(0)->pdgId();
-   Int_t daughter2 = 0;
-   if (genIt->numberOfDaughters()>1) daughter2 = genIt->daughter(1)->pdgId();
-   Double_t px = genIt->px();
-   Double_t py = genIt->py();
-   Double_t pz = genIt->pz();
-   Double_t etot = genIt->energy();
-   Double_t vx = 0;
-   Double_t vy = 0;
-   Double_t vz = 0;
-   Double_t time = 0;
-  
-   new (genParticles[counter]) TParticle (pdg, status, mother1, mother2, daughter1, daughter2, px, py, pz, etot, vx, vy, vz, time);
-  
-    
-   counter++;
-  }
- }
 }
 
 
@@ -624,159 +577,150 @@ void SimpleNtple::FillGenParticles(const edm::Event& iEvent, const edm::EventSet
 void SimpleNtple::FillGenJet(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-  std::cout << "SimpleNtple::FillGenJet" << std::endl;
- edm::Handle< reco::GenJetCollection > genJetsHandle ;
- iEvent.getByLabel( genJetTag_, genJetsHandle ) ;
-
- TClonesArray &genJets = *m_genJets;
- int counter = 0;
- for (reco::GenJetCollection::const_iterator gJIt = genJetsHandle->begin (); 
-      gJIt != genJetsHandle->end (); 
-      ++gJIt ) 
- { 
+  std::cout << "[SimpleNtple::FillGenJet]" << std::endl;
+  edm::Handle< reco::GenJetCollection > genJetHandle ;
+  iEvent.getByLabel( genJetLabel_, genJetHandle ) ;
   
-  myvector.SetPx ((*gJIt).px ()) ;
-  myvector.SetPy ((*gJIt).py ()) ;
-  myvector.SetPz ((*gJIt).pz ()) ;
-  myvector.SetE ((*gJIt).emEnergy () + (*gJIt).hadEnergy ()) ;
-  new (genJets[counter]) TLorentzVector (myvector);
-  counter++;
- }
-}
+  TClonesArray &genJet = *genjetP4_;
+  int genjetIndex = 0;
+  for (reco::GenJetCollection::const_iterator genjet_itr = genJetHandle->begin (); 
+       genjet_itr != genJetHandle->end (); ++genjet_itr, genjetIndex++ ) { 
+  
+    myvector_.SetPx ( genjet_itr->px() );
+    myvector_.SetPy ( genjet_itr->py() );
+    myvector_.SetPz ( genjet_itr->pz() );
+    myvector_.SetE  ( genjet_itr->emEnergy() + genjet_itr->hadEnergy() );
+    new (genJet[genjetIndex]) TLorentzVector (myvector_);
 
-
-
-// --------------------------------------------------------------------
-
-
-void SimpleNtple::FillGenMet(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-
-  std::cout << "SimpleNtple::FillGenMet" << std::endl;
- edm::Handle< reco::GenMETCollection > genMetHandle ;
- iEvent.getByLabel( genMetTag_, genMetHandle ) ;
-
- TClonesArray &genMets = *m_genMet;
- int counter = 0;
- for (reco::GenMETCollection::const_iterator gMIt = genMetHandle->begin (); 
-      gMIt != genMetHandle->end (); 
-      ++gMIt ) 
- { 
-  myvector.SetPx ((*gMIt).px ()) ;
-  myvector.SetPy ((*gMIt).py ()) ;
-  myvector.SetPz ((*gMIt).pz ()) ;
-  myvector.SetE ((*gMIt).emEnergy () + (*gMIt).hadEnergy ()) ;
-  new (genMets[counter]) TLorentzVector (myvector);
-  counter++;
- }
-}
-
-// --------------------------------------------------------------------
-
-
-void SimpleNtple::Init(){
-
-  std::cout << "SimpleNtple::Init" << std::endl;
-  nEle = 0; 
-  nMu = 0;
-  for (int i=0;i<30;i++){
-    IsolEleSumPt[i]=0;IsolEleNTracks[i]=0;EleId[i]=0;
-    IsolMuSumPt[i]=0;IsolMuNTracks[i]=0;
   }
 
-  MinvTags = -1;
+}
+
+
+
+// --------------------------------------------------------------------
+void SimpleNtple::FillGenMet(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  std::cout << "[SimpleNtple::FillGenMet]" << std::endl;
+  edm::Handle< reco::GenMETCollection > genMetHandle ;
+  iEvent.getByLabel( genMetLabel_, genMetHandle ) ;
+  
+  TClonesArray &genMets = *genmetP4_;
+  int metIndex = 0;
+  for (reco::GenMETCollection::const_iterator met_itr = genMetHandle->begin (); 
+       met_itr != genMetHandle->end (); ++met_itr, metIndex++ ) { 
+    myvector_.SetPx ( met_itr->px () );
+    myvector_.SetPy ( met_itr->py () );
+    myvector_.SetPz ( met_itr->pz () );
+    myvector_.SetE ( met_itr->emEnergy () + met_itr->hadEnergy () );
+    new (genMets[metIndex]) TLorentzVector (myvector_);
+  }
+  std::cout << "[SimpleNtple::FillGenMet] DONE" << std::endl;
 }
 
 
 // ------------ method called once each job just before starting event loop  ------------
-
-
 void SimpleNtple::beginJob(const edm::EventSetup& iSetup)
 {
 
-  std::cout << "SimpleNtple::beginJob" << std::endl;
-  mytree_->Branch("IdEvent",&IdEvent,"IdEvent/I");
+  std::cout << "[SimpleNtple::beginJob]" << std::endl;
+  tagjetInvMass_    = new std::vector<double>;    // depends on the tag jet definition
+  tagjetDeltaEta_   = new std::vector<double>;
+  tagjetZeppenfeld_ = new std::vector<double>;
+  zjetInvMass_    = new std::vector<double>;    // depends on the z jet definition => btagger?
+  zjetDeltaEta_   = new std::vector<double>;
+  zjetZeppenfeld_ = new std::vector<double>;
+  mytree_->Branch("evtID",&evtID_,"evtID_/I");
  
-  mytree_->Branch("nEle",&nEle,"nEle/I");
-  mytree_->Branch("IsolEleSumPt",IsolEleSumPt,"IsolEleSumPt[30]/F");
-  mytree_->Branch("IsolEleNTracks",IsolEleNTracks,"IsolEleNTracks[30]/F");
-  mytree_->Branch("EleId",EleId,"EleId[30]/I");
+  // vector of the TLorentz Vectors of electron
+  eleP4_    = new TClonesArray ("TLorentzVector");
+  eleVtxP3_ = new TClonesArray ("TVector3");
+  eleEt_        = new std::vector<double>;
+  elePt_        = new std::vector<double>;
+  eleD0_        = new std::vector<double>;
+  eleDxy_       = new std::vector<double>;
+  eleDxyError_  = new std::vector<double>;
+  eleIsoSumPt_  = new std::vector<double>;
+  eleIsoNtrack_ = new std::vector<double>;
+  eleID_        = new std::vector<int>;
+  mytree_->Branch("electronP4",     "TClonesArray",       &eleP4_,    256000,0);
+  mytree_->Branch("electronVtxP3",  "TClonesArray",       &eleVtxP3_, 256000,0);
+  mytree_->Branch("eleN",                                 &eleN_,"eleN_/I");
+  mytree_->Branch("eleIsoSumPt",    "std::vector<double>",&eleIsoSumPt_);
+  mytree_->Branch("eleIsoEleNtrack","std::vector<double>",&eleIsoNtrack_);
+  mytree_->Branch("eleID",          "std::vector<int>",   &eleID_);     
 
-  mytree_->Branch("nMu",&nMu,"nMu/I");
-  mytree_->Branch("IsolMuSumPt",IsolMuSumPt,"IsolMuSumPt[30]/F");
-  mytree_->Branch("IsolMuNTracks",IsolMuNTracks,"IsolMuNTracks[30]/F");
-
-  mytree_->Branch("MinvTags",&MinvTags,"MinvTags/F");
+  // vector of the TLorentz Vectors of muon
+  muP4_    = new TClonesArray ("TLorentzVector");
+  muVtxP3_ = new TClonesArray ("TVector3");
+  muEt_        = new std::vector<double>;
+  muPt_        = new std::vector<double>;
+  muD0_        = new std::vector<double>;
+  muDxy_       = new std::vector<double>;
+  muDxyError_  = new std::vector<double>;
+  muIsoSumPt_  = new std::vector<double>;
+  muIsoNtrack_ = new std::vector<double>;
+  muID_        = new std::vector<int>;
+  mytree_->Branch("muonP4",     "TClonesArray",       &muP4_,    256000,0);
+  mytree_->Branch("muonVtxP3",  "TClonesArray",       &muVtxP3_, 256000,0);
+  mytree_->Branch("muN",                              &muN_,      "muN_/I");
+  mytree_->Branch("muIsoSumPt", "std::vector<double>",&muIsoSumPt_);
+  mytree_->Branch("muIsoNtrack","std::vector<double>",&muIsoNtrack_);
+  mytree_->Branch("muID",       "std::vector<int>",   &muID_);
 
   // vector with the 2 tag TLorentzVectors
-  m_tagJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("tagJets", "TClonesArray", &m_tagJets, 256000,0);
-
-  // vector of the TLorentz Vectors of other jets
-  m_otherJets = new TClonesArray ("TLorentzVector");
-  emFrac_     = new std::vector<double>;
-  mytree_->Branch ("otherJets", "TClonesArray", &m_otherJets, 256000,0);
-  mytree_->Branch ("jetEMfrac", "std::vector<double>",&emFrac_);
-
-  m_otherJets_IterativeCone5CaloJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_IterativeCone5CaloJets", "TClonesArray", &m_otherJets_IterativeCone5CaloJets, 256000,0);
-  m_otherJets_IterativeCone5PFJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_IterativeCone5PFJets", "TClonesArray", &m_otherJets_IterativeCone5PFJets, 256000,0);
+  tagjetP4_    = new TClonesArray ("TLorentzVector");
+  tagjetVtxP3_ = new TClonesArray ("TVector3");
+  tagjetEmFrac_ = new std::vector<double>;
+  tagjetChFrac_ = new std::vector<double>;
+  tagjetCorEt_  = new std::vector<double>;
+  tagjetCorPt_  = new std::vector<double>;
+  mytree_->Branch ("tagjetP4",    "TClonesArray",       &tagjetP4_,    256000,0);
+  mytree_->Branch ("tagjetVtxP3", "TClonesArray",       &tagjetVtxP3_, 256000,0);
+  mytree_->Branch ("tagjetEmFrac","std::vector<double>",&tagjetEmFrac_);
+  mytree_->Branch ("tagjetChFrac","std::vector<double>",&tagjetChFrac_);
+  mytree_->Branch ("tagjetCorEt", "std::vector<double>",&tagjetCorEt_);
+  mytree_->Branch ("tagjetCorPt", "std::vector<double>",&tagjetCorPt_);
 
   // vector of the TLorentz Vectors of other jets with b tag
-  m_otherJets_corIterativeCone5CaloJetsWithBTag = new TClonesArray ("TLorentzVector");
-  emFracWithBTag_           = new std::vector<double>;
-  corEtWithBTag_            = new std::vector<double>;
-  compoSVbTagDiscrWithBTag_ = new std::vector<double>;
-  highEFFbTagDiscrWithBTag_ = new std::vector<double>;
-  highPURbTagDiscrWithBTag_ = new std::vector<double>;
-  discriminatorVecWithBTag_ = new std::vector<std::vector<double> >;
-  mytree_->Branch ("otherJets_corIterativeCone5CaloJetsWithBTag", "TClonesArray", &m_otherJets_corIterativeCone5CaloJetsWithBTag, 256000,0);
-  mytree_->Branch ("jetEMfracWithBTag",       "std::vector<double>",&emFracWithBTag_);
-  mytree_->Branch ("jetCorEtWithBTag",        "std::vector<double>",&corEtWithBTag_);
-  mytree_->Branch ("compoSVbTagDiscrWithBTag","std::vector<double>",&compoSVbTagDiscrWithBTag_);
-  mytree_->Branch ("highEFFbTagDiscrWithBTag","std::vector<double>",&highEFFbTagDiscrWithBTag_);
-  mytree_->Branch ("highPURbTagDiscrWithBTag","std::vector<double>",&highPURbTagDiscrWithBTag_);
-  mytree_->Branch ("discriminatorVecWithBTag","std::vector<std::vector<double> >",&discriminatorVecWithBTag_);
+  btagjetP4_    = new TClonesArray ("TLorentzVector");
+  btagjetVtxP3_ = new TClonesArray ("TVector3");
+  btagjetEmFrac_           = new std::vector<double>;
+  btagjetChFrac_           = new std::vector<double>;
+  btagjetCorEt_            = new std::vector<double>;
+  btagjetCorPt_            = new std::vector<double>;
+  btagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  btagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  btagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("btagjetP4",              "TClonesArray",       &btagjetP4_,    256000,0);
+  mytree_->Branch ("btagjetVtxP3",           "TClonesArray",       &btagjetVtxP3_, 256000,0);
+  mytree_->Branch ("btagjetEmFrac",          "std::vector<double>",&btagjetEmFrac_);
+  mytree_->Branch ("btagjetChFrac",          "std::vector<double>",&btagjetChFrac_);
+  mytree_->Branch ("btagjetCorEt",           "std::vector<double>",&btagjetCorEt_);
+  mytree_->Branch ("btagjetCorPt",           "std::vector<double>",&btagjetCorPt_);
+  mytree_->Branch ("btagjetcompoSVbTagDiscr","std::vector<double>",&btagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("btagjethighEFFbTagDiscr","std::vector<double>",&btagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("btagjethighPURbTagDiscr","std::vector<double>",&btagjetHighPURbTagDiscr_);
 
-  m_otherJets_corIterativeCone5PFJetsWithBtag = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_corIterativeCone5PFJetsWithBtag", "TClonesArray", &m_otherJets_corIterativeCone5PFJetsWithBtag, 256000,0);
-  m_otherJets_SisCone5CaloJets  = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_SisCone5CaloJets", "TClonesArray", &m_otherJets_SisCone5CaloJets, 256000,0);
-  m_otherJets_SisCone5PFJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_SisCone5PFJets", "TClonesArray", &m_otherJets_SisCone5PFJets, 256000,0);
-  m_otherJets_corSisCone5CaloJetsWithBTag  = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("otherJets_corSisCone5CaloJetsWithBTag", "TClonesArray", &m_otherJets_corSisCone5CaloJetsWithBTag, 256000,0);
-  m_otherJets_corSisCone5PFJetsWithBtag = new TClonesArray ("TLorentzVector");            
-  mytree_->Branch ("otherJets_corSisCone5PFJetsWithBtag", "TClonesArray", &m_otherJets_corSisCone5PFJetsWithBtag, 256000,0);
+  // vector of the TLorentz Vectors of met
+  metP4_ = new TClonesArray ("TLorentzVector");
+  metSig_ = new std::vector<double>;
+  mytree_->Branch ("metP4", "TClonesArray", &metP4_, 256000,0);
 
-  // vector of the TLorentz Vectors of other jets
-  m_electrons = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("electrons", "TClonesArray", &m_electrons, 256000,0);
+  // vector of the TLorentz Vectors of tracks
+  trackP4_ = new TClonesArray ("TLorentzVector");
+  mytree_->Branch ("trackP4", "TClonesArray", &trackP4_, 256000,0);
 
-  // vector of the TLorentz Vectors of other jets
-  m_muons = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("muons", "TClonesArray", &m_muons, 256000,0);
-
-  // vector of the TLorentz Vectors of other jets
-  m_MET = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("MET", "TClonesArray", &m_MET, 256000,0);
-
-  // vector of the TLorentz Vectors of other jets
-  m_tracks = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("tracks", "TClonesArray", &m_tracks, 256000,0);
-
-  // vector of the TLorentz Vectors of other genParticles
-  m_genParticles = new TClonesArray ("TParticle");
-  mytree_->Branch ("genParticles", "TClonesArray", &m_genParticles, 256000,0);
+  // vector of the TLorentz Vectors of other genParticle
+  genparticleP4_ = new TClonesArray ("TParticle");
+  mytree_->Branch ("genParticleP4", "TClonesArray", &genparticleP4_, 256000,0);
 
   // vector of the TLorentz Vectors of other genJets
-  m_genJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("genJets", "TClonesArray", &m_genJets, 256000,0);
+  genjetP4_ = new TClonesArray ("TLorentzVector");
+  mytree_->Branch ("genJetP4", "TClonesArray", &genjetP4_, 256000,0);
 
   // vector of the TLorentz Vectors of other genMet
-  m_genMet = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("genMet", "TClonesArray", &m_genMet, 256000,0);
+  genmetP4_ = new TClonesArray ("TLorentzVector");
+  mytree_->Branch ("genMetP4", "TClonesArray", &genmetP4_, 256000,0);
 
 }
 
@@ -786,18 +730,16 @@ void SimpleNtple::beginJob(const edm::EventSetup& iSetup)
 
 void 
 SimpleNtple::endJob() {
-  std::cout << "SimpleNtple::endJob" << std::endl;
+  std::cout << "[SimpleNtple::endJob]" << std::endl;
 }
 
 
 // --------------------------------------------------------------------
 
 
-void SimpleNtple::setMomentum (TLorentzVector &myvector, const LorentzVector & mom)
-{
-  myvector.SetPx (mom.Px());
-  myvector.SetPy (mom.Py());
-  myvector.SetPz (mom.Pz());
-  myvector.SetE (mom.E());
+void SimpleNtple::setVertex (TVector3 &myvector, const TVector3 & mom) {
+  myvector.SetX (mom.X());
+  myvector.SetY (mom.Y());
+  myvector.SetZ (mom.Z());
 }
 

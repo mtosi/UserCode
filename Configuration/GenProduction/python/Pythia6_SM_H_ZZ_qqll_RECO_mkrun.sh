@@ -9,7 +9,8 @@ else
 fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
-CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
+CONDITION="FrontierConditions_GlobalTag,MC_31X_V1::All"
+#CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
 EVENTCONTENT="RECOSIM"
 DATATIER="GEN-SIM-RECO"
 echo condition $CONDITION
@@ -25,23 +26,23 @@ for k in 130; do
 #for k in ${HIGGSMASSLIST}; do 
     DIROUT="H${k}ZZllqq/"
 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.py '********'
-    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root`
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_MC31X.py '********'
+    echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X.root`
 
-    cmsDriver.py Reconstruction_${k}_10TeV.py \
+    cmsDriver.py RECO_${k}_10TeV.py \
 	-s RAW2DIGI,RECO \
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
 	--conditions $CONDITION \
-	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
-	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL.root \
-	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL_cfg.py \
+	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X.root \
+	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_MC31X.root \
+	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_MC31X_cfg.py \
 	--mc \
 	--dirout $DIROUT \
 	-n 10 \
 	--no_exec
 
-    sed -i -e 's/Reconstruction_/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_IDEAL_cfg.py
+#    sed -i -e 's/RECO_*_10TeV/PYTHIA6_SM_H_ZZ_2l_2jets_mH*_10TeV/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_RECO_MC31X_cfg.py
 done
 echo '****************************************************************************************************************'
 

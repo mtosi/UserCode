@@ -9,7 +9,8 @@ else
 fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
-CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
+CONDITION="FrontierConditions_GlobalTag,MC_31X_V1::All"
+#CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
 EVENTCONTENT="RAWSIM"
 DATATIER="GEN"
 echo condition $CONDITION
@@ -31,7 +32,7 @@ echo '**************************************************************************
 
 #for k in 130; do 
 for k in ${HIGGSMASSLIST}; do 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.py '********'
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X.py '********'
     echo `ls PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py`
 
     DIROUT="H${k}ZZllqq/"
@@ -43,15 +44,15 @@ for k in ${HIGGSMASSLIST}; do
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
 	--conditions $CONDITION \
-        --fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \
-	--python_filename ${DIROPUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py \
+        --fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X.root \
+	--python_filename ${DIROPUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X_cfg.py \
 	--mc \
 	--dirout $DIROUT \
 	-n 10 \
 	--no_exec 
 
-#    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py
-    cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL_cfg.py ${DIROUT}
+#    cvs add PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X_cfg.py
+    cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X_cfg.py ${DIROUT}
     cp PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_cff.py* ${DIROUT}
 done
 echo '****************************************************************************************************************'

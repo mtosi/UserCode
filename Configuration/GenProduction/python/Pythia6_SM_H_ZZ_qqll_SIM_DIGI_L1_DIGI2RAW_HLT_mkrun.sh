@@ -9,7 +9,8 @@ else
 fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
-CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
+CONDITION="FrontierConditions_GlobalTag,MC_31X_V1::All"
+#CONDITION="FrontierConditions_GlobalTag,MC31X_31X::All"
 EVENTCONTENT="RAWSIM"
 DATATIER="GEN-SIM-RAW"
 echo condition $CONDITION
@@ -25,7 +26,7 @@ for k in 130; do
 #for k in ${HIGGSMASSLIST}; do 
     DIROUT="H${k}ZZllqq/"
 
-    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_DIGI_L1_DIGI2RAW_HLT_IDEAL.py '********'
+    echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_DIGI_L1_DIGI2RAW_HLT_MC31X.py '********'
     echo `ls ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN.root`
 
     cmsDriver.py SIM_DIGI_L1_DIGI2RAW_HLT_${k}_10TeV.py \
@@ -33,16 +34,16 @@ for k in 130; do
 	--eventcontent $EVENTCONTENT \
 	--datatier $DATATIER \
 	--conditions $CONDITION \
-	--processName SIM-RAW-HLT \
-	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_IDEAL.root \
-	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL.root \
-	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py \
+	--processName HLT \
+	--filein file:${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_GEN_MC31X.root \
+	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X.root \
+	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X_cfg.py \
 	--mc \
 	--dirout $DIROUT 
 #	-n 10 \
 #	--no_exec
 
-    sed -i -e 's/SIM_DIGI_L1_DIGI2RAW_HLT/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_IDEAL_cfg.py
+    sed -i -e 's/SIM_DIGI_L1_DIGI2RAW_HLT/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X_cfg.py
 
 done
 echo '****************************************************************************************************************'

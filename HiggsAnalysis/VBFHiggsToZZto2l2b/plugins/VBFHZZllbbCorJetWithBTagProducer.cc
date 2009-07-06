@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Wed Mar 18 16:33:51 CET 2009
-// $Id$
+// $Id: VBFHZZllbbCorJetWithBTagProducer.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
 //
 //
 
@@ -95,6 +95,10 @@ VBFHZZllbbCorJetWithBTagProducer::~VBFHZZllbbCorJetWithBTagProducer()
 void VBFHZZllbbCorJetWithBTagProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   //  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::produce]" << std::endl;
+  //  edm::Handle<reco::SecondaryVertexTagInfoCollection> secondaryVtxTagInfosHandle;
+  //  iEvent.getByLabel( "secondaryVertexTagInfos", secondaryVtxTagInfosHandle );
+  //  std::cout << "secondaryVtxTagInfosHandle" << std::endl;
+  //  std::cout << "secondaryVtxTagInfosHandle->size(): " << secondaryVtxTagInfosHandle->size() << std::endl;
 
   std::auto_ptr<vbfhzz2l2b::CorJetWithBTagDiscrCollection> jetCollection;
   
@@ -125,6 +129,20 @@ void VBFHZZllbbCorJetWithBTagProducer::produce(edm::Event& iEvent, const edm::Ev
   }
   else jetCollection.reset( new vbfhzz2l2b::CorJetWithBTagDiscrCollection(edm::RefToBaseProd<Jet>()));
 
+//  for ( unsigned int taggerIndex = 0; taggerIndex != bJetTagInputTags_.size(); taggerIndex++ ) {
+//    for ( reco::SecondaryVertexTagInfoCollection::const_iterator secondaryVtxTagInfos_itr = secondaryVtxTagInfosHandle->begin();
+//	  secondaryVtxTagInfos_itr != secondaryVtxTagInfosHandle->end(); ++secondaryVtxTagInfos_itr ) {
+//      
+//      RefToBase< Jet >        jetRef          = secondaryVtxTagInfos_itr -> jet();
+//      std::cout << "jetRef et: " << jetRef->et() <<std::endl;
+//      double discr = reco::JetFloatAssociation::getValue(*bTagHandle_vec[taggerIndex], jetRef);
+//      std::cout << "[VBFHZZllbbCorJetWithBTagProducer::produce] taggerIndex: " << taggerIndex 
+//		<< " --> discriminator: " << discr << std::endl;
+//    }
+//  }
+//  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::produce] DONE w/ SecondaryVertexTagInfoCollection" << std::endl;
+//  std::cout << "******************" << std::endl;
+
   int jetIndex = 0;    
   for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin(); 
 	jet != jets.end();
@@ -135,7 +153,7 @@ void VBFHZZllbbCorJetWithBTagProducer::produce(edm::Event& iEvent, const edm::Ev
     for ( unsigned int taggerIndex = 0; taggerIndex != bJetTagInputTags_.size(); taggerIndex++ ) {
       double discr = reco::JetFloatAssociation::getValue(*bTagHandle_vec[taggerIndex], **jet);
       //      std::cout << "[VBFHZZllbbCorJetWithBTagProducer::produce] taggerIndex: " << taggerIndex 
-      //		<< " --> discriminator: " << discr << std::endl;
+      //      		<< " --> discriminator: " << discr << std::endl;
       bTagDiscrs.push_back(discr);
     }
 

@@ -110,7 +110,7 @@ SimpleNtple::SimpleNtple(const edm::ParameterSet& iConfig) :
   edm::Service<TFileService> fs ;
   mytree_  = fs->make <TTree>("VBFSimpleTree","VBFSimpleTree"); 
   
-  std::cout << "[SimpleNtple::SimpleNtple] DONE" << std::endl;
+  //  std::cout << "[SimpleNtple::SimpleNtple] DONE" << std::endl;
 
 }
 
@@ -124,15 +124,21 @@ SimpleNtple::~SimpleNtple()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
-  delete tagjetInvMass_;    // depends on the tag jet definition
-  delete tagjetDeltaEta_;
-  delete tagjetZeppenfeld_;
+  delete invmasstagjetInvMass_;    // depends on the tag jet definition
+  delete invmasstagjetDeltaEta_;
+  delete invmasstagjetZeppenfeld_;
+  delete deltaetatagjetInvMass_;    // depends on the tag jet definition
+  delete deltaetatagjetDeltaEta_;
+  delete deltaetatagjetZeppenfeld_;
+  delete zeptagjetInvMass_;    // depends on the tag jet definition
+  delete zeptagjetDeltaEta_;
+  delete zeptagjetZeppenfeld_;
   delete zjetInvMass_;    // depends on the z jet definition => btagger?
   delete zjetDeltaEta_;
   delete zjetZeppenfeld_;
 
   delete eleP4_ ;
-  delete eleVtxP3_;
+  delete elePrimVtxP3_;
   delete eleEt_;
   delete elePt_;
   delete eleIsoSumPt_;
@@ -142,27 +148,69 @@ SimpleNtple::~SimpleNtple()
   delete eleDxyError_;
   delete eleID_;
 
-  delete muP4_ ;
-  delete muVtxP3_;
-  delete muEt_;
-  delete muPt_;
-  delete muIsoSumPt_;
-  delete muIsoNtrack_;
-  delete muD0_;
-  delete muDxy_;
-  delete muDxyError_;
-  delete muID_;
+  delete glbmuPromptTightFlag_;
+  delete glbmuP4_;
+  delete glbmuPrimVtxP3_;
+  delete glbmuCharge_;
+  delete glbmuEmEnergy_;
+  delete glbmuEmS9Energy_;
+  delete glbmuHadEnergy_;
+  delete glbmuHadS9Energy_;
+  delete glbmuHoEnergy_;
+  delete glbmuHoS9Energy_;
+  delete glbmuIso03emEt_;
+  delete glbmuIso03hadEt_;
+  delete glbmuIso03hoEt_;
+  delete glbmuIso03nJets_;
+  delete glbmuIso03nTracks_;
+  delete glbmuIso03sumPt_;
+  delete glbmuIso05emEt_;
+  delete glbmuIso05hadEt_;
+  delete glbmuIso05hoEt_;
+  delete glbmuIso05nJets_;
+  delete glbmuIso05nTracks_;
+  delete glbmuIso05sumPt_  ;
+  delete glbmuChi2_;
+  delete glbmuNdof_;
+  delete glbmud0_;
+  delete glbmud0Err_;
+  delete glbmudz_;
+  delete glbmudzErr_;
 
-  delete tagjetP4_;
-  delete tagjetVtxP3_;
-  delete tagjetEmFrac_;
-  delete tagjetChFrac_;
-  delete tagjetCorEt_;
-  delete tagjetCorPt_;
+  delete invmasstagjetP4_;
+  delete invmasstagjetPrimVtxP3_;
+  delete invmasstagjetEmEnergyFraction_;
+  delete invmasstagjetChFrac_;
+  delete invmasstagjetCorEt_;
+  delete invmasstagjetCorPt_;
+  delete invmasstagjetCompoSVbTagDiscr_;
+  delete invmasstagjetHighEFFbTagDiscr_;
+  delete invmasstagjetHighPURbTagDiscr_;
+
+  delete deltaetatagjetP4_;
+  delete deltaetatagjetPrimVtxP3_;
+  delete deltaetatagjetEmEnergyFraction_;
+  delete deltaetatagjetChFrac_;
+  delete deltaetatagjetCorEt_;
+  delete deltaetatagjetCorPt_;
+  delete deltaetatagjetCompoSVbTagDiscr_;
+  delete deltaetatagjetHighEFFbTagDiscr_;
+  delete deltaetatagjetHighPURbTagDiscr_;
+
+  delete zeptagjetP4_;
+  delete zeptagjetPrimVtxP3_;
+  delete zeptagjetEmEnergyFraction_;
+  delete zeptagjetChFrac_;
+  delete zeptagjetCorEt_;
+  delete zeptagjetCorPt_;
+  delete zeptagjetCompoSVbTagDiscr_;
+  delete zeptagjetHighEFFbTagDiscr_;
+  delete zeptagjetHighPURbTagDiscr_;
 
   delete btagjetP4_;
-  delete btagjetVtxP3_; 
-  delete btagjetEmFrac_;
+  delete btagjetPrimVtxP3_; 
+  delete btagjetSecVtxP3_; 
+  delete btagjetEmEnergyFraction_;
   delete btagjetChFrac_;
   delete btagjetCorEt_;
   delete btagjetCorPt_;
@@ -178,7 +226,7 @@ SimpleNtple::~SimpleNtple()
   delete genjetP4_;
   delete genmetP4_;
 
-  std::cout << "[SimpleNtple::~SimpleNtple]" << std::endl;
+  //  std::cout << "[SimpleNtple::~SimpleNtple]" << std::endl;
   
 }
 
@@ -192,7 +240,7 @@ void
 SimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   InitObjs();
-  std::cout << "SimpleNtple::analyze] InitObjs DONE" << std::endl;
+  //  std::cout << "[SimpleNtple::analyze] InitObjs DONE" << std::endl;
   FillEvent                  (iEvent, iSetup);
   FillcorIC5CaloJetsWithBTag (iEvent, iSetup);
   FillMuon                   (iEvent, iSetup);
@@ -205,13 +253,13 @@ SimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     FillcorIC5PFJetsWithBTag (iEvent, iSetup);   
   if ( whichSim_ == FULLSIM )
     FillTrack (iEvent, iSetup);
-  FillGenParticle  (iEvent, iSetup); // got an error message in execution
-  FillGenJet       (iEvent, iSetup);
-  FillGenMet       (iEvent, iSetup);
+  FillGenParticle            (iEvent, iSetup); // got an error message in execution
+  FillGenJet                 (iEvent, iSetup);
+  FillGenMet                 (iEvent, iSetup);
   
   mytree_->Fill();
 
-  std::cout << "[SimpleNtple::analyze] DONE" << std::endl;
+  //  std::cout << "[SimpleNtple::analyze] DONE" << std::endl;
   
 }
 
@@ -224,9 +272,15 @@ void SimpleNtple::InitObjs() {
   evtID_    = 0;
   evtRun_   = 0;
   evtEvent_ = 0;
-  tagjetInvMass_    -> clear ();    // depends on the tag jet definition
-  tagjetDeltaEta_   -> clear ();
-  tagjetZeppenfeld_ -> clear ();
+  invmasstagjetInvMass_    -> clear ();    // depends on the tag jet definition
+  invmasstagjetDeltaEta_   -> clear ();
+  invmasstagjetZeppenfeld_ -> clear ();
+  deltaetatagjetInvMass_    -> clear ();    // depends on the tag jet definition
+  deltaetatagjetDeltaEta_   -> clear ();
+  deltaetatagjetZeppenfeld_ -> clear ();
+  zeptagjetInvMass_    -> clear ();    // depends on the tag jet definition
+  zeptagjetDeltaEta_   -> clear ();
+  zeptagjetZeppenfeld_ -> clear ();
   zjetInvMass_      -> clear ();    // depends on the z jet definition => btagger?
   zjetDeltaEta_     -> clear ();
   zjetZeppenfeld_   -> clear ();
@@ -241,41 +295,77 @@ void SimpleNtple::InitObjs() {
   eleDxy_       -> clear ();
   eleDxyError_  -> clear ();
   eleID_        -> clear ();
-  eleVtxP3_     -> Clear ();
+  elePrimVtxP3_ -> Clear ();
   //muons
-  muN_ = 0;
-  muP4_        -> Clear ();
-  muEt_        -> clear ();
-  muPt_        -> clear ();
-  muIsoSumPt_  -> clear ();
-  muIsoNtrack_ -> clear ();
-  muD0_        -> clear ();
-  muDxy_       -> clear ();
-  muDxyError_  -> clear ();
-  muID_        -> clear ();
-  muVtxP3_     -> Clear ();
+  muN_               = 0;
+  glbmuN_            = 0;
+  glbmuPromptTightN_ = 0;
+  glbmuPromptTightFlag_ -> clear();
+  glbmuP4_          -> Clear();
+  glbmuPrimVtxP3_   -> Clear();
+  glbmuCharge_      -> clear();
+  glbmuEmEnergy_    -> clear() ;   
+  glbmuEmS9Energy_  -> clear() ; 
+  glbmuHadEnergy_   -> clear() ;  
+  glbmuHadS9Energy_ -> clear() ;
+  glbmuHoEnergy_    -> clear() ;   
+  glbmuHoS9Energy_  -> clear() ; 
+  glbmuIso03emEt_   -> clear() ;
+  glbmuIso03hadEt_   -> clear() ;
+  glbmuIso03hoEt_    -> clear() ;
+  glbmuIso03nJets_   -> clear() ;
+  glbmuIso03nTracks_ -> clear() ;
+  glbmuIso03sumPt_   -> clear() ;
+  glbmuIso05emEt_    -> clear() ;
+  glbmuIso05hadEt_   -> clear() ;
+  glbmuIso05hoEt_    -> clear() ;
+  glbmuIso05nJets_   -> clear() ;
+  glbmuIso05nTracks_ -> clear() ;
+  glbmuIso05sumPt_   -> clear() ;
+  glbmuChi2_  -> clear() ;
+  glbmuNdof_  -> clear() ;
+  glbmud0_    -> clear() ;
+  glbmud0Err_ -> clear() ;
+  glbmudz_    -> clear() ;
+  glbmudzErr_ -> clear() ;
   // tag jets
-  tagjetN_      = 0;
-  tagjetNtrack_ = 0;
-  tagjetP4_     -> Clear ();
-  tagjetEmFrac_ -> clear ();
-  tagjetChFrac_ -> clear ();
-  tagjetCorEt_  -> clear ();
-  tagjetCorPt_  -> clear ();
-  tagjetEmFrac_ -> clear ();
-  tagjetVtxP3_  -> Clear ();
+  invmasstagjetN_      = 0;
+  invmasstagjetNtrack_ = 0;
+  invmasstagjetP4_               -> Clear ();
+  invmasstagjetEmEnergyFraction_ -> clear ();
+  invmasstagjetChFrac_           -> clear ();
+  invmasstagjetCorEt_            -> clear ();
+  invmasstagjetCorPt_            -> clear ();
+  invmasstagjetPrimVtxP3_        -> Clear ();
+  deltaetatagjetN_      = 0;
+  deltaetatagjetNtrack_ = 0;
+  deltaetatagjetP4_               -> Clear ();
+  deltaetatagjetEmEnergyFraction_ -> clear ();
+  deltaetatagjetChFrac_           -> clear ();
+  deltaetatagjetCorEt_            -> clear ();
+  deltaetatagjetCorPt_            -> clear ();
+  deltaetatagjetPrimVtxP3_        -> Clear ();
+  zeptagjetN_      = 0;
+  zeptagjetNtrack_ = 0;
+  zeptagjetP4_               -> Clear ();
+  zeptagjetEmEnergyFraction_ -> clear ();
+  zeptagjetChFrac_           -> clear ();
+  zeptagjetCorEt_            -> clear ();
+  zeptagjetCorPt_            -> clear ();
+  zeptagjetPrimVtxP3_        -> Clear ();
   // other jets with b tag
   btagjetN_      = 0;
   btagjetNtrack_ = 0;
   btagjetP4_               -> Clear ();
-  btagjetEmFrac_           -> clear ();
+  btagjetEmEnergyFraction_ -> clear ();
   btagjetChFrac_           -> clear ();
   btagjetCorEt_            -> clear ();
   btagjetCorPt_            -> clear ();
   btagjetCompoSVbTagDiscr_ -> clear ();
   btagjetHighEFFbTagDiscr_ -> clear ();
   btagjetHighPURbTagDiscr_ -> clear ();
-  btagjetVtxP3_            -> Clear ();
+  btagjetPrimVtxP3_        -> Clear ();
+  btagjetSecVtxP3_         -> Clear ();
  
   // met
   metP4_  -> Clear ();
@@ -334,13 +424,212 @@ void SimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const edm
   iEvent.getByLabel(corIC5CaloJetsWithBTagLabel_,"corJetWithBTagDiscr",corJetWithBTagHandle);
   //  std::cout << "corJetWithBTagHandle->size(): " << corJetWithBTagHandle->size() << std::endl;
 
-  TClonesArray &jetP4 = *btagjetP4_;
+  edm::Handle<reco::SecondaryVertexTagInfoCollection> secondaryVtxTagInfosHandle;
+  iEvent.getByLabel( "secondaryVertexTagInfos", secondaryVtxTagInfosHandle );  
+
+
+  
+  const TrackIPTagInfoRef & trkIPtagInfoRef = secondaryVtxTagInfosHandle -> at(0) . trackIPTagInfoRef ();
+  //  reco::TrackIPTagInfoCollection::const_iterator trackIPTagInfos = 
+
+  std::cout << "****************************************************************" << std::endl;
+  std::cout << "************************ primary vertex ************************" << std::endl;
+  edm::Ref< reco::VertexCollection > primVtxColl = (trkIPtagInfoRef.product()) -> at(0) . primaryVertex ();
+  std::cout << "primVtxColl.size(): " << (primVtxColl.product())->size() << std::endl;
+
+  double chi2 = primVtxColl->chi2(); // chi-squares
+  bool   isFake = primVtxColl->isFake(); //	Tells whether a Vertex is fake, i.e.
+  bool   isValid = primVtxColl->isValid(); // Tells whether the vertex is valid.
+  double ndof = primVtxColl->ndof(); // Number of degrees of freedom
+  // Meant to be Double32_t for soft-assignment fitters:
+  // tracks may contribute to the vertex with fractional weights. 
+  double normalizedChi2 = primVtxColl->normalizedChi2(); //	chi-squared divided by n.d.o.f.
+  const reco::Vertex::Point & position = primVtxColl->position (); // position
+  size_t tracksSize = primVtxColl->tracksSize(); //	number of tracks
+  double x = primVtxColl->x(); // x coordinate
+  double y = primVtxColl->y(); // y coordinate
+  double z = primVtxColl->z(); // z coordinate
+  double xError = primVtxColl->xError(); //	error on x
+  double yError = primVtxColl->yError(); //	error on y
+  double zError = primVtxColl->zError(); //	error on z
+  
+  std::cout << "x: " << x << "+o-" << xError << std::endl;
+  std::cout << "y: " << y << "+o-" << yError << std::endl;
+  std::cout << "z: " << z << "+o-" << zError << std::endl;
+  std::cout << "isFake: " << isFake << " <--> isValid: " << isValid << std::endl;
+  std::cout << "chi2: " << chi2 << " ndof: " << ndof << " => normalizedChi2: " << normalizedChi2 << "(" << chi2/ndof << ")" << std::endl;
+  std::cout << "tracksSize: " << tracksSize << std::endl;
+  std::cout << "****************************************************************" << std::endl;
+    
+      
+  
+  TClonesArray &jetP4        = *btagjetP4_;
+  TClonesArray &jetPrimVtxP3 = *btagjetPrimVtxP3_;
+  TClonesArray &jetSecVtxP3  = *btagjetSecVtxP3_;
   int jetIndex = 0;
   std::vector<reco::JetBaseRef> jets = vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets(*corJetWithBTagHandle);  
-  for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin(); 
-	jet != jets.end(); ++jet, jetIndex++ ) {
-    //    std::cout << "jetIndex: " << jetIndex << std::endl;
+  reco::SecondaryVertexTagInfoCollection::const_iterator secondaryVtxTagInfos_itr = secondaryVtxTagInfosHandle->begin(); 
+  std::cout << "///////////// loop over jet collection ///////////" << std::endl;
+  for ( std::vector<reco::JetBaseRef>::const_iterator jet = jets.begin();
+	jet != jets.end(); ++jet, jetIndex++, ++secondaryVtxTagInfos_itr ) {
+    std::cout << "   jetIndex: " << jetIndex << std::endl;
+
+    //    RefToBase<Jet> sVjetRef = secondaryVtxTagInfos_itr -> jet();
+    //    const JetTracksAssociationRef & jetTrackAssRef = secondaryVtxTagInfos_itr -> jtaRef();
+    //    unsigned int   nSelTrks   = secondaryVtxTagInfos_itr -> nSelectedTracks ();
+    TrackRefVector selTrkColl = secondaryVtxTagInfos_itr ->trackIPTagInfoRef() -> selectedTracks ();
+
+    //    TrackRefVector trkColl = secondaryVtxTagInfos_itr -> tracks (); // returns a list of tracks associated to the jet [belongs to BaseTagInfo]
+    //    std::cout << "trkColl.size():    " << trkColl.size() << std::endl;
+    std::cout << "   selTrkColl.size(): " << selTrkColl.size() << std::endl;
+
+    std::cout << "   /-/-/-/-/-/-/-/ loop over selTrkColl /-/-/-/-/-/-/-/" << std::endl;
+    for ( unsigned int index = 0; index != selTrkColl.size(); index++ ) { // of course the maximum number of tracks [for which one gets IP data] is the amount of selected tracks
+      //      TrackRef selTrkRef = secondaryVtxTagInfos_itr -> track (index);
+      //      const reco::SecondaryVertexTagInfo::TrackData selTrkDataByRef  = secondaryVtxTagInfos_itr -> trackData (selTrkRef);
+      //      const reco::TrackIPTagInfo::TrackIPData selTrkIPDataByRef = secondaryVtxTagInfos_itr -> trackIPData (selTrkRef);
+
+      const reco::SecondaryVertexTagInfo::TrackData selTrkData  = secondaryVtxTagInfos_itr -> trackData (index); // what can I do w/ this?!?!?
+      const reco::TrackIPTagInfo::TrackIPData selTrkIPData = secondaryVtxTagInfos_itr -> trackIPData (index);
+
+      std::cout << "      --- nSelTrks index: " << index << std::endl;
+      std::cout << "      selTrkData.usedForVertexFit():     " << selTrkData.usedForVertexFit()     << std::endl;
+      std::cout << "      selTrkData.associatedToVertex():   " << selTrkData.associatedToVertex()   << std::endl; // associatedToVertex() referers to secondary vertex
+      if (selTrkData.associatedToVertex()) {
+	std::cout << "        nVtxCand: " << secondaryVtxTagInfos_itr -> nVertexCandidates () << std::endl;
+	std::cout << "        nVtx:     " << secondaryVtxTagInfos_itr -> nVertices ()         << std::endl;
+      }
+      std::cout << "      selTrkIPData.distanceToFirstTrack: " << selTrkIPData.distanceToFirstTrack << std::endl;
+      std::cout << "      selTrkIPData.distanceToJetAxis:    " << selTrkIPData.distanceToJetAxis    << std::endl;
+      std::cout << "      selTrkIPData.ip2d.significance():  " << selTrkIPData.ip2d.significance()  << std::endl;   
+      std::cout << "      selTrkIPData.ip3d.significance():  " << selTrkIPData.ip3d.significance()  << std::endl;
+    }
+    std::cout << "   ----------------------------------------------------------------" << std::endl;
+
+    unsigned int trackIPTagInfosIndex = 0;
+    const TrackIPTagInfoRef & trkIPtagInfoRef = secondaryVtxTagInfos_itr -> trackIPTagInfoRef ();
+    std::cout << "   (trkIPtagInfoRef.product())->size(): " << (trkIPtagInfoRef.product())->size() << std::endl;
+    std::cout << "   /---/---/---/---/ loop over trkIPtagInfos /---/---/---/---/" << std::endl;
+    for ( reco::TrackIPTagInfoCollection::const_iterator trackIPTagInfos_itr = (trkIPtagInfoRef.product())->begin(); 
+	 trackIPTagInfos_itr !=  (trkIPtagInfoRef.product())->end(); ++trackIPTagInfos_itr, trackIPTagInfosIndex++ ) {
+      std::cout << "     ---> trackIPTagInfosIndex: " << trackIPTagInfosIndex << std::endl;
+
+      // look @ TrackIPData
+      const std::vector<reco::TrackIPTagInfo::TrackIPData> & ipColl = trackIPTagInfos_itr -> impactParameterData (); // vectors of TrackIPData orderd as the selectedTracks()
+
+      int selTrkNum    = trackIPTagInfos_itr->selectedTracks().size();
+      int selTrkNum_S1 = 0;
+      int selTrkNum_S2 = 0;
+      int selTrkNum_S3 = 0;
+      
+      double selTrkSumPt    = 0.;
+      double selTrkSumPt_S1 = 0.;
+      double selTrkSumPt_S2 = 0.;
+      double selTrkSumPt_S3 = 0.;
+
+      // additional vectors to store subgroups of selectedTracks
+      reco::TrackRefVector selTrkColl_S1; // track collection w/ significance > 1.
+      reco::TrackRefVector selTrkColl_S2; // track collection w/ significance > 2.
+      reco::TrackRefVector selTrkColl_S3; // track collection w/ significance > 3.
+
+      std::cout << "      ipColl.size():     " << ipColl.size()     << std::endl;
+      std::cout << "      selTrkColl.size(): " << selTrkColl.size() << std::endl;
     
+      unsigned int trkIndex = 0;
+      std::cout << "      /-*-/-*-/-*-/ loop over selTrkColl /-*-/-*-/-*-/" << std::endl;
+      reco::TrackRefVector::const_iterator selTrkColl_itr = selTrkColl.begin();
+      for ( reco::TrackRefVector::const_iterator selTrkColl_itr = selTrkColl.begin();
+	    selTrkColl_itr != selTrkColl.end();
+	    ++selTrkColl_itr, trkIndex++ ) {
+
+	const reco::TrackIPTagInfo::TrackIPData selTrkIP = secondaryVtxTagInfos_itr -> trackIPData (trkIndex);
+
+	++selTrkNum;
+	selTrkSumPt += (*selTrkColl_itr)->pt();
+
+	std::cout << "         ----- trkIndex: " << trkIndex << std::endl;
+	std::cout << "         selTrkColl_itr -> charge ():    " << (*selTrkColl_itr) -> charge()   << std::endl;
+	std::cout << "         selTrkIP.ip2d.significance:     " << selTrkIP.ip2d.significance()    << std::endl;
+	std::cout << "         selTrkIP.ip3d.significance:     " << selTrkIP.ip3d.significance()    << std::endl;
+	//	std::cout << "         ipColl_itr->ip2d.significance:  " << ipColl_itr->ip2d.significance() << std::endl;
+	//	std::cout << "         ipColl_itr->ip3d.significance:  " << ipColl_itr->ip3d.significance() << std::endl;
+
+	// take tracks with minimum IP significance
+	if ( fabs(selTrkIP.ip3d.significance()) > 1. ) {
+	  //	if ( fabs(ipColl_itr->ip3d.significance()) > 1. ) {
+	  selTrkColl_S1.push_back(*selTrkColl_itr);
+	  selTrkSumPt_S1 += (*selTrkColl_itr)->pt();
+	  ++selTrkNum_S1;
+	}
+	if ( fabs(selTrkIP.ip3d.significance()) > 2. ) {
+	  //	if ( fabs(ipColl_itr->ip3d.significance()) > 2. ) {
+	  selTrkColl_S2.push_back(*selTrkColl_itr);
+	  selTrkSumPt_S2 += (*selTrkColl_itr)->pt();
+	  ++selTrkNum_S2;
+	}
+	if ( fabs(selTrkIP.ip3d.significance()) > 3. ) {
+	  //	if ( fabs(ipColl_itr->ip3d.significance()) > 3. ) {
+	  selTrkColl_S3.push_back(*selTrkColl_itr);
+	  selTrkSumPt_S3 += (*selTrkColl_itr)->pt();
+	  ++selTrkNum_S3;
+	}
+      }
+      std::cout << "      /-*-/-*-/-*-/-*-/-*-/-*-/-*-/-*-/-*-/-*-/-*-/-*-/" << std::endl;
+
+      // evaluate tag tracks invariant mass
+      double bTagTkInvMass    = vbfhzz2l2b::tracksInvariantMass( selTrkColl    );
+      double bTagTkInvMass_S1 = vbfhzz2l2b::tracksInvariantMass( selTrkColl_S1 );
+      double bTagTkInvMass_S2 = vbfhzz2l2b::tracksInvariantMass( selTrkColl_S2 );
+      double bTagTkInvMass_S3 = vbfhzz2l2b::tracksInvariantMass( selTrkColl_S3 );
+      
+      std::cout << "      bTagTkInvMass   : " << bTagTkInvMass   
+		<< "      bTagTkInvMass_S1: " << bTagTkInvMass_S1
+		<< "      bTagTkInvMass_S2: " << bTagTkInvMass_S2
+		<< "      bTagTkInvMass_S3: " << bTagTkInvMass_S3 << std::endl;
+      
+      std::cout << "      selTrkSumPt   : " << selTrkSumPt    
+		<< "      selTrkSumPt_S1: " << selTrkSumPt_S1 
+		<< "      selTrkSumPt_S2: " << selTrkSumPt_S2 
+		<< "      selTrkSumPt_S3: " << selTrkSumPt_S3 << std::endl;
+      
+    }
+    std::cout << "   /---/---/---/---/---/---/---/---/---/---/---/---/" << std::endl;
+    
+    
+      
+    unsigned int nVtxCand = secondaryVtxTagInfos_itr -> nVertexCandidates ();
+    unsigned int nVtx     = secondaryVtxTagInfos_itr -> nVertices ();
+    std::cout << "   nVtxCand: " << nVtxCand << std::endl;
+    std::cout << "   nVtx:     " << nVtx << std::endl;
+    for ( unsigned int secVtxCandIndex = 0; secVtxCandIndex != nVtxCand; secVtxCandIndex++ ) {
+      std::cout << "      ****************************************************************" << std::endl;
+      std::cout << "      *********************** secondary vertex ***********************" << std::endl;
+      
+      unsigned int nVtxTrks = secondaryVtxTagInfos_itr -> nVertexTracks (secVtxCandIndex);
+      std::cout << "      nVtxTrks: " << nVtxTrks << std::endl;
+
+      const Vertex   secVtx = secondaryVtxTagInfos_itr -> secondaryVertex (secVtxCandIndex);
+      double x = secVtx.x(); // x coordinate
+      double y = secVtx.y(); // y coordinate
+      double z = secVtx.z(); // z coordinate
+      double xError = secVtx.xError(); //	error on x
+      double yError = secVtx.yError(); //	error on y
+      double zError = secVtx.zError(); //	error on z
+      std::cout << "      x: " << x << "+o-" << xError << std::endl;
+      std::cout << "      y: " << y << "+o-" << yError << std::endl;
+      std::cout << "      z: " << z << "+o-" << zError << std::endl;
+      reco::TrackRefVector vtxTrkColl = secondaryVtxTagInfos_itr -> vertexTracks (secVtxCandIndex);
+      std::cout << "      vtxTrks.size(): " << vtxTrkColl.size() << std::endl;
+      unsigned int trkIndex = secondaryVtxTagInfos_itr -> findTrack (vtxTrkColl[0]);
+      std::cout << "      trkIndex: " << trkIndex << " <--> 0" << std::endl;
+      trkIndex = secondaryVtxTagInfos_itr -> findTrack (vtxTrkColl[1]);
+      std::cout << "      trkIndex: " << trkIndex << " <--> 1" << std::endl;
+      std::cout << "      ****************************************************************" << std::endl;
+    }
+ 
+    std::cout << "   ****************************************************************" << std::endl;
+    std::cout << "   ********************** b tag dicriminator **********************" << std::endl;
+   
     std::vector<double> discrVec = (*corJetWithBTagHandle)[*jet].discrVec_;
 //    std::cout << "corJetWithBTag highEffDiscr: "       << discrVec[vbfhzz2l2b::HIGHEFF]    << std::endl;
 //    std::cout << "corJetWithBTag highPurDiscr: "       << discrVec[vbfhzz2l2b::HIGHPUR]    << std::endl;
@@ -350,12 +639,21 @@ void SimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const edm
     double uncorrPt = (*jet)->pt();
     double corPt    = (corrEt/uncorrEt)*uncorrPt;
     double emFrac = (dynamic_cast<const reco::CaloJet*>(&**jet))->emEnergyFraction();
+    double etaeta = (*jet)->etaetaMoment ();
+    double etaphi = (*jet)->etaphiMoment ();
+    double phiphi = (*jet)->phiphiMoment ();
+    double maxEinEmTow  = (dynamic_cast<const reco::CaloJet*>(&**jet))->maxEInEmTowers();
+    double maxEinHadTow = (dynamic_cast<const reco::CaloJet*>(&**jet))->maxEInHadTowers();
 
     vbfhzz2l2b::setMomentum (myvector_, (*jet)->p4());
     new (jetP4[jetIndex]) TLorentzVector (myvector_);
+    //    vbfhzz2l2b::setVertex   (myvertex_, trackIPTagInfos_itr->primaryVertex ());
+    new (jetPrimVtxP3[jetIndex]) TVector3       (myvertex_);
+    //    vbfhzz2l2b::setVertex   (myvertex_, secondaryVtxTagInfos_itr -> secondaryVertex (index) );
+    new (jetSecVtxP3[jetIndex])  TVector3       (myvertex_);
     //    btagjetNtrack_ = ;
-    btagjetEmFrac_  -> push_back (emFrac);
-    //    btagjetChFrac_ -> push_back ();
+    btagjetEmEnergyFraction_  -> push_back (emFrac);
+    btagjetChFrac_ -> push_back (corPt/corrEt);
     btagjetCorEt_            -> push_back (corrEt);
     btagjetCorPt_	     -> push_back (corPt);
     btagjetHighPURbTagDiscr_ -> push_back (discrVec[vbfhzz2l2b::HIGHEFF]   );
@@ -364,6 +662,7 @@ void SimpleNtple::FillcorIC5CaloJetsWithBTag(const edm::Event& iEvent, const edm
     //  btagjetVtxP3_;  
 
   }
+  std::cout << "///////////////////////////////////////////////////////////////////////" << std::endl;
   btagjetN_ = jets.size();
 }
 
@@ -379,29 +678,60 @@ void SimpleNtple::FillMuon(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel (muonLabel_,muonHandle);
 
 
-  TClonesArray &muonP4 = *muP4_;
-  TClonesArray &muonVtxP3 = *muVtxP3_;
+  TClonesArray &muonP4    = *glbmuP4_;
+  TClonesArray &muonPrimVtxP3 = *glbmuPrimVtxP3_;
 
   int muonIndex = 0;
+  int globalmuonCounter = 0;
+  int globalmuonprompttightCounter = 0;
   for ( reco::MuonCollection::const_iterator muon_itr = muonHandle->begin();
 	muon_itr != muonHandle->end(); ++muon_itr, muonIndex++ ) {
-    vbfhzz2l2b::setMomentum (myvector_, muon_itr->p4());
-    //    setVertex(myvertex_,muon_itr->Vertex());
-    new (muonP4[muonIndex]) TLorentzVector (myvector_);
-    new (muonVtxP3[muonIndex]) TVector3 (myvertex_);
 
-    //    muEt_        -> push_back ();
-    muPt_        -> push_back (muon_itr->pt());
-    //    muIsoSumPt_  -> push_back ();
-    //    muIsoNtrack_ -> push_back ();
-    //    muD0_        -> push_back ();
-    //    muDxy_       -> push_back ();
-    //    muDxyError_  -> push_back ();
-    //    muID_        -> push_back ();
+    bool glbmuPromptTightFlag = false;
+    if ( !muon_itr->isGlobalMuon() ) continue;
+    globalmuonCounter++;
+    if ( muon_itr->isGood(reco::Muon::GlobalMuonPromptTight) ) {
+      globalmuonprompttightCounter++;
+      glbmuPromptTightFlag = true;
+    }
+
+    glbmuPromptTightFlag_ -> push_back(glbmuPromptTightFlag);
+    vbfhzz2l2b::setMomentum (myvector_, muon_itr->p4()    );
+    vbfhzz2l2b::setVertex   (myvertex_, muon_itr->vertex());
+    //    vbfhzz2l2b::setVertex   (myvertex_, muon_itr-> globalTrack()->referencePoint();
+    new (muonP4[muonIndex])    TLorentzVector (myvector_);
+    new (muonPrimVtxP3[muonIndex]) TVector3       (myvertex_);
+
+    glbmuCharge_       -> push_back (muon_itr -> charge() );
+    glbmuEmEnergy_     -> push_back (muon_itr -> calEnergy().em    );   
+    glbmuEmS9Energy_   -> push_back (muon_itr -> calEnergy().emS9  ); 
+    glbmuHadEnergy_    -> push_back (muon_itr -> calEnergy().had   );  
+    glbmuHadS9Energy_  -> push_back (muon_itr -> calEnergy().hadS9 );
+    glbmuHoEnergy_     -> push_back (muon_itr -> calEnergy().ho    );   
+    glbmuHoS9Energy_   -> push_back (muon_itr -> calEnergy().hoS9  ); 
+    glbmuIso03emEt_    -> push_back (muon_itr -> isolationR03().emEt    );
+    glbmuIso03hadEt_   -> push_back (muon_itr -> isolationR03().hadEt   );
+    glbmuIso03hoEt_    -> push_back (muon_itr -> isolationR03().hoEt    );
+    glbmuIso03nJets_   -> push_back (muon_itr -> isolationR03().nJets   );
+    glbmuIso03nTracks_ -> push_back (muon_itr -> isolationR03().nTracks );
+    glbmuIso03sumPt_   -> push_back (muon_itr -> isolationR03().sumPt   );
+    glbmuIso05emEt_    -> push_back (muon_itr -> isolationR05().emEt    );
+    glbmuIso05hadEt_   -> push_back (muon_itr -> isolationR05().hadEt   );
+    glbmuIso05hoEt_    -> push_back (muon_itr -> isolationR05().hoEt    );
+    glbmuIso05nJets_   -> push_back (muon_itr -> isolationR05().nJets   );
+    glbmuIso05nTracks_ -> push_back (muon_itr -> isolationR05().nTracks );
+    glbmuIso05sumPt_   -> push_back (muon_itr -> isolationR05().sumPt   );
+    glbmuChi2_         -> push_back (muon_itr -> globalTrack()->chi2()    );
+    glbmuNdof_         -> push_back (muon_itr -> globalTrack()->ndof()    );
+    glbmud0_           -> push_back (muon_itr -> globalTrack()->d0()      );
+    glbmud0Err_        -> push_back (muon_itr -> globalTrack()->d0Error() );
+    glbmudz_           -> push_back (muon_itr -> globalTrack()->dz()      );
+    glbmudzErr_        -> push_back (muon_itr -> globalTrack()->dzError() );
 
   }
-  muN_ = muonHandle->size(); 
-
+  muN_               = muonHandle->size(); 
+  glbmuN_            = globalmuonCounter;
+  glbmuPromptTightN_ = globalmuonprompttightCounter;
 }
 
 // --------------------------------------------------------------------
@@ -413,7 +743,7 @@ void SimpleNtple::FillElectron(const edm::Event& iEvent, const edm::EventSetup& 
   iEvent.getByLabel (electronLabel_,electronHandle) ;
 
   TClonesArray &electronP4 = *eleP4_;
-  TClonesArray &electronVtxP3 = *eleVtxP3_;
+  TClonesArray &electronPrimVtxP3 = *elePrimVtxP3_;
   int electronIndex = 0;
   for ( reco::PixelMatchGsfElectronCollection::const_iterator electron_itr = electronHandle->begin();
 	electron_itr != electronHandle->end(); ++electron_itr, electronIndex++ ) {
@@ -458,45 +788,85 @@ void SimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup& iS
     vbfhzz2l2b::findPair_maxInvMass_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
 							20., 15.);
 
-  double invMass    = -99.;
-  double deltaEta   = -99.;
+  double invMass   = -99.;
+  double deltaEta  = -99.;
   double zeppenfeld = -999.;
+  int    njets     = 0;
   if (maxInvMassPair.first != maxInvMassPair.second) {
     invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
     deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
     zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &invmassjetTag = *invmasstagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
+    new (invmassjetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
+    new (invmassjetTag[1]) TLorentzVector (myvector_);
+    invmasstagjetEmEnergyFraction_->push_back((maxInvMassPair.first)->emEnergyFraction());
+    invmasstagjetEmEnergyFraction_->push_back((maxInvMassPair.second)->emEnergyFraction());
   }
-  tagjetInvMass_->push_back(invMass);
-  tagjetDeltaEta_->push_back(deltaEta);
-  tagjetZeppenfeld_->push_back(zeppenfeld);
+  invmasstagjetInvMass_->push_back(invMass);
+  invmasstagjetDeltaEta_->push_back(deltaEta);
+  invmasstagjetZeppenfeld_->push_back(zeppenfeld);
+  invmasstagjetN_ = njets;
 
   // looking for the highest delta eta jets pair
   std::pair<tagJetItr,tagJetItr> maxDeltaEtaPair = 
     vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
 							 20., 15.);
-  invMass    = -99.;
-  deltaEta   = -99.;
+  invMass   = -99.;
+  deltaEta  = -99.;
   zeppenfeld = -999.;
+  njets     = 0;
   if(maxDeltaEtaPair.first != maxDeltaEtaPair.second) {
     invMass    =  (     (maxDeltaEtaPair.first)->p4() + ((maxDeltaEtaPair.second)->p4()) ).M();
     deltaEta   =  fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
     zeppenfeld =  (     (maxDeltaEtaPair.first)->pz() * (maxDeltaEtaPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &deltaetajetTag = *deltaetatagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
+    new (deltaetajetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
+    new (deltaetajetTag[1]) TLorentzVector (myvector_);
+    deltaetatagjetEmEnergyFraction_->push_back((maxDeltaEtaPair.first)->emEnergyFraction());
+    deltaetatagjetEmEnergyFraction_->push_back((maxDeltaEtaPair.second)->emEnergyFraction());
   }
-  tagjetInvMass_->push_back(invMass);
-  tagjetDeltaEta_->push_back(deltaEta);
-  tagjetZeppenfeld_->push_back(zeppenfeld);
+  deltaetatagjetInvMass_->push_back(invMass);
+  deltaetatagjetDeltaEta_->push_back(deltaEta);
+  deltaetatagjetZeppenfeld_->push_back(zeppenfeld);
+  deltaetatagjetN_ = njets;
 
 
-  TClonesArray &jetTag = *tagjetP4_;
-  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
-  new (jetTag[0]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
-  new (jetTag[1]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
-  new (jetTag[2]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
-  new (jetTag[3]) TLorentzVector (myvector_);
+  // looking for the highest zeppenfeld variable value jets pair
+  std::pair<tagJetItr,tagJetItr> maxZepPair = 
+    vbfhzz2l2b::findPair_maxZeppenfeld_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							   20., 15.);
 
+  invMass   = -99.;
+  deltaEta  = -99.;
+  zeppenfeld = -999.;
+  njets     = 0;
+  if (maxZepPair.first != maxZepPair.second) {
+    invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
+    zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &zepjetTag = *zeptagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxZepPair.first)->p4());
+    new (zepjetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxZepPair.second)->p4());
+    new (zepjetTag[1]) TLorentzVector (myvector_);
+    zeptagjetEmEnergyFraction_->push_back((maxZepPair.first)->emEnergyFraction());
+    zeptagjetEmEnergyFraction_->push_back((maxZepPair.second)->emEnergyFraction());
+  }
+
+  zeptagjetInvMass_->push_back(invMass);
+  zeptagjetDeltaEta_->push_back(deltaEta);
+  zeptagjetZeppenfeld_->push_back(zeppenfeld);
+  zeptagjetN_ = njets;
 }
 
 // --------------------------------------------------------------------
@@ -520,7 +890,6 @@ void  SimpleNtple::FillTrack(const edm::Event& iEvent, const edm::EventSetup& iS
     new (track[trackIndex]) TLorentzVector (myvector_);
   }
 }
-
 
 // --------------------------------------------------------------------
 void SimpleNtple::FillGenParticle(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -619,17 +988,45 @@ void SimpleNtple::beginJob(const edm::EventSetup& iSetup)
 {
 
   std::cout << "[SimpleNtple::beginJob]" << std::endl;
-  tagjetInvMass_    = new std::vector<double>;    // depends on the tag jet definition
-  tagjetDeltaEta_   = new std::vector<double>;
-  tagjetZeppenfeld_ = new std::vector<double>;
+  invmasstagjetInvMass_    = new std::vector<double>;    // depends on the tag jet definition
+  invmasstagjetDeltaEta_   = new std::vector<double>;
+  invmasstagjetZeppenfeld_ = new std::vector<double>;
+  deltaetatagjetInvMass_    = new std::vector<double>;    // depends on the tag jet definition
+  deltaetatagjetDeltaEta_   = new std::vector<double>;
+  deltaetatagjetZeppenfeld_ = new std::vector<double>;
+  zeptagjetInvMass_    = new std::vector<double>;    // depends on the tag jet definition
+  zeptagjetDeltaEta_   = new std::vector<double>;
+  zeptagjetZeppenfeld_ = new std::vector<double>;
   zjetInvMass_    = new std::vector<double>;    // depends on the z jet definition => btagger?
   zjetDeltaEta_   = new std::vector<double>;
   zjetZeppenfeld_ = new std::vector<double>;
   mytree_->Branch("evtID",&evtID_,"evtID_/I");
- 
+  mytree_->Branch("whichSim",&whichSim_,"whichSim_/I");
+  mytree_->Branch("jetN",           &jetN_,           "jetN_/I"           );
+  mytree_->Branch("btagjetN",       &btagjetN_,       "btagjetN_/I"       );
+  mytree_->Branch("invmasstagjetN", &invmasstagjetN_, "invmasstagjetN_/I" );
+  mytree_->Branch("deltaetatagjetN",&deltaetatagjetN_,"deltaetatagjetN_/I");
+  mytree_->Branch("zeptagjetN",     &zeptagjetN_,     "zeptagjetN_/I"     );
+  mytree_->Branch("muN",              &muN_,              "muN_/I"              );
+  mytree_->Branch("glbmuN",           &glbmuN_,           "glbmuN_/I"           );
+  mytree_->Branch("glbmuPromptTightN",&glbmuPromptTightN_,"glbmuPromptTightN_/I");
+  mytree_->Branch("eleN",&eleN_,"&eleN_/I");
+  mytree_->Branch("invmasstagjetInvMass",   "std::vector<double>",&invmasstagjetInvMass_   );
+  mytree_->Branch("invmasstagjetDeltaEta",  "std::vector<double>",&invmasstagjetDeltaEta_  );
+  mytree_->Branch("invmasstagjetZeppenfeld","std::vector<double>",&invmasstagjetZeppenfeld_);
+  mytree_->Branch("deltaetatagjetInvMass",   "std::vector<double>",&deltaetatagjetInvMass_   );
+  mytree_->Branch("deltaetatagjetDeltaEta",  "std::vector<double>",&deltaetatagjetDeltaEta_  );
+  mytree_->Branch("deltaetatagjetZeppenfeld","std::vector<double>",&deltaetatagjetZeppenfeld_);
+  mytree_->Branch("zeptagjetInvMass",   "std::vector<double>",&zeptagjetInvMass_   );
+  mytree_->Branch("zeptagjetDeltaEta",  "std::vector<double>",&zeptagjetDeltaEta_  );
+  mytree_->Branch("zeptagjetZeppenfeld","std::vector<double>",&zeptagjetZeppenfeld_);
+  mytree_->Branch("zjetInvMass",     "std::vector<double>",&zjetInvMass_     );
+  mytree_->Branch("zjetDeltaEta",    "std::vector<double>",&zjetDeltaEta_    );
+  mytree_->Branch("zjetZeppenfeld",  "std::vector<double>",&zjetZeppenfeld_  );
+
   // vector of the TLorentz Vectors of electron
   eleP4_    = new TClonesArray ("TLorentzVector");
-  eleVtxP3_ = new TClonesArray ("TVector3");
+  elePrimVtxP3_ = new TClonesArray ("TVector3");
   eleEt_        = new std::vector<double>;
   elePt_        = new std::vector<double>;
   eleD0_        = new std::vector<double>;
@@ -638,64 +1035,156 @@ void SimpleNtple::beginJob(const edm::EventSetup& iSetup)
   eleIsoSumPt_  = new std::vector<double>;
   eleIsoNtrack_ = new std::vector<double>;
   eleID_        = new std::vector<int>;
-  mytree_->Branch("electronP4",     "TClonesArray",       &eleP4_,    256000,0);
-  mytree_->Branch("electronVtxP3",  "TClonesArray",       &eleVtxP3_, 256000,0);
+  mytree_->Branch("electronP4",     "TClonesArray",       &eleP4_,        256000,0);
+  mytree_->Branch("electronPrimVtxP3",  "TClonesArray",   &elePrimVtxP3_, 256000,0);
   mytree_->Branch("eleN",                                 &eleN_,"eleN_/I");
   mytree_->Branch("eleIsoSumPt",    "std::vector<double>",&eleIsoSumPt_);
   mytree_->Branch("eleIsoEleNtrack","std::vector<double>",&eleIsoNtrack_);
   mytree_->Branch("eleID",          "std::vector<int>",   &eleID_);     
 
-  // vector of the TLorentz Vectors of muon
-  muP4_    = new TClonesArray ("TLorentzVector");
-  muVtxP3_ = new TClonesArray ("TVector3");
-  muEt_        = new std::vector<double>;
-  muPt_        = new std::vector<double>;
-  muD0_        = new std::vector<double>;
-  muDxy_       = new std::vector<double>;
-  muDxyError_  = new std::vector<double>;
-  muIsoSumPt_  = new std::vector<double>;
-  muIsoNtrack_ = new std::vector<double>;
-  muID_        = new std::vector<int>;
-  mytree_->Branch("muonP4",     "TClonesArray",       &muP4_,    256000,0);
-  mytree_->Branch("muonVtxP3",  "TClonesArray",       &muVtxP3_, 256000,0);
-  mytree_->Branch("muN",                              &muN_,      "muN_/I");
-  mytree_->Branch("muIsoSumPt", "std::vector<double>",&muIsoSumPt_);
-  mytree_->Branch("muIsoNtrack","std::vector<double>",&muIsoNtrack_);
-  mytree_->Branch("muID",       "std::vector<int>",   &muID_);
 
-  // vector with the 2 tag TLorentzVectors
-  tagjetP4_    = new TClonesArray ("TLorentzVector");
-  tagjetVtxP3_ = new TClonesArray ("TVector3");
-  tagjetEmFrac_ = new std::vector<double>;
-  tagjetChFrac_ = new std::vector<double>;
-  tagjetCorEt_  = new std::vector<double>;
-  tagjetCorPt_  = new std::vector<double>;
-  mytree_->Branch ("tagjetP4",    "TClonesArray",       &tagjetP4_,    256000,0);
-  mytree_->Branch ("tagjetVtxP3", "TClonesArray",       &tagjetVtxP3_, 256000,0);
-  mytree_->Branch ("tagjetEmFrac","std::vector<double>",&tagjetEmFrac_);
-  mytree_->Branch ("tagjetChFrac","std::vector<double>",&tagjetChFrac_);
-  mytree_->Branch ("tagjetCorEt", "std::vector<double>",&tagjetCorEt_);
-  mytree_->Branch ("tagjetCorPt", "std::vector<double>",&tagjetCorPt_);
+  // muon
+  glbmuPromptTightFlag_ = new std::vector<bool>;
+  glbmuP4_              = new TClonesArray ("TLorentzVector");
+  glbmuPrimVtxP3_       = new TClonesArray ("TVector3");      
+  glbmuCharge_          = new std::vector<int>;
+  glbmuEmEnergy_        = new std::vector<double>;   
+  glbmuEmS9Energy_      = new std::vector<double>; 
+  glbmuHadEnergy_       = new std::vector<double>;  
+  glbmuHadS9Energy_     = new std::vector<double>;
+  glbmuHoEnergy_        = new std::vector<double>;   
+  glbmuHoS9Energy_      = new std::vector<double>; 
+  glbmuIso03emEt_       = new std::vector<double>;
+  glbmuIso03hadEt_      = new std::vector<double>;
+  glbmuIso03hoEt_       = new std::vector<double>;
+  glbmuIso03nJets_      = new std::vector<int>;
+  glbmuIso03nTracks_    = new std::vector<int>;
+  glbmuIso03sumPt_      = new std::vector<double>;
+  glbmuIso05emEt_       = new std::vector<double>;
+  glbmuIso05hadEt_      = new std::vector<double>;
+  glbmuIso05hoEt_       = new std::vector<double>;
+  glbmuIso05nJets_      = new std::vector<int>;
+  glbmuIso05nTracks_    = new std::vector<int>;
+  glbmuIso05sumPt_      = new std::vector<double>;
+  glbmuChi2_            = new std::vector<double>;
+  glbmuNdof_            = new std::vector<double>;
+  glbmud0_              = new std::vector<double>;
+  glbmud0Err_           = new std::vector<double>;
+  glbmudz_              = new std::vector<double>;
+  glbmudzErr_           = new std::vector<double>;
+  mytree_->Branch("muN",              &muN_,              "muN_/I");
+  mytree_->Branch("glbmuN",           &glbmuN_,           "muN_/I");
+  mytree_->Branch("glbmuPromptTightN",&glbmuPromptTightN_,"muN_/I");
+  mytree_->Branch("glbmuonP4",        "TClonesArray",&glbmuP4_,        256000,0);
+  mytree_->Branch("glbmuonPrimVtxP3", "TClonesArray",&glbmuPrimVtxP3_, 256000,0);
+  mytree_->Branch("glbmuonPromptTightFlag","std::vector<bool>",  &glbmuPromptTightFlag_);
+  mytree_->Branch("glbmuonCharge",         "std::vector<int>",   &glbmuCharge_         );
+  mytree_->Branch("glbmuonEmEnergy",       "std::vector<double>",&glbmuEmEnergy_       );
+  mytree_->Branch("glbmuonEmS9Energy",     "std::vector<double>",&glbmuEmS9Energy_     );
+  mytree_->Branch("glbmuonHadEnergy",      "std::vector<double>",&glbmuHadEnergy_      );
+  mytree_->Branch("glbmuonHadS9Energy",    "std::vector<double>",&glbmuHadS9Energy_    );
+  mytree_->Branch("glbmuonHoEnergy",       "std::vector<double>",&glbmuHoEnergy_       );
+  mytree_->Branch("glbmuonHoS9Energy",     "std::vector<double>",&glbmuHoS9Energy_     );
+  mytree_->Branch("glbmuonIso03emEt",      "std::vector<double>",&glbmuIso03emEt_      );
+  mytree_->Branch("glbmuonIso03hadEt",     "std::vector<double>",&glbmuIso03hadEt_     );
+  mytree_->Branch("glbmuonIso03hoEt",      "std::vector<double>",&glbmuIso03hoEt_      );
+  mytree_->Branch("glbmuonIso03nJets",     "std::vector<int>",   &glbmuIso03nJets_     );
+  mytree_->Branch("glbmuonIso03nTracks",   "std::vector<int>",   &glbmuIso03nTracks_   );
+  mytree_->Branch("glbmuonIso03sumPt",     "std::vector<double>",&glbmuIso03sumPt_     );
+  mytree_->Branch("glbmuonIso05emEt",      "std::vector<double>",&glbmuIso05emEt_      );
+  mytree_->Branch("glbmuonIso05hadEt",     "std::vector<double>",&glbmuIso05hadEt_     );
+  mytree_->Branch("glbmuonIso05hoEt",      "std::vector<double>",&glbmuIso05hoEt_      );
+  mytree_->Branch("glbmuonIso05nJets",     "std::vector<int>",   &glbmuIso05nJets_     );
+  mytree_->Branch("glbmuonIso05nTracks",   "std::vector<int>",   &glbmuIso05nTracks_   );
+  mytree_->Branch("glbmuonIso05sumPt",     "std::vector<double>",&glbmuIso05sumPt_     );
+  mytree_->Branch("glbmuonChi2",           "std::vector<double>",&glbmuChi2_           );
+  mytree_->Branch("glbmuonNdof",           "std::vector<double>",&glbmuNdof_           );
+  mytree_->Branch("glbmuond0",             "std::vector<double>",&glbmud0_             );
+  mytree_->Branch("glbmuond0Err",          "std::vector<double>",&glbmud0Err_          );
+  mytree_->Branch("glbmuondz",             "std::vector<double>",&glbmudz_             );
+  mytree_->Branch("glbmuondzErr",          "std::vector<double>",&glbmudzErr_          );
 
   // vector of the TLorentz Vectors of other jets with b tag
-  btagjetP4_    = new TClonesArray ("TLorentzVector");
-  btagjetVtxP3_ = new TClonesArray ("TVector3");
-  btagjetEmFrac_           = new std::vector<double>;
+  btagjetP4_        = new TClonesArray ("TLorentzVector");
+  btagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  btagjetSecVtxP3_  = new TClonesArray ("TVector3");
+  btagjetEmEnergyFraction_ = new std::vector<double>;
   btagjetChFrac_           = new std::vector<double>;
   btagjetCorEt_            = new std::vector<double>;
   btagjetCorPt_            = new std::vector<double>;
   btagjetCompoSVbTagDiscr_ = new std::vector<double>;
   btagjetHighEFFbTagDiscr_ = new std::vector<double>;
   btagjetHighPURbTagDiscr_ = new std::vector<double>;
-  mytree_->Branch ("btagjetP4",              "TClonesArray",       &btagjetP4_,    256000,0);
-  mytree_->Branch ("btagjetVtxP3",           "TClonesArray",       &btagjetVtxP3_, 256000,0);
-  mytree_->Branch ("btagjetEmFrac",          "std::vector<double>",&btagjetEmFrac_);
+  mytree_->Branch ("btagjetP4",              "TClonesArray",       &btagjetP4_,        256000,0);
+  mytree_->Branch ("btagjetPrimVtxP3",       "TClonesArray",       &btagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("btagjetSecVtxP3",        "TClonesArray",       &btagjetSecVtxP3_,  256000,0);
+  mytree_->Branch ("btagjetEmFrac",          "std::vector<double>",&btagjetEmEnergyFraction_);
   mytree_->Branch ("btagjetChFrac",          "std::vector<double>",&btagjetChFrac_);
   mytree_->Branch ("btagjetCorEt",           "std::vector<double>",&btagjetCorEt_);
   mytree_->Branch ("btagjetCorPt",           "std::vector<double>",&btagjetCorPt_);
   mytree_->Branch ("btagjetcompoSVbTagDiscr","std::vector<double>",&btagjetCompoSVbTagDiscr_);
   mytree_->Branch ("btagjethighEFFbTagDiscr","std::vector<double>",&btagjetHighEFFbTagDiscr_);
   mytree_->Branch ("btagjethighPURbTagDiscr","std::vector<double>",&btagjetHighPURbTagDiscr_);
+
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  invmasstagjetP4_        = new TClonesArray ("TLorentzVector");
+  invmasstagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  invmasstagjetEmEnergyFraction_ = new std::vector<double>;
+  invmasstagjetChFrac_           = new std::vector<double>;
+  invmasstagjetCorEt_            = new std::vector<double>;
+  invmasstagjetCorPt_            = new std::vector<double>;
+  invmasstagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  invmasstagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  invmasstagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("invmasstagjetP4",              "TClonesArray",       &invmasstagjetP4_,        256000,0);
+  mytree_->Branch ("invmasstagjetPrimVtxP3",       "TClonesArray",       &invmasstagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("invmasstagjetEmFrac",          "std::vector<double>",&invmasstagjetEmEnergyFraction_);
+  mytree_->Branch ("invmasstagjetChFrac",          "std::vector<double>",&invmasstagjetChFrac_);
+  mytree_->Branch ("invmasstagjetCorEt",           "std::vector<double>",&invmasstagjetCorEt_);
+  mytree_->Branch ("invmasstagjetCorPt",           "std::vector<double>",&invmasstagjetCorPt_);
+  mytree_->Branch ("invmasstagjetcompoSVbTagDiscr","std::vector<double>",&invmasstagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("invmasstagjethighEFFbTagDiscr","std::vector<double>",&invmasstagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("invmasstagjethighPURbTagDiscr","std::vector<double>",&invmasstagjetHighPURbTagDiscr_);
+
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  deltaetatagjetP4_        = new TClonesArray ("TLorentzVector");
+  deltaetatagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  deltaetatagjetEmEnergyFraction_ = new std::vector<double>;
+  deltaetatagjetChFrac_           = new std::vector<double>;
+  deltaetatagjetCorEt_            = new std::vector<double>;
+  deltaetatagjetCorPt_            = new std::vector<double>;
+  deltaetatagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  deltaetatagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  deltaetatagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("deltaetatagjetP4",              "TClonesArray",       &deltaetatagjetP4_,        256000,0);
+  mytree_->Branch ("deltaetatagjetPrimVtxP3",       "TClonesArray",       &deltaetatagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("deltaetatagjetEmFrac",          "std::vector<double>",&deltaetatagjetEmEnergyFraction_);
+  mytree_->Branch ("deltaetatagjetChFrac",          "std::vector<double>",&deltaetatagjetChFrac_);
+  mytree_->Branch ("deltaetatagjetCorEt",           "std::vector<double>",&deltaetatagjetCorEt_);
+  mytree_->Branch ("deltaetatagjetCorPt",           "std::vector<double>",&deltaetatagjetCorPt_);
+  mytree_->Branch ("deltaetatagjetcompoSVbTagDiscr","std::vector<double>",&deltaetatagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("deltaetatagjethighEFFbTagDiscr","std::vector<double>",&deltaetatagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("deltaetatagjethighPURbTagDiscr","std::vector<double>",&deltaetatagjetHighPURbTagDiscr_);
+
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  zeptagjetP4_        = new TClonesArray ("TLorentzVector");
+  zeptagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  zeptagjetEmEnergyFraction_ = new std::vector<double>;
+  zeptagjetChFrac_           = new std::vector<double>;
+  zeptagjetCorEt_            = new std::vector<double>;
+  zeptagjetCorPt_            = new std::vector<double>;
+  zeptagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  zeptagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  zeptagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("zeptagjetP4",              "TClonesArray",       &zeptagjetP4_,        256000,0);
+  mytree_->Branch ("zeptagjetPrimVtxP3",       "TClonesArray",       &zeptagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("zeptagjetEmFrac",          "std::vector<double>",&zeptagjetEmEnergyFraction_);
+  mytree_->Branch ("zeptagjetChFrac",          "std::vector<double>",&zeptagjetChFrac_);
+  mytree_->Branch ("zeptagjetCorEt",           "std::vector<double>",&zeptagjetCorEt_);
+  mytree_->Branch ("zeptagjetCorPt",           "std::vector<double>",&zeptagjetCorPt_);
+  mytree_->Branch ("zeptagjetcompoSVbTagDiscr","std::vector<double>",&zeptagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("zeptagjethighEFFbTagDiscr","std::vector<double>",&zeptagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("zeptagjethighPURbTagDiscr","std::vector<double>",&zeptagjetHighPURbTagDiscr_);
 
   // vector of the TLorentz Vectors of met
   metP4_ = new TClonesArray ("TLorentzVector");
@@ -733,9 +1222,4 @@ SimpleNtple::endJob() {
 // --------------------------------------------------------------------
 
 
-void SimpleNtple::setVertex (TVector3 &myvector, const TVector3 & mom) {
-  myvector.SetX (mom.X());
-  myvector.SetY (mom.Y());
-  myvector.SetZ (mom.Z());
-}
 

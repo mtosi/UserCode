@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Mon Feb  2 17:31:44 CET 2009
-// $Id: VBFHZZllbbBTagInfoAnalyzer.h,v 1.2 2009/04/28 16:45:01 tosi Exp $
+// $Id: VBFHZZllbbBTagInfoAnalyzer.h,v 1.1 2009/05/14 10:52:01 tosi Exp $
 //
 //
 
@@ -59,18 +59,7 @@ class VBFHZZllbbBTagInfoAnalyzer : public edm::EDAnalyzer {
   // ----------member data ---------------------------
   edm::InputTag impactParameterTagInfosLabel_;
   edm::InputTag secondaryVertexTagInfosLabel_;
-  std::vector<edm::ParameterSet> bTagConfigLabel_;
-  std::string jetCorrectionServiceLabel_;
-
-  std::vector<edm::InputTag> bJetTagInputTags_;
-
 
   edm::Service<TFileService> fs;
   
-  std::vector<TH1D*> hvec_bjet_pt, hvec_bjet_eta, hvec_bjet_phi, hvec_bjet_emFrac, hvec_bjet_bDiscr;
-  std::vector<TH1D*> hvec_bjetmuon_deltaR, hvec_bjetelectron_deltaR, hvec_bjetmet_deltaR;
-
-  TH1D * h_bcoronflyjet_pt;
-
-
 };

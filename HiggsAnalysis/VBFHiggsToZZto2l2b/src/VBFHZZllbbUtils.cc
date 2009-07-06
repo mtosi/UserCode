@@ -1,5 +1,6 @@
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "DataFormats/TrackReco/interface/Track.h"
 #include <iostream>
 #include "Math/VectorUtil.h"
 #include "TLorentzVector.h"
@@ -36,6 +37,20 @@ namespace vbfhzz2l2b
     return (recValue-refValue)/refValue;
   }
   
+  void setVertex (TVector3 &myvector, 
+		  const math::XYZPoint & mom) {
+    myvector.SetX (mom.X());
+    myvector.SetY (mom.Y());
+    myvector.SetZ (mom.Z());
+  }
+
+  void setVertex (TVector3 &myvector, 
+		  const TVector3 & mom) {
+    myvector.SetX (mom.X());
+    myvector.SetY (mom.Y());
+    myvector.SetZ (mom.Z());
+  }
+
   void setMomentum (TLorentzVector & myvector, 
 		    const reco::Candidate & gen) {
     myvector.SetPx (gen.px ()) ;
@@ -51,6 +66,35 @@ namespace vbfhzz2l2b
     v1.SetPz ( v2.Pz() );
     v1.SetE  ( v2.E()  );
   }
+
+
+  double tracksInvariantMass( const reco::TrackRefVector & selectedTracks ) {
+    double chargedPI_mass_ = 0.13957018; // GeV/c^2
+    
+    int trksChargeSum = 0;
+    // setting invariant mass of the tracks system
+    TLorentzVector tracks4DVec(0.,0.,0.,0.);
+    
+    if( int(selectedTracks.size()) != 0 ) {
+      int tracksCharge = 0;
+      
+      for ( int index=0; index < (int)selectedTracks.size(); ++index ) {
+	tracksCharge += (selectedTracks)[index]->charge();
+	TLorentzVector chargedPIcand_fromTrk_4DVec( (selectedTracks)[index]->momentum().x(),
+						    (selectedTracks)[index]->momentum().y(),
+						    (selectedTracks)[index]->momentum().z(),
+						    sqrt(pow((double)(selectedTracks)[index]->momentum().r(),2) + pow(chargedPI_mass_,2)));
+	
+	tracks4DVec += chargedPIcand_fromTrk_4DVec;
+      }
+      trksChargeSum = tracksCharge;    
+    }
+    
+    std::cout << "trksChargeSum: " << trksChargeSum << " tagMass: " << tracks4DVec.M() << std::endl;
+    
+    return tracks4DVec.M();
+  }
+
   
 
   //  double deltaPhi (double phi1, double phi2) {    

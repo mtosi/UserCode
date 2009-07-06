@@ -11,6 +11,8 @@
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 namespace vbfhzz2l2b
 {
@@ -33,12 +35,21 @@ namespace vbfhzz2l2b
 
   bool BhadronTable(int pdgcode);
 
+
+  void setVertex (TVector3 &,
+		  const math::XYZPoint &);
+
+  void setVertex (TVector3 &,
+		  const TVector3 &);
+
   void setMomentum (TLorentzVector &, 
 		    const reco::Candidate &);
 
   void setMomentum (TLorentzVector & v1, 
 		    const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v2);
 
+
+  double tracksInvariantMass( const reco::TrackRefVector & selectedTracks);
 
   // *********************************************************
   // *** find couple of objs w/ the highest invariant mass ***
@@ -118,6 +129,98 @@ namespace vbfhzz2l2b
 	
 	if ( objsSumP4.M () > maxInvMass ) {
 	  maxInvMass = objsSumP4.M () ;
+	  objPair.first  = firstObj ;
+	  objPair.second = secondObj ;
+	}
+      } // end second loop over objs
+    } // end first loop over objs  
+    return objPair ;
+  }
+
+  // ********************************************************************
+  // *** find couple of objs w/ the highest zeppenfeld variable value ***
+  // ********************************************************************
+  template <typename T>
+  std::pair<T,T> findPair_maxZeppenfeld (const T begin, const T end) {
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxZep = 0. ;
+    // first loop over objects
+    for ( T firstObj = begin; firstObj != end; ++firstObj ) {
+        
+      // second loop over objs
+      for ( T secondObj = firstObj + 1; secondObj != end; ++secondObj ) {
+	
+	double objsZep = fabs(firstObj->pz () * secondObj->pz ());
+	
+	if ( objsZep > maxZep ) {
+	  maxZep = objsZep;
+	  objPair.first  = firstObj ;
+	  objPair.second = secondObj ;
+	}
+      } // end second loop over objs
+    } // end first loop over objs  
+    return objPair ;
+  }
+  // ------------------------------------------------------------
+
+
+  // ****************************************************
+  // *** find couple of objs which satisfy pt min cut ***
+  // *** w/ the highest zeppenfeld variable value     ***
+  // ****************************************************
+  template <typename T>
+  std::pair<T,T> findPair_maxZeppenfeld_ptMinCut (const T begin, const T end,
+						  double ptMin1, double ptMin2 = -1.) {
+
+    std::pair<T,T> objPair(begin,begin) ;
+    double maxZep = 0. ;
+    // first loop over objects
+    for ( T firstObj = begin; firstObj != end; ++firstObj ) {
+      if (firstObj->pt() < ptMin1) continue ;
+      
+      // second loop over objs
+      for ( T secondObj = firstObj + 1; secondObj != end; ++secondObj ) {
+	if (secondObj->pt() < ptMin2) continue ;
+	
+	double objsZep = fabs(firstObj->pz () * secondObj->pz ());
+	
+	if ( objsZep > maxZep ) {
+	  maxZep = objsZep;
+	  objPair.first  = firstObj ;
+	  objPair.second = secondObj ;
+	}
+      } // end second loop over objs
+    } // end first loop over objs  
+    return objPair ;
+  }
+  // ------------------------------------------------------------
+
+  // ************************************************
+  // *** find couple of objs which satisfy        ***
+  // *** - pt min cut                             ***
+  // *** - eta max cut                            ***
+  // *** w/ the highest zeppenfeld variable value ***
+  // ************************************************
+  template <typename T>
+  std::pair<T,T> findPair_maxZeppenfeld_ptMinCut_etaMaxCut (const T begin, const T end,
+							    double ptMin1, double ptMin2 = -1.,
+							    double etaMax1, double etaMax2 = 10.) {
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxZep = 0. ;
+    // first loop over objects
+    for ( T firstObj = begin; firstObj != end; ++firstObj ) {
+      if (firstObj->pt() < ptMin1 || 
+	  fabs( firstObj->eta() ) > etaMax1) continue ;
+          
+      // second loop over objs
+      for ( T secondObj = firstObj + 1; secondObj != end; ++secondObj ) {
+	if (secondObj->pt() < ptMin2 || 
+	    fabs( secondObj->eta () ) > etaMax2 ) continue ;
+	
+	double objsZep = fabs(firstObj->pz () * secondObj->pz ());
+	
+	if ( objsZep > maxZep ) {
+	  maxZep = objsZep;
 	  objPair.first  = firstObj ;
 	  objPair.second = secondObj ;
 	}

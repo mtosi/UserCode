@@ -10,7 +10,6 @@ fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
 CONDITION="FrontierConditions_GlobalTag,MC_31X_V1::All"
-#CONDITION="FrontierConditions_GlobalTag,IDEAL_31X::All"
 EVENTCONTENT="RECOSIM"
 DATATIER="GEN-SIM-RECO"
 echo condition $CONDITION

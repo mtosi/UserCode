@@ -10,7 +10,6 @@ fi
 echo 'Higgs mass value: ' $HIGGSMASSLIST
 
 CONDITION="FrontierConditions_GlobalTag,MC_31X_V1::All"
-#CONDITION="FrontierConditions_GlobalTag,MC31X_31X::All"
 EVENTCONTENT="RAWSIM"
 DATATIER="GEN-SIM-RAW"
 echo condition $CONDITION
@@ -40,8 +39,8 @@ for k in 130; do
 	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X_cfg.py \
 	--mc \
 	--dirout $DIROUT 
-#	-n 10 \
-#	--no_exec
+	-n 10 \
+	--no_exec
 
     sed -i -e 's/SIM_DIGI_L1_DIGI2RAW_HLT/PYTHIA6_SM_H_ZZ_2l_2jets_mH/g' ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_10TeV_SIM_RAW_MC31X_cfg.py
 

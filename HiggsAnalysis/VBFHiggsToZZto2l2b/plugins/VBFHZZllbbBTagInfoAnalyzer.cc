@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Mon Feb  2 17:31:44 CET 2009
-// $Id: VBFHZZllbbBTagInfoAnalyzer.cc,v 1.1 2009/05/14 10:52:00 tosi Exp $
+// $Id: VBFHZZllbbBTagInfoAnalyzer.cc,v 1.2 2009/07/06 13:15:48 tosi Exp $
 //
 //
 
@@ -42,6 +42,8 @@
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
+
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetWithBTagDiscr.h"
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
@@ -76,8 +78,88 @@ void
 VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
+  edm::Handle<reco::MuonCollection> muonHandle;
+  iEvent.getByLabel ("muons",muonHandle);
+  for ( reco::MuonCollection::const_iterator muon_itr = muonHandle->begin();
+	muon_itr != muonHandle->end(); ++muon_itr ) {
+    if ( muon_itr->isGood(reco::Muon::GlobalMuonPromptTight) ) {
+      muonpvX_ -> Fill( muon_itr->vertex().x());
+      muonpvY_ -> Fill( muon_itr->vertex().y());
+      muonpvZ_ -> Fill( muon_itr->vertex().z());
+    }
+  }
+
+
+  edm::Handle<reco::VertexCollection> primaryVerticesWithBSHandle;
+  iEvent.getByLabel("offlinePrimaryVerticesWithBS",primaryVerticesWithBSHandle);
+  edm::Handle<reco::VertexCollection> primaryVerticesHandle;
+  iEvent.getByLabel("offlinePrimaryVertices",primaryVerticesHandle);
+  edm::Handle<reco::VertexCollection> pixelVerticesHandle;
+  iEvent.getByLabel("pixelVertices",pixelVerticesHandle);
+
+  for ( reco::VertexCollection::const_iterator pV_itr = primaryVerticesHandle->begin();
+	pV_itr != primaryVerticesHandle->end();
+	++pV_itr ) {
+    pvX_ -> Fill(pV_itr -> x());
+    pvY_ -> Fill(pV_itr -> y());
+    pvZ_ -> Fill(pV_itr -> z());
+  }
+  for ( reco::VertexCollection::const_iterator pV_itr = primaryVerticesWithBSHandle->begin();
+	pV_itr != primaryVerticesWithBSHandle->end();
+	++pV_itr ) {
+    BSpvX_ -> Fill(pV_itr -> x());
+    BSpvY_ -> Fill(pV_itr -> y());
+    BSpvZ_ -> Fill(pV_itr -> z());
+  }
+  for ( reco::VertexCollection::const_iterator pV_itr = pixelVerticesHandle->begin();
+	pV_itr != pixelVerticesHandle->end();
+	++pV_itr ) {
+    PXpvX_ -> Fill(pV_itr -> x());
+    PXpvY_ -> Fill(pV_itr -> y());
+    PXpvZ_ -> Fill(pV_itr -> z());
+  }
+
+
+
   edm::Handle<reco::SecondaryVertexTagInfoCollection> secondaryVtxTagInfosHandle;
   iEvent.getByLabel( secondaryVertexTagInfosLabel_, secondaryVtxTagInfosHandle );  
+
+  const reco::TrackIPTagInfoRef & trkIPtagInfoRef = secondaryVtxTagInfosHandle -> at(0) . trackIPTagInfoRef ();
+  //  reco::TrackIPTagInfoCollection::const_iterator trackIPTagInfos = 
+
+  std::cout << "****************************************************************" << std::endl;
+  std::cout << "************************ primary vertex ************************" << std::endl;
+  edm::Ref< reco::VertexCollection > primVtxColl = (trkIPtagInfoRef.product()) -> at(0) . primaryVertex ();
+  std::cout << "primVtxColl.size(): " << (primVtxColl.product())->size() << std::endl;
+
+  double chi2 = primVtxColl->chi2(); // chi-squares
+  bool   isFake = primVtxColl->isFake(); //	Tells whether a Vertex is fake, i.e.
+  bool   isValid = primVtxColl->isValid(); // Tells whether the vertex is valid.
+  double ndof = primVtxColl->ndof(); // Number of degrees of freedom
+                                     // Meant to be Double32_t for soft-assignment fitters:
+                                     // tracks may contribute to the vertex with fractional weights. 
+  double normalizedChi2 = primVtxColl->normalizedChi2(); //	chi-squared divided by n.d.o.f.
+  const reco::Vertex::Point & position = primVtxColl->position (); // position
+  size_t tracksSize = primVtxColl->tracksSize(); //	number of tracks
+  double x = primVtxColl->x(); // x coordinate
+  double y = primVtxColl->y(); // y coordinate
+  double z = primVtxColl->z(); // z coordinate
+  double xError = primVtxColl->xError(); //	error on x
+  double yError = primVtxColl->yError(); //	error on y
+  double zError = primVtxColl->zError(); //	error on z
+  
+  tagpvX_ -> Fill (x);
+  tagpvY_ -> Fill (y);
+  tagpvZ_ -> Fill (z);
+
+  std::cout << "x: " << x << "+o-" << xError << std::endl;
+  std::cout << "y: " << y << "+o-" << yError << std::endl;
+  std::cout << "z: " << z << "+o-" << zError << std::endl;
+  std::cout << "isFake: " << isFake << " <--> isValid: " << isValid << std::endl;
+  std::cout << "chi2: " << chi2 << " ndof: " << ndof << " => normalizedChi2: " << normalizedChi2 << "(" << chi2/ndof << ")" << std::endl;
+  std::cout << "tracksSize: " << tracksSize << std::endl;
+  std::cout << "****************************************************************" << std::endl;
+    
 
   std::cout << "*************************************************************" << std::endl;
   std::cout << "secondaryVtxTagInfosHandle" << std::endl;
@@ -97,55 +179,41 @@ VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
     std::cout << "selTrkColl.size(): " << selTrkColl.size() << std::endl;
     std::cout << " trkColl.size():   " << trkColl.size() << std::endl;
     for ( unsigned int index = 0; index != nSelTrks; index++ ) {
-      TrackRef selTrkRef = secondaryVtxTagInfos_itr -> track (index);
-      const reco::SecondaryVertexTagInfo::TrackData trkData1  = secondaryVtxTagInfos_itr -> trackData (index);
-      const reco::SecondaryVertexTagInfo::TrackData trkData2  = secondaryVtxTagInfos_itr -> trackData (selTrkRef);
-      const reco::TrackIPTagInfo::TrackIPData trkIPData1 = secondaryVtxTagInfos_itr -> trackIPData (index);
-      const reco::TrackIPTagInfo::TrackIPData trkIPData2 = secondaryVtxTagInfos_itr -> trackIPData (selTrkRef);
-      std::cout << " trkIPData1 -> distanceToFirstTrack: "  << trkIPData1.distanceToFirstTrack << std::endl;
-      std::cout << " trkIPData1 -> distanceToJetAxis:    "  << trkIPData1.distanceToJetAxis    << std::endl;
-      std::cout << " trkIPData1 -> ip2d:		 "  << trkIPData1.ip2d.significance()  << std::endl;   
-      std::cout << " trkIPData1 -> ip3d:                 "  << trkIPData1.ip3d.significance()  << std::endl;
+      //      TrackRef selTrkRef = secondaryVtxTagInfos_itr -> track (index);
+      //      const reco::SecondaryVertexTagInfo::TrackData selTrkDataByRef  = secondaryVtxTagInfos_itr -> trackData (selTrkRef);
+      //      const reco::TrackIPTagInfo::TrackIPData selTrkIPDataByRef = secondaryVtxTagInfos_itr -> trackIPData (selTrkRef);
+
+      const reco::SecondaryVertexTagInfo::TrackData selTrkData  = secondaryVtxTagInfos_itr -> trackData (index); // what can I do w/ this?!?!?
+      const reco::TrackIPTagInfo::TrackIPData selTrkIPData = secondaryVtxTagInfos_itr -> trackIPData (index);
+
+      std::cout << "      --- nSelTrks index: " << index << std::endl;
+      std::cout << "      selTrkData.usedForVertexFit():     " << selTrkData.usedForVertexFit()     << std::endl;
+      std::cout << "      selTrkData.associatedToVertex():   " << selTrkData.associatedToVertex()   << std::endl; // associatedToVertex() referers to secondary vertex
+      if (selTrkData.associatedToVertex()) {
+	std::cout << "        nVtxCand: " << secondaryVtxTagInfos_itr -> nVertexCandidates () << std::endl;
+	std::cout << "        nVtx:     " << secondaryVtxTagInfos_itr -> nVertices ()         << std::endl;
+      }
+      std::cout << "      selTrkIPData.distanceToFirstTrack: " << selTrkIPData.distanceToFirstTrack << std::endl;
+      std::cout << "      selTrkIPData.distanceToJetAxis:    " << selTrkIPData.distanceToJetAxis    << std::endl;
+      std::cout << "      selTrkIPData.ip2d.significance():  " << selTrkIPData.ip2d.significance()  << std::endl;   
+      std::cout << "      selTrkIPData.ip3d.significance():  " << selTrkIPData.ip3d.significance()  << std::endl;
+
+      distanceTo1track_  -> Fill ( selTrkIPData.distanceToFirstTrack );
+      distanceToJetAxis_ -> Fill ( selTrkIPData.distanceToJetAxis    );
+      ip2d_              -> Fill ( selTrkIPData.ip2d.value()         );
+      ip3d_              -> Fill ( selTrkIPData.ip3d.value()         );
+      ip2dSig_           -> Fill ( selTrkIPData.ip2d.significance()  );
+      ip3dSig_           -> Fill ( selTrkIPData.ip3d.significance()  );
+
     }
     const TrackIPTagInfoRef & trkIPtagInfoRef = secondaryVtxTagInfos_itr -> trackIPTagInfoRef ();
 
     std::cout << "---------------------------------------------------------------" << std::endl;
     std::cout << "impactParameterTagInfos" << std::endl;
     std::cout << "(trkIPtagInfoRef.product())->size(): " << (trkIPtagInfoRef.product())->size()<< std::endl;
-    
-  
     unsigned int trackIPTagInfos_index = 0;
     for( reco::TrackIPTagInfoCollection::const_iterator trackIPTagInfos_itr = (trkIPtagInfoRef.product())->begin(); 
 	 trackIPTagInfos_itr !=  (trkIPtagInfoRef.product())->end(); ++trackIPTagInfos_itr, trackIPTagInfos_index++ ) {
-      if ( trackIPTagInfos_index == 0 ) {
-	edm::Ref< reco::VertexCollection > primVtxColl = trackIPTagInfos_itr->primaryVertex ();
-	std::cout << "primVtxColl.size(): " << (primVtxColl.product())->size() << std::endl;
-	
-	double chi2 = primVtxColl->chi2(); // chi-squares
-	bool   isFake = primVtxColl->isFake(); //	Tells whether a Vertex is fake, i.e.
-	bool   isValid = primVtxColl->isValid(); // Tells whether the vertex is valid.
-	double ndof = primVtxColl->ndof(); // Number of degrees of freedom
-                                           // Meant to be Double32_t for soft-assignment fitters:
-                                           // tracks may contribute to the vertex with fractional weights. 
-	double normalizedChi2 = primVtxColl->normalizedChi2(); //	chi-squared divided by n.d.o.f.
-	const reco::Vertex::Point & position = primVtxColl->position (); // position
-	size_t tracksSize = primVtxColl->tracksSize(); //	number of tracks
-	//      float  trackWeight = primVtxColl->trackWeight(const TrackRef &r); // returns the weight with which a Track has contributed to the vertex-fit.
-	double x = primVtxColl->x(); // x coordinate
-	double y = primVtxColl->y(); // y coordinate
-	double z = primVtxColl->z(); // z coordinate
-	double xError = primVtxColl->xError(); //	error on x
-	double yError = primVtxColl->yError(); //	error on y
-	double zError = primVtxColl->zError(); //	error on z
-	
-	std::cout << "x: " << x << "+o-" << xError << std::endl;
-	std::cout << "y: " << y << "+o-" << yError << std::endl;
-	std::cout << "z: " << z << "+o-" << zError << std::endl;
-	std::cout << "isFake: " << isFake << " <--> isValid: " << isValid << std::endl;
-	std::cout << "chi2: " << chi2 << " ndof: " << ndof << " => normalizedChi2: " << normalizedChi2 << "(" << chi2/ndof << ")" << std::endl;
-	std::cout << "tracksSize: " << tracksSize << std::endl;
-      }
-
       bool hasProb = trackIPTagInfos_itr -> hasProbabilities (); // check if probability information is globally available
                                                                // impact parameters in the collection
       if(!hasProb) std::cout << "hasProb is FALSE!!" << std::endl;
@@ -153,31 +221,6 @@ VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       // look @ TrackIPData
       const std::vector<reco::TrackIPTagInfo::TrackIPData> & ipColl = trackIPTagInfos_itr -> impactParameterData (); // vectors of TrackIPData orderd as the selectedTracks()
       std::cout << "ipColl.size(): " << ipColl.size() << std::endl;
-      for ( unsigned int index = 0; index != ipColl.size(); index++ ) {
-	
-	const std::vector<float> & probabilities = trackIPTagInfos_itr -> probabilities (index);
-	std::cout << "ipColl[index]: " << index << std::endl;
-	std::cout << "probabilities.size(): " << probabilities.size() << std::endl;
-	GlobalPoint 	closestToFirstTrk = ipColl[index].closestToFirstTrack;
-	GlobalPoint 	closestToJet      = ipColl[index].closestToJetAxis;
-	float 	        distanceToFirstTrk = ipColl[index].distanceToFirstTrack;
-	float 	        distanceToJet      = ipColl[index].distanceToJetAxis;
-	Measurement1D 	ip2d = ipColl[index].ip2d;
-	Measurement1D 	ip3d = ipColl[index].ip3d;
-	std::cout << " trkIPData1 -> distanceToFirstTrack: "  << ipColl[index].distanceToFirstTrack << std::endl;
-	std::cout << " trkIPData1 -> distanceToJetAxis:    "  << ipColl[index].distanceToJetAxis    << std::endl;
-	std::cout << " trkIPData1 -> ip2d:		 "  << ipColl[index].ip2d.significance()  << std::endl;   
-	std::cout << " trkIPData1 -> ip3d:                 "  << ipColl[index].ip3d.significance()  << std::endl;
-      }
-      
-      RefToBase< Jet > trkIPjetRef = trackIPTagInfos_itr -> jet();
-      std::cout << "trkIPjet et: " << trkIPjetRef->et() <<std::endl;
-      const JetTracksAssociationRef & jetTrackAssRef = trackIPTagInfos_itr -> jtaRef();
-      const reco::TrackRefVector & selTrkColl = trackIPTagInfos_itr -> selectedTracks(); // return the vector of tracks for which the IP information is available 
-                                                                                         // quality cuts are applied to reject fake tracks
-      TrackRefVector trkColl    = trackIPTagInfos_itr -> tracks (); // returns a list of tracks associated to the jet [belongs to BaseTagInfo]
-      std::cout << "selTrkColl.size(): " << selTrkColl.size() << std::endl;
-      std::cout << " trkColl.size():   " << trkColl.size() << std::endl;
       
       // SortCriteria
       //  - IP3DSig 	
@@ -211,11 +254,6 @@ VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       double selTrkSumPt_S2 = 0.;
       double selTrkSumPt_S3 = 0.;
 
-      int probNum_0 = trackIPTagInfos_itr->probabilities(0).size();
-      int probNum_1 = trackIPTagInfos_itr->probabilities(1).size();
-
-      std::cout << "probNum_0: " << probNum_0 << " <--> probNum_1: " << probNum_1 << std::endl;
-      
       // additional vectors to store subgroups of selectedTracks
       reco::TrackRefVector selTrkColl_S1; // track collection w/ significance > 1.
       reco::TrackRefVector selTrkColl_S2; // track collection w/ significance > 2.
@@ -263,17 +301,37 @@ VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 		<< " selTrkSumPt_S1: " << selTrkSumPt_S1 
 		<< " selTrkSumPt_S2: " << selTrkSumPt_S2 
 		<< " selTrkSumPt_S3: " << selTrkSumPt_S3 << std::endl;
+
+      std::cout << " selTrkNum   : " << selTrkNum    
+		<< " selTrkNum_S1: " << selTrkNum_S1 
+		<< " selTrkNum_S2: " << selTrkNum_S2 
+		<< " selTrkNum_S3: " << selTrkNum_S3 << std::endl;
+
+      
+      selTrkNum_     -> Fill ( selTrkNum        );
+      selTrkNumS1_   -> Fill ( selTrkNum_S1     );
+      selTrkNumS2_   -> Fill ( selTrkNum_S2     );
+      selTrkNumS3_   -> Fill ( selTrkNum_S3     );
+      selTrkSumPt_   -> Fill ( selTrkSumPt      );
+      selTrkSumPtS1_ -> Fill ( selTrkSumPt_S1   );
+      selTrkSumPtS2_ -> Fill ( selTrkSumPt_S2   );
+      selTrkSumPtS3_ -> Fill ( selTrkSumPt_S3   );
+      selTrkMass_    -> Fill ( bTagTkInvMass    );
+      selTrkMassS1_  -> Fill ( bTagTkInvMass_S1 );
+      selTrkMassS2_  -> Fill ( bTagTkInvMass_S2 );
+      selTrkMassS3_  -> Fill ( bTagTkInvMass_S3 );      
+      
       
     }
     std::cout << "---------------------------------------------------------------" << std::endl;
 
-    unsigned int nVtxCand = secondaryVtxTagInfos_itr -> nVertexCandidates ();
-    unsigned int nVtx     = secondaryVtxTagInfos_itr -> nVertices ();
-    std::cout << "nVtxCand: " << nVtxCand << std::endl;
-    std::cout << "nVtx:     " << nVtx << std::endl;
-    for ( unsigned int index = 0; index != nVtxCand; index++ ) {
-      unsigned int nVtxTrks = secondaryVtxTagInfos_itr -> nVertexTracks (index);
-      std::cout << "nVtxTrks: " << nVtxTrks << std::endl;
+    unsigned int nSecVtxCand = secondaryVtxTagInfos_itr -> nVertexCandidates ();
+    unsigned int nSecVtx     = secondaryVtxTagInfos_itr -> nVertices ();
+    std::cout << "nSecVtxCand: " << nSecVtxCand << std::endl;
+    std::cout << "nSecVtx:     " << nSecVtx << std::endl;
+    for ( unsigned int index = 0; index != nSecVtxCand; index++ ) {
+      unsigned int nSecVtxTrks = secondaryVtxTagInfos_itr -> nVertexTracks (index);
+      std::cout << "nSecVtxTrks: " << nSecVtxTrks << std::endl;
       const Vertex   secVtx = secondaryVtxTagInfos_itr -> secondaryVertex (index);
       std::cout << "secondary vertex: " << std::endl;
       double x = secVtx.x(); // x coordinate
@@ -285,6 +343,11 @@ VBFHZZllbbBTagInfoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
       std::cout << "x: " << x << "+o-" << xError << std::endl;
       std::cout << "y: " << y << "+o-" << yError << std::endl;
       std::cout << "z: " << z << "+o-" << zError << std::endl;
+
+      tagsvX_ -> Fill (x);
+      tagsvY_ -> Fill (y);
+      tagsvZ_ -> Fill (z);
+
       TrackRefVector vtxTrkColl = secondaryVtxTagInfos_itr -> vertexTracks (index);
       std::cout << "vtxTrks.size(): " << vtxTrkColl.size() << std::endl;
       unsigned int trkIndex = secondaryVtxTagInfos_itr -> findTrack (vtxTrkColl[0]);
@@ -303,10 +366,47 @@ void
 VBFHZZllbbBTagInfoAnalyzer::beginJob(const edm::EventSetup&)
 {
 
-  TFileDirectory bjetInfoSubDir = fs->mkdir( "bjetInfo" );
-  TFileDirectory ipTagInfoSubDir     = bjetInfoSubDir.mkdir( "ipTagInfo" );
-  TFileDirectory secVtxTagInfoSubDir = bjetInfoSubDir.mkdir( "secVtxTagInfo" );
+  TFileDirectory muoninfoSubDir = fs->mkdir( "muoninfo" );
+  muonpvX_ = muoninfoSubDir.make<TH1D>("muonpvX","primary vertex x (cm)",100,-0.1,0.1);
+  muonpvY_ = muoninfoSubDir.make<TH1D>("muonpvY","primary vertex y (cm)",100,-0.1,0.1);
+  muonpvZ_ = muoninfoSubDir.make<TH1D>("muonpvZ","primary vertex z (cm)",100,-10.,10.);
 
+  TFileDirectory pvinfoSubDir = fs->mkdir( "pvinfo" );
+  pvX_ = pvinfoSubDir.make<TH1D>("pvX","primary vertex x (cm)",100,-0.1,0.1);
+  pvY_ = pvinfoSubDir.make<TH1D>("pvY","primary vertex y (cm)",100,-0.1,0.1);
+  pvZ_ = pvinfoSubDir.make<TH1D>("pvZ","primary vertex z (cm)",100,-10.,10.);
+  BSpvX_ = pvinfoSubDir.make<TH1D>("BSpvX","primary vertex x (cm)",100,-0.1,0.1);
+  BSpvY_ = pvinfoSubDir.make<TH1D>("BSpvY","primary vertex y (cm)",100,-0.1,0.1);
+  BSpvZ_ = pvinfoSubDir.make<TH1D>("BSpvZ","primary vertex z (cm)",100,-10.,10.);
+  PXpvX_ = pvinfoSubDir.make<TH1D>("PXpvX","primary vertex x (cm)",100,-0.1,0.1);
+  PXpvY_ = pvinfoSubDir.make<TH1D>("PXpvY","primary vertex y (cm)",100,-0.1,0.1);
+  PXpvZ_ = pvinfoSubDir.make<TH1D>("PXpvZ","primary vertex z (cm)",100,-10.,10.);
+
+  TFileDirectory taginfoSubDir = fs->mkdir( "taginfo" );
+  tagpvX_ = taginfoSubDir.make<TH1D>("tagpvX","primary vertex x (cm)",100,-0.1,0.1);
+  tagpvY_ = taginfoSubDir.make<TH1D>("tagpvY","primary vertex y (cm)",100,-0.1,0.1);
+  tagpvZ_ = taginfoSubDir.make<TH1D>("tagpvZ","primary vertex z (cm)",100,-10.,10.);
+  distanceTo1track_  = taginfoSubDir.make<TH1D>("distanceTo1track","distance to first track",50,0.,1.);
+  distanceToJetAxis_ = taginfoSubDir.make<TH1D>("distanceToJetAxis","distance to jet axis",100,-1.,1.);
+  ip2d_    = taginfoSubDir.make<TH1D>("ip2d","2dim impact parameter",100,-1.,1.);
+  ip3d_    = taginfoSubDir.make<TH1D>("ip3d","3dim impact parameter",100,-1.,1.);
+  ip2dSig_ = taginfoSubDir.make<TH1D>("ip2dSig","2dim impact parameter significance",100,-10.,15.);
+  ip3dSig_ = taginfoSubDir.make<TH1D>("ip3dSig","3dim impact parameter significance",100,-10.,15.);
+  tagsvX_ = taginfoSubDir.make<TH1D>("tagsvX","secondary vertex x (cm)",100,-0.1,0.1);
+  tagsvY_ = taginfoSubDir.make<TH1D>("tagsvY","secondary vertex y (cm)",100,-0.1,0.1);
+  tagsvZ_ = taginfoSubDir.make<TH1D>("tagsvZ","secondary vertex z (cm)",100,-10.,10.);
+  selTrkNum_   = taginfoSubDir.make<TH1D>("selTrkNum",  "number of selected tracks",                       10,0.,10.);
+  selTrkNumS1_ = taginfoSubDir.make<TH1D>("selTrkNumS1","number of selected tracks w/ ip significance > 1",10,0.,10.);
+  selTrkNumS2_ = taginfoSubDir.make<TH1D>("selTrkNumS2","number of selected tracks w/ ip significance > 2",10,0.,10.);
+  selTrkNumS3_ = taginfoSubDir.make<TH1D>("selTrkNumS3","number of selected tracks w/ ip significance > 3",10,0.,10.);
+  selTrkSumPt_   = taginfoSubDir.make<TH1D>("selTrkSumPt",  "Sum p_{T} of selected tracks",                       100,0.,100.);
+  selTrkSumPtS1_ = taginfoSubDir.make<TH1D>("selTrkSumPtS1","Sum p_{T} of selected tracks w/ ip significance > 1",100,0.,100.);
+  selTrkSumPtS2_ = taginfoSubDir.make<TH1D>("selTrkSumPtS2","Sum p_{T} of selected tracks w/ ip significance > 2",100,0.,100.);
+  selTrkSumPtS3_ = taginfoSubDir.make<TH1D>("selTrkSumPtS3","Sum p_{T} of selected tracks w/ ip significance > 3",100,0.,100.);
+  selTrkMass_   = taginfoSubDir.make<TH1D>("selTrkMass",  "invariant mass of selected tracks",                       250,0.,25.);
+  selTrkMassS1_ = taginfoSubDir.make<TH1D>("selTrkMassS1","invariant mass of selected tracks w/ ip significance > 1",250,0.,25.);
+  selTrkMassS2_ = taginfoSubDir.make<TH1D>("selTrkMassS2","invariant mass of selected tracks w/ ip significance > 2",250,0.,25.);
+  selTrkMassS3_ = taginfoSubDir.make<TH1D>("selTrkMassS3","invariant mass of selected tracks w/ ip significance > 3",250,0.,25.);
 
 }
 

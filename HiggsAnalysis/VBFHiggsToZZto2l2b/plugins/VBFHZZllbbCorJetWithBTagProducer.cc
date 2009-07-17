@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Wed Mar 18 16:33:51 CET 2009
-// $Id: VBFHZZllbbCorJetWithBTagProducer.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
+// $Id: VBFHZZllbbCorJetWithBTagProducer.cc,v 1.3 2009/07/06 13:15:48 tosi Exp $
 //
 //
 
@@ -74,7 +74,7 @@ VBFHZZllbbCorJetWithBTagProducer::VBFHZZllbbCorJetWithBTagProducer(const edm::Pa
   produces<vbfhzz2l2b::CorJetWithBTagDiscrCollection>( "corJetWithBTagDiscr" );
 
   //now do what ever other initialization is needed
-  
+  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::VBFHZZllbbCorJetWithBTagProducer] DONE" << std::endl;
 }
 
 
@@ -83,7 +83,7 @@ VBFHZZllbbCorJetWithBTagProducer::~VBFHZZllbbCorJetWithBTagProducer()
  
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
-
+  std::cout << "VBFHZZllbbCorJetWithBTagProducer::~VBFHZZllbbCorJetWithBTagProducer] DONE" << std::endl;
 }
 
 
@@ -189,6 +189,8 @@ void VBFHZZllbbCorJetWithBTagProducer::produce(edm::Event& iEvent, const edm::Ev
   // puts Corrected Jet Collection with BTags discriminator into event
   iEvent.put(jetCollection, "corJetWithBTagDiscr");
 
+  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::produce] DONE" << std::endl;
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -198,12 +200,13 @@ void VBFHZZllbbCorJetWithBTagProducer::beginJob(const edm::EventSetup&)
     std::string dataFormatType = "JetTag";
     edm::InputTag bTagLabel = bTagConfigLabel_[iModule].getParameter<edm::InputTag>("label");
     bJetTagInputTags_.push_back( bTagLabel );
-    //    std::cout << "[VBFHZZllbbRAWCORBTAGtesting::beginJob] collection: " << bTagLabel << std::endl;
   }
+  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::beginJob] DONE" << std::endl;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void VBFHZZllbbCorJetWithBTagProducer::endJob() {
+  std::cout << "[VBFHZZllbbCorJetWithBTagProducer::endJob] DONE" << std::endl;
 }
 
 DEFINE_FWK_MODULE(VBFHZZllbbCorJetWithBTagProducer);

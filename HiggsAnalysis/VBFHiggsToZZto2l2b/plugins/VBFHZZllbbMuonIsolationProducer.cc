@@ -32,6 +32,7 @@
 #include <DataFormats/EgammaCandidates/interface/GsfElectronFwd.h>
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
 //
 #include <memory>
 #include <vector>
@@ -85,7 +86,7 @@ void VBFHZZllbbMuonIsolationProducer::produce(edm::Event& iEvent, const edm::Eve
   VBFHZZllbbMuonAssociationMap::Filler filler( *IsoMuMap );
 
   // Get tracks
-  Handle<edm::View<reco::Track> > trackHandle;
+  Handle<reco::TrackCollection> trackHandle;
   iEvent.getByLabel(trackLabel_, trackHandle);
 
   //get electrons
@@ -182,10 +183,10 @@ void VBFHZZllbbMuonIsolationProducer::produce(edm::Event& iEvent, const edm::Eve
       }
     }
     
-    edm::View<reco::Track>::const_iterator track_itr = trackHandle->begin();
+    reco::TrackCollection::const_iterator track_itr = trackHandle->begin();
     for ( ; track_itr != trackHandle->end(); track_itr++) {    
       
-      bool goodTrack = testTrackerTrack(track_itr, muons[h]);
+      bool goodTrack = vbfhzz2l2b::testTrackerTrack(track_itr, muons[h]);
       
       reco::Particle::LorentzVector p4Track(track_itr -> px(), track_itr -> py(), track_itr -> pz(), track_itr -> p());      
       reco::IsoDeposit::Direction dirTrack(p4Track.eta(), p4Track.phi());
@@ -273,46 +274,3 @@ void VBFHZZllbbMuonIsolationProducer::produce(edm::Event& iEvent, const edm::Eve
 }
 
 
-bool VBFHZZllbbMuonIsolationProducer::testTrackerTrack(edm::View<reco::Track>::const_iterator iterTrack, const reco::Muon* muon) {
-
-  /************* quality track requirements ************/  
-
-  bool keep = true;
-  // Extract properties at Vertex
-  float vz  = iterTrack -> vz();
-  float edz = iterTrack -> dzError();
-  float d0  = iterTrack -> d0();
-  float ed0 = iterTrack -> d0Error();
-  // Difference with lepton/Z vertex
-  float dz  = muon -> vertex().z() - vz;
-  
-  dz  = fabs(dz);                //impact parameter in the (r, z) plane
-  edz = fabs(edz);               //error on dz 
-  d0  = fabs(d0);                //impact parameter in the (r, phi) plane
-  ed0 = fabs(ed0);               //error on d0   
-
-  reco::Particle::LorentzVector track(iterTrack -> px(), iterTrack -> py(), iterTrack -> pz(), iterTrack -> p());
-  float track_pt =  track.pt();
-  int nhits = iterTrack -> recHitsSize(); 
-
-  if ( nhits < 8 ) {
-    if ( track_pt < 1.) return false;
-    if ( d0 > 0.04) return false;
-    if ( dz > 0.50) return false;
-    if ( d0 / ed0 > 7.) return false;
-    if ( dz / edz > 7.) return false;
-  }
-  else if ( nhits < 10 ) {
-    if ( track_pt < 1.) return false;
-    if ( d0 > 0.20) return false;
-    if ( dz > 2.00) return false;
-    if ( d0 / ed0 > 10.) return false;
-    if ( dz / edz > 10.) return false;
-  }
-  else {
-    if ( track_pt < 1.) return false;
-    if ( d0 > 1.00) return false;
-    if ( dz > 5.00) return false;
-  }
-  return keep;
-}

@@ -25,8 +25,8 @@ DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBTagInfoAnalyzer);
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBhadronReconstruction.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBhadronReconstruction);
 
-#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/newSimpleNtple.h"
-DEFINE_ANOTHER_FWK_MODULE(newSimpleNtple); 
+//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/newSimpleNtple.h"
+//DEFINE_ANOTHER_FWK_MODULE(newSimpleNtple); 
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/SimpleNtple.h"
 DEFINE_ANOTHER_FWK_MODULE(SimpleNtple); 

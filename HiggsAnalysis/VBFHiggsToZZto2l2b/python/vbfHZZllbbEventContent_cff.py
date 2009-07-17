@@ -37,12 +37,13 @@ VBFHZZ2l2bEventContent = cms.PSet(
         
         # particle-flow collections
 #        'keep *recoPF*_*_*_*',
-#        'keep *_particleFlow_*_*',
+        'keep *_particleFlow_*_*',
         'keep *_iterativeCone5PFJets_*_*',
         'keep *_kt4PFJets_*_*',
         'keep *_kt6PFJets_*_*',
         'keep *_sisCone5PFJets_*_*',
         'keep *_sisCone7PFJets_*_*',
+#        'keep *_pfMet_*_*',
 
         # met collections
         'keep *_genMet_*_*',

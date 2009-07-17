@@ -13,6 +13,9 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 
 namespace vbfhzz2l2b
 {
@@ -25,9 +28,13 @@ namespace vbfhzz2l2b
 	 SOFTELECTRON  = 6,
 	 JETPROB       = 3 };
   
+  enum { FASTSIM = 0,
+	 FULLSIM = 1 };
+
   // calculate the distance between two lorentz vectors 
   // using DeltaR(eta, phi) or normal space angle(theta, phi)
   double distance(const math::XYZTLorentzVector&, const math::XYZTLorentzVector&, bool);
+  
 
   int bTaggerCode ( const std::string& );
 
@@ -37,10 +44,16 @@ namespace vbfhzz2l2b
 
 
   void setVertex (TVector3 &,
+		  const double&, const double&, const double&);
+
+  void setVertex (TVector3 &,
 		  const math::XYZPoint &);
 
   void setVertex (TVector3 &,
 		  const TVector3 &);
+
+  void setVertex (TVector3 &,
+		  const reco::Vertex &);
 
   void setMomentum (TLorentzVector &, 
 		    const reco::Candidate &);
@@ -48,6 +61,13 @@ namespace vbfhzz2l2b
   void setMomentum (TLorentzVector & v1, 
 		    const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >& v2);
 
+  
+  double dzVtxMomentum (const math::XYZVector & vertex,
+			const math::XYZVector & momentum);
+  
+  bool testTrackerTrack (reco::TrackCollection::const_iterator & track_itr);
+  bool testTrackerTrack (reco::TrackCollection::const_iterator & track_itr, const reco::Muon* muon);
+  
 
   double tracksInvariantMass( const reco::TrackRefVector & selectedTracks);
 
@@ -327,43 +347,43 @@ namespace vbfhzz2l2b
     return objPair;
   }
   
- template<class T>
-   std::pair<T,T> findPair_maxInvMass_oppositeEta (T & begin, T & end ) {
-
-   std::pair<T,T> objPair (begin,begin) ;
-   double maxInvMass = 0. ;
-   // first loop over jets
-   for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
-
+  template<class T>
+  std::pair<T,T> findPair_maxInvMass_oppositeEta (T & begin, T & end ) {
+    
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxInvMass = 0. ;
+    // first loop over jets
+    for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
+      
       // second loop over objs
       for (T secondObj = firstObj + 1 ; secondObj != end ; ++secondObj ) {
 	
 	if (firstObj->eta ()*secondObj->eta () > 0) continue ;
 	
 	math::XYZTLorentzVector objsSumP4 = firstObj->p4 () + secondObj->p4 () ;
-
+	
 	if (objsSumP4.M () > maxInvMass) {
 	  maxInvMass = objsSumP4.M () ;
 	  objPair.first  = firstObj ;
 	  objPair.second = secondObj ;
 	}
       } // second loop over objs
-   } // first loop over objs
-   
-   return objPair ;
- }
-
- template<class T>
-   std::pair<T,T> findPair_maxInvMass_oppositeEta_ptMinCut (T & begin, T & end,
-						 double ptMin ) {
-
-   std::pair<T,T> objPair (begin,begin) ;
-   double maxInvMass = 0. ;
-   // first loop over jets
-   for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
-
-     if (firstObj->pt () < ptMin) continue ;
-
+    } // first loop over objs
+    
+    return objPair ;
+  }
+  
+  template<class T>
+  std::pair<T,T> findPair_maxInvMass_oppositeEta_ptMinCut (T & begin, T & end,
+							   double ptMin ) {
+    
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxInvMass = 0. ;
+    // first loop over jets
+    for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
+      
+      if (firstObj->pt () < ptMin) continue ;
+      
       // second loop over objs
       for (T secondObj = firstObj + 1 ; secondObj != end ; ++secondObj ) {
 	
@@ -372,30 +392,30 @@ namespace vbfhzz2l2b
 	if (firstObj->eta ()*secondObj->eta () > 0) continue ;
 	
 	math::XYZTLorentzVector objsSumP4 = firstObj->p4 () + secondObj->p4 () ;
-
+	
 	if (objsSumP4.M () > maxInvMass) {
 	  maxInvMass = objsSumP4.M () ;
 	  objPair.first  = firstObj ;
 	  objPair.second = secondObj ;
 	}
       } // second loop over objs
-   } // first loop over objs
-   
-   return objPair ;
- }
-
- template<class T>
-   std::pair<T,T> findPair_maxInvMass_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
-							   double ptMin, double etaMax) {
-
-   std::pair<T,T> objPair (begin,begin) ;
-   double maxInvMass = 0. ;
-   // first loop over jets
-   for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
-
+    } // first loop over objs
+    
+    return objPair ;
+  }
+  
+  template<class T>
+  std::pair<T,T> findPair_maxInvMass_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
+								     double ptMin, double etaMax) {
+    
+    std::pair<T,T> objPair (begin,begin) ;
+    double maxInvMass = 0. ;
+    // first loop over jets
+    for (T firstObj = begin ; firstObj != end ; ++firstObj ) {
+      
       if (firstObj->pt () < ptMin || 
           fabs (firstObj->eta ()) > etaMax) continue ;
-
+      
       // second loop over objs
       for (T secondObj = firstObj + 1 ; secondObj != end ; ++secondObj ) {
 	
@@ -405,19 +425,19 @@ namespace vbfhzz2l2b
 	if (firstObj->eta ()*secondObj->eta () > 0) continue ;
 	
 	math::XYZTLorentzVector objsSumP4 = firstObj->p4 () + secondObj->p4 () ;
-
+	
 	if (objsSumP4.M () > maxInvMass) {
 	  maxInvMass = objsSumP4.M () ;
 	  objPair.first  = firstObj ;
 	  objPair.second = secondObj ;
 	}
       } // second loop over objs
-   } // first loop over objs
-   
-   return objPair ;
- }
-
-
+    } // first loop over objs
+    
+    return objPair ;
+  }
+  
+  
   // ****************************************************
   // *** find couple of objs w/ the highest delta eta ***
   // ****************************************************
@@ -513,20 +533,20 @@ namespace vbfhzz2l2b
   // ------------------------------------------------------------
 
 
-// --------------------------------------------------------------------
-
-template <class T>
+  // --------------------------------------------------------------------
+  
+  template <class T>
   std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end) {
-
-  std::pair<T,T> objPair (begin, begin) ; 
-
-  double ptMax1 = 0;
-  double ptMax2 = 0;
-
-  T obj1, obj2;
-
-  for (T obj = begin ; obj != end ; ++obj) {
-
+    
+    std::pair<T,T> objPair (begin, begin) ; 
+    
+    double ptMax1 = 0;
+    double ptMax2 = 0;
+    
+    T obj1, obj2;
+    
+    for (T obj = begin ; obj != end ; ++obj) {
+      
     if (obj->p4().Pt() > ptMax1) {
       obj2 = obj1;
       obj1 = obj;
@@ -538,86 +558,86 @@ template <class T>
       obj2 = obj;
       ptMax2 = obj->p4().Pt() ;
     }
-  }
-  
-  objPair.first  = obj1;
-  objPair.second = obj2 ;
-  
-  return objPair ;
-  
-}
-
-template <class T>
-std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
-								 double ptMin) {
-
-  std::pair<T,T> objPair (begin, begin) ; 
-
-  double ptMax1 = 0;
-  double ptMax2 = 0;
-
-  T obj1, obj2;
-
-  for (T obj = begin ; obj != end ; ++obj) {
-
-    if (obj->pt () < ptMin) continue ;
-
-    if (obj->p4().Pt() > ptMax1) {
-      obj2 = obj1;
-      obj1 = obj;
-      ptMax2 = ptMax1;
-      ptMax1 = obj->p4().Pt() ;
-    } 
-    else if ( (obj->p4().Pt() > ptMax2) && 
-	      (obj1->p4().Eta() * obj->p4().Eta() < 0) ) {
-      obj2 = obj;
-      ptMax2 = obj->p4().Pt() ;
     }
+    
+    objPair.first  = obj1;
+    objPair.second = obj2 ;
+    
+    return objPair ;
+    
   }
   
-  objPair.first  = obj1;
-  objPair.second = obj2 ;
-  
-  return objPair ;
-  
-}
-
-template <class T>
-std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
-								 double ptMin, double etaMax) {
-
-  std::pair<T,T> objPair (begin, begin) ; 
-
-  double ptMax1 = 0;
-  double ptMax2 = 0;
-
-  T obj1, obj2;
-
-  for (T obj = begin ; obj != end ; ++obj) {
-
-    if (obj->pt () < ptMin || 
-	fabs (obj->eta ()) > etaMax) continue ;
-
-    if (obj->p4().Pt() > ptMax1) {
-      obj2 = obj1;
-      obj1 = obj;
-      ptMax2 = ptMax1;
-      ptMax1 = obj->p4().Pt() ;
-    } 
-    else if ( (obj->p4().Pt() > ptMax2) && 
-	      (obj1->p4().Eta() * obj->p4().Eta() < 0) ) {
-      obj2 = obj;
-      ptMax2 = obj->p4().Pt() ;
+  template <class T>
+  std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
+								   double ptMin) {
+    
+    std::pair<T,T> objPair (begin, begin) ; 
+    
+    double ptMax1 = 0;
+    double ptMax2 = 0;
+    
+    T obj1, obj2;
+    
+    for (T obj = begin ; obj != end ; ++obj) {
+      
+      if (obj->pt () < ptMin) continue ;
+      
+      if (obj->p4().Pt() > ptMax1) {
+	obj2 = obj1;
+	obj1 = obj;
+	ptMax2 = ptMax1;
+	ptMax1 = obj->p4().Pt() ;
+      } 
+      else if ( (obj->p4().Pt() > ptMax2) && 
+		(obj1->p4().Eta() * obj->p4().Eta() < 0) ) {
+	obj2 = obj2;
+	ptMax2 = obj->p4().Pt() ;
+      }
     }
+    
+    objPair.first  = obj1;
+    objPair.second = obj2 ;
+    
+    return objPair ;
+    
+  }
+
+  template <class T>
+  std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & end,
+								   double ptMin, double etaMax) {
+    
+    std::pair<T,T> objPair (begin, begin) ; 
+    
+    double ptMax1 = 0;
+    double ptMax2 = 0;
+    
+    T obj1, obj2;
+    
+    for (T obj = begin ; obj != end ; ++obj) {
+      
+      if (obj->pt () < ptMin || 
+	  fabs (obj->eta ()) > etaMax) continue ;
+      
+      if (obj->p4().Pt() > ptMax1) {
+	obj2 = obj1;
+	obj1 = obj;
+	ptMax2 = ptMax1;
+	ptMax1 = obj->p4().Pt() ;
+      } 
+      else if ( (obj->p4().Pt() > ptMax2) && 
+		(obj1->p4().Eta() * obj->p4().Eta() < 0) ) {
+	obj2 = obj2;
+	ptMax2 = obj->p4().Pt() ;
+      }
+    }
+    
+    objPair.first  = obj1;
+    objPair.second = obj2 ;
+    
+    return objPair ;
+    
   }
   
-  objPair.first  = obj1;
-  objPair.second = obj2 ;
-  
-  return objPair ;
-  
- }
-
   class PtGreater {
   public:
     template <typename T> bool operator () (const T& i, const T& j) {
@@ -626,45 +646,45 @@ std::pair<T,T> findObjPair_maxPt_oppositeEta_ptMinCut_etaMaxCut (T & begin, T & 
   };
   
 
-template <typename T>
-struct maxPtSorting {
-  bool operator() ( const T &t1, 
-		    const T &t2 ) const { 
-    return t1.p4().Pt() > t2.p4().Pt(); 
-  }
-};
+  template <typename T>
+  struct maxPtSorting {
+    bool operator() ( const T &t1, 
+		      const T &t2 ) const { 
+      return t1.p4().Pt() > t2.p4().Pt(); 
+    }
+  };
+  
+  template <typename T>
+  struct maxInvMassSorting {
+    bool operator() ( const std::pair<T,T> & couple1,
+		      const std::pair<T,T> & couple2 ) const {
+      double invMass1 = (couple1.first->p4()+couple1.second->p4()).M();
+      double invMass2 = (couple2.first->p4()+couple2.second->p4()).M();
+      return ( invMass1 < invMass2 );
+    }
+  };
+  
+  template <typename T>
+  struct maxPairPtSorting { 
+    bool operator() ( const std::pair<T,T> & couple1,
+		      const std::pair<T,T> & couple2 ) const {
+      return ( couple1.first->p4().Pt()  < couple2.first->p4().Pt() &&
+	       couple1.second->p4().Pt() < couple2.second->p4().Pt() );
+    }
+  };
+  
+  template <typename T>
+  struct maxPairSumPtSorting {
+    bool operator() ( const std::pair<T,T> & couple1,
+		      const std::pair<T,T> & couple2 ) {
+      double sumPt1 = couple1.first->p4().Pt() + couple1.second->p4().Pt();
+      double sumPt2 = couple2.first->p4().Pt() + couple2.second->p4().Pt();
+      return ( sumPt1 < sumPt2 );
+    }
+  };
 
-template <typename T>
-struct maxInvMassSorting {
-  bool operator() ( const std::pair<T,T> & couple1,
-		    const std::pair<T,T> & couple2 ) const {
-    double invMass1 = (couple1.first->p4()+couple1.second->p4()).M();
-    double invMass2 = (couple2.first->p4()+couple2.second->p4()).M();
-    return ( invMass1 < invMass2 );
-  }
-};
-
-template <typename T>
-struct maxPairPtSorting { 
-  bool operator() ( const std::pair<T,T> & couple1,
-		    const std::pair<T,T> & couple2 ) const {
-    return ( couple1.first->p4().Pt()  < couple2.first->p4().Pt() &&
-	     couple1.second->p4().Pt() < couple2.second->p4().Pt() );
-  }
-};
-
-template <typename T>
-struct maxPairSumPtSorting {
-  bool operator() ( const std::pair<T,T> & couple1,
-		    const std::pair<T,T> & couple2 ) {
-    double sumPt1 = couple1.first->p4().Pt() + couple1.second->p4().Pt();
-    double sumPt2 = couple2.first->p4().Pt() + couple2.second->p4().Pt();
-    return ( sumPt1 < sumPt2 );
-  }
-};
 
 }
-
 #endif // VBFHZZLLBBUTILS_H
 
 

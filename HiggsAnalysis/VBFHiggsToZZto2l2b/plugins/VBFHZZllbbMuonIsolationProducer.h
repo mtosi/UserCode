@@ -22,7 +22,6 @@ class VBFHZZllbbMuonIsolationProducer : public edm::EDProducer {
 
  private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
-  bool testTrackerTrack(edm::View<reco::Track>::const_iterator, const reco::Muon*);
 
   edm::InputTag muonLabel_;
   edm::InputTag electronLabel_;

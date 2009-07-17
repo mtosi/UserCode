@@ -8,14 +8,14 @@
 namespace vbfhzz2l2b
 {
 
-
+  
   // calculate the distance between two lorentz vectors 
   // using DeltaR(eta, phi) or normal space angle(theta, phi)
   double distance(const math::XYZTLorentzVector& v1, const math::XYZTLorentzVector& v2, bool useDeltaR = true) {
     if(useDeltaR) return ROOT::Math::VectorUtil::DeltaR(v1, v2);
     return ROOT::Math::VectorUtil::Angle(v1, v2);
   }
-
+  
 
   int bTaggerCode ( const std::string& bTagger ) {
     
@@ -37,6 +37,14 @@ namespace vbfhzz2l2b
     return (recValue-refValue)/refValue;
   }
   
+  
+  void setVertex (TVector3 &myvector, 
+		  const double& x, const double& y, const double& z) {
+    myvector.SetX (x);
+    myvector.SetY (y);
+    myvector.SetZ (z);
+  }
+  
   void setVertex (TVector3 &myvector, 
 		  const math::XYZPoint & mom) {
     myvector.SetX (mom.X());
@@ -49,6 +57,13 @@ namespace vbfhzz2l2b
     myvector.SetX (mom.X());
     myvector.SetY (mom.Y());
     myvector.SetZ (mom.Z());
+  }
+
+  void setVertex (TVector3 &myvector, 
+		  const reco::Vertex & mom) {
+    myvector.SetX (mom.x());
+    myvector.SetY (mom.y());
+    myvector.SetZ (mom.z());
   }
 
   void setMomentum (TLorentzVector & myvector, 
@@ -95,15 +110,7 @@ namespace vbfhzz2l2b
     return tracks4DVec.M();
   }
 
-  
 
-  //  double deltaPhi (double phi1, double phi2) {    
-  //    double deltaphi=fabs(phi1-phi2);
-  //    if (deltaphi > 6.283185308) deltaphi -= 6.283185308;
-  //    if (deltaphi > 3.141592654) deltaphi = 6.283185308-deltaphi;
-  //    return deltaphi;
-  //  }
-  
   bool BhadronTable(int pdgcode) {
     bool isBhadron = false;
     int Bmeson[53] = {511,521,10511,10521,513,523,10513,10523,20513,20523,515,
@@ -132,6 +139,89 @@ namespace vbfhzz2l2b
     }
     return isBhadron;
   }
+
   
+  double dzVtxMomentum (const math::XYZVector & vertex,
+			const math::XYZVector & momentum) { 
+    double invpt = 1. / sqrt ( momentum.Perp2 () ) ;
+    return vertex.z () -  (vertex.x () * momentum.x () + vertex.y () * momentum.y ()) * invpt * (momentum.z () * invpt) ; 
+  }
+
+
+  bool testTrackerTrack (reco::TrackCollection::const_iterator & track_itr) {
+    
+    // extract track properties
+    double d0    = track_itr->d0 () ; 
+    double d0Err = track_itr->d0Error () ;
+    double d0Sig = fabs(d0)/d0Err;
+    double dz    = track_itr->dz () ;
+    double dzErr = track_itr->dzError () ;
+    double dzSig = fabs(dz)/dzErr;
+    int    nhits = track_itr->recHitsSize () ;
+
+    if ( nhits < 8 ) {
+      if ( fabs(d0) >  0.04 ) return false;
+      if ( fabs(dz) >  0.50 ) return false;
+      if ( d0Sig    >  7.00 ) return false;
+      if ( dzSig    > 10.00 ) return false;
+    }
+    else if ( nhits < 10 ) {
+      if ( fabs(d0) >  0.20 ) return false;
+      if ( fabs(dz) >  2.00 ) return false;
+      if ( d0Sig    > 10.00 ) return false;
+      if ( dzSig    > 10.00 ) return false;
+    }
+    else {
+      if ( fabs(d0) > 1.00 ) return false;
+      if ( fabs(dz) > 5.00 ) return false;
+    }
+    
+    return true;
+    
+  }
+
+  bool testTrackerTrack (reco::TrackCollection::const_iterator & track_itr, const reco::Muon* muon) {
+
+  // Extract properties at Vertex
+  float vz  = track_itr -> vz();
+  float edz = track_itr -> dzError();
+  float d0  = track_itr -> d0();
+  float ed0 = track_itr -> d0Error();
+  // Difference with lepton/track Z vertex
+  float dz  = muon -> vertex().z() - vz;
+  
+  dz  = fabs(dz);   //impact parameter in the (r, z) plane
+  edz = fabs(edz);  //error on dz 
+  d0  = fabs(d0);   //impact parameter in the (r, phi) plane
+  ed0 = fabs(ed0);  //error on d0   
+
+  reco::Particle::LorentzVector track(track_itr -> px(), track_itr -> py(), track_itr -> pz(), track_itr -> p());
+  float track_pt =  track.pt();
+  int nhits = track_itr -> recHitsSize(); 
+
+  if ( nhits < 8 ) {
+    if ( track_pt < 1.00) return false;
+    if ( d0       > 0.04) return false;
+    if ( dz       > 0.50) return false;
+    if ( d0 / ed0 > 7.00) return false;
+    if ( dz / edz > 7.00) return false;
+  }
+  else if ( nhits < 10 ) {
+    if ( track_pt <  1.00) return false;
+    if ( d0       >  0.20) return false;
+    if ( dz       >  2.00) return false;
+    if ( d0 / ed0 > 10.00) return false;
+    if ( dz / edz > 10.00) return false;
+  }
+  else {
+    if ( track_pt < 1.) return false;
+    if ( d0 > 1.00) return false;
+    if ( dz > 5.00) return false;
+  }
+  return true;
+
+}
+
+
 }
 

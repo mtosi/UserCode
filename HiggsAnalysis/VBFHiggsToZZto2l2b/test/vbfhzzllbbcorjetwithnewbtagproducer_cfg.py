@@ -47,12 +47,12 @@ process.TFileService = cms.Service("TFileService",
 
 # from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbNewIterCone5PFBTagSequence_cff import *
 # from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbNewSisCone5CaloBTagSequence_cff import *
-# from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cfi import *
+# from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cff import *
 
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbNewIterCone5PFBTagSequence_cff")
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbNewSisCone5CaloBTagSequence_cff")
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbNewSisCone5PFBTagSequence_cff")
-process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cfi")
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cff")
 
 process.pSequence = cms.Sequence(
     process.sisC5CaloBtaggingSequence *

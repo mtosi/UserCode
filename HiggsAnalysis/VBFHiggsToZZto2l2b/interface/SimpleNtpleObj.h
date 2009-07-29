@@ -50,8 +50,7 @@ namespace vbfhzz2l2b {
       int nmuon;
       int nelectron;
       int nZhad;
-
-      //      ClassDef(EVT,0)
+      //      ClassDef(EVT,1)
     };
 
     // JET

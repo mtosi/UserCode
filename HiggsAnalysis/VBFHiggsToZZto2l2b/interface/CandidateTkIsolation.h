@@ -53,6 +53,8 @@ class CandidateTkIsolation {
   double getPtTracks2() const ;
   std::vector<double> getPtTracksCorr() const ;
 
+  bool testTrackerTrack(edm::View<reco::Track>::const_iterator iterTrack, const reco::Muon* muon);
+
   //destructor 
   ~CandidateTkIsolation() ;
   

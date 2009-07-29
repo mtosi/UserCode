@@ -5,7 +5,7 @@ from Configuration.StandardSequences.Geometry_cff import *
 from Configuration.StandardSequences.FrontierConditions_GlobalTag_cff import *
 from Geometry.CommonDetUnit.globalTrackingGeometry_cfi import *
 #process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
-GlobalTag.globaltag = cms.string('IDEAL_V9::All')
+GlobalTag.globaltag = cms.string('IDEAL_V11::All')
 from Configuration.StandardSequences.MagneticField_cff import *
 
 from TrackingTools.TrackAssociator.default_cfi import *

@@ -25,17 +25,18 @@ DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBTagInfoAnalyzer);
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBhadronReconstruction.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBhadronReconstruction);
 
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/newSimpleNtple.h"
-//DEFINE_ANOTHER_FWK_MODULE(newSimpleNtple); 
-
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/SimpleNtple.h"
 DEFINE_ANOTHER_FWK_MODULE(SimpleNtple); 
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbDeltaRAnalyzer.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbDeltaRAnalyzer);
 
+
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbAnalyzer.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbAnalyzer);
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatchAnalyzer.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbJetMatchAnalyzer);
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbJetMatching.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbJetMatching);
@@ -71,29 +72,19 @@ DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbPreSelection) ;
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbCommonPreselection.h"
 DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbCommonPreselection);
 
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMuonSelector.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMuonSelector.h"
 //typedef ObjectSelector<VBFHZZllbbMuonSelector> VBFHZZllbbMuonSelection;
 //typedef ObjectSelector<VBFHZZllbbMuonSelector, edm::RefVector<reco::MuonCollection> > VBFHZZllbbMuonSelectionRef;
+DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMuonSelector);
 //DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMuonSelection);
 //DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMuonSelectionRef);
-
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbElectronSelector.h"
-//typedef ObjectSelector<VBFHZZllbbElectronSelector> VBFHZZllbbElectronSelection;
-//typedef ObjectSelector<VBFHZZllbbElectronSelector, edm::RefVector<reco::PixelMatchGsfElectronCollection> > VBFHZZllbbElectronSelectionRef;
-//DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbElectronSelection);
-//DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbElectronSelectionRef);
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbCommonOfflineSelection.h"
 DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbCommonOfflineSelection);
 
-
-
-#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMuonIsolationProducer.h"
-DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbMuonIsolationProducer);
-
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbElectronIsolationProducer.h"
 DEFINE_ANOTHER_FWK_MODULE (VBFHZZllbbElectronIsolationProducer);
 
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbCorJetWithBTagProducer.cc"
-//DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbCorJetWithBTagProducer);
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbCorJetWithBTagProducer.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbCorJetWithBTagProducer);
 

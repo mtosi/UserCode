@@ -45,7 +45,7 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('VBFHZZllbbCorJetWithBTagTESTHistos.root')
 )
 
-process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cfi")
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cff")
 process.vbfhzzllbbCorJetWithBTag = cms.Path(
     process.vbfhzzllbbCorJetWithBTagSequence
 )

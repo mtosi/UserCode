@@ -1,11 +1,30 @@
 import FWCore.ParameterSet.Config as cms
 
 vbfHZZllbbAnalyzer = cms.EDAnalyzer('VBFHZZllbbAnalyzer',
-    genParticleLabel = cms.untracked.InputTag( 'genParticles'                    ),
-    caloJetLabel     = cms.untracked.InputTag( 'iterativeCone5CaloJets'          ),
-    muonLabel        = cms.untracked.InputTag( 'muons'                           ),
-    electronLabel    = cms.untracked.InputTag( 'pixelMatchGsfElectrons'          ),
-    bTagLabel        = cms.untracked.InputTag( 'combinedSecondaryVertexBJetTags' ),
-    metLabel         = cms.untracked.InputTag( 'caloMET'                         ), # needs to be checked!!!
-    ptMax = cms.untracked.double(10)                           
+        whichSim = cms.int32(1), # 0:FastSim, 1:FullSim                              
+        vertexLabel                 = cms.InputTag('offlinePrimaryVertexWithBS'),
+	trackLabel                  = cms.InputTag('generalTracks'),
+	muonLabel                   = cms.InputTag('muons'),
+	electronLabel               = cms.InputTag('pixelMatchGsfElectrons'),
+#	metLabel                    = cms.InputTag('met'),
+ 	metLabel                    = cms.InputTag('corMetType1Icone5Muons'),
+	caloJetLabel                = cms.InputTag('iterativeCone5CaloJets'),
+        corIC5CaloJetsWithBTagLabel = cms.string('vbfhzzllbbCorJetWithBTagProd'),
+	genParticleLabel            = cms.InputTag('genParticles'),
+	genJetLabel                 = cms.InputTag('iterativeCone5GenJets'),
+	genMetLabel                 = cms.InputTag('genMet'),
+        corIC5PFJetsWithBTagFlag  = cms.bool(False),
+           corIC5PFJetsWithBTagLabel = cms.string(''),  
+        eleTrkIsoAlgoFlag         = cms.bool(True),
+           coneRadius      = cms.double(0.3),
+           vetoRadius      = cms.double(0.1),
+           otherVetoRadius = cms.double(0.0002),
+           ptMin           = cms.double(100.),
+           lipMax          = cms.double(100.),
+           useTkQuality    = cms.untracked.bool(True),
+        leptonPtCut         = cms.double(10.),
+        jetEtCut            = cms.double(15.),
+        jetPartonDeltaR2Cut = cms.double(0.3),
+        jetLeptonDeltaRCut  = cms.double(0.3),
+        jetEMfracCut        = cms.double(0.2)
 )

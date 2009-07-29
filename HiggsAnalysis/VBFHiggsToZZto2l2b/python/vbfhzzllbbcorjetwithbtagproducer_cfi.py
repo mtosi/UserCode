@@ -19,12 +19,3 @@ vbfhzzllbbCorJetWithBTagProd = cms.EDProducer('VBFHZZllbbCorJetWithBTagProducer'
 )
 
 
-from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbIC5CaloCorrections_cff import *
-vbfhzzllbbCorJetWithBTagSequence = cms.Sequence(
-    ic5CaloJetMETCorrections     *
-    vbfhzzllbbCorJetWithBTagProd
-)
-
-vbfhzzllbbCorJetWithBTag = cms.Path(
-    vbfhzzllbbCorJetWithBTagSequence
-)

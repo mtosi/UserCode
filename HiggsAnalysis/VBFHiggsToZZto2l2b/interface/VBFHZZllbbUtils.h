@@ -42,7 +42,6 @@ namespace vbfhzz2l2b
 
   bool BhadronTable(int pdgcode);
 
-
   void setVertex (TVector3 &,
 		  const double&, const double&, const double&);
 

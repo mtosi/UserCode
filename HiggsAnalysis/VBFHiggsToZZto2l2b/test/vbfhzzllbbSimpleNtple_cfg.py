@@ -18,10 +18,20 @@ process.options = cms.untracked.PSet(
 )
 
 ## this defines the input files
-from HiggsAnalysis.VBFHiggsToZZto2l2b.Data.H150_ZZ_qqllSummer08_IDEALV9v2_GENSIMRECO_FULL_Input_cfi import *
+#from HiggsAnalysis.VBFHiggsToZZto2l2b.Data.H150_ZZ_qqllSummer08_IDEALV9v2_GENSIMRECO_FULL_Input_cfi import *
+from HiggsAnalysis.VBFHiggsToZZto2l2b.Data.PYTHIA6_SM_H_ZZ_qqll_mH150_10TeV_RECO_IDEAL_legnaro_cfi import *
 
 # this inputs the input files from the previous function
 process.source = RecoInput()
+
+#process.source = cms.Source("PoolSource",
+#                   debugVerbosity = cms.untracked.uint32(0),
+#                   debugFlag = cms.untracked.bool(True),
+#                   fileNames = cms.untracked.vstring(
+#                        'file:H150_ZZ_qqllSummer08_IDEALV9v2_GEN-SIM-RECO_FULL1.root'
+#                        )
+#                            )
+
 
 ## set the number of events
 process.maxEvents = cms.untracked.PSet(

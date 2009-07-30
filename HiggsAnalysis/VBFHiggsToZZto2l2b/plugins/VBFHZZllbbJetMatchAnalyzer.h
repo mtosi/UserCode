@@ -50,6 +50,8 @@ class VBFHZZllbbJetMatchAnalyzer : public edm::EDAnalyzer {
     InputTag matched_;
     InputTag matchedjetsOne_;   
     InputTag matchedjetsMany_;   
+  bool     histomakerFlag_;
+    double   dRcut_;
 
     Handle<CandidateCollection> source;
     Handle<CandidateCollection> matched;
@@ -58,11 +60,16 @@ class VBFHZZllbbJetMatchAnalyzer : public edm::EDAnalyzer {
 
 
     unsigned eventcounter_;
+    unsigned eventmatchedcounter_;
+    unsigned eventmatchedcounter_dRcut_;
 
     edm::Service<TFileService> fs;
-    TH1D * deltaR_;
+    TH1D * deltaR_; 
     TH1D * deltaPt_;
     TH1D * resPt_; 
     TH2D * deltaPtVSdeltaR_;
     TH2D * resPtVSdeltaR_; 
+    TH1D * deltaPt_dRcut_;
+    TH1D * resPt_dRcut_; 
+
 };

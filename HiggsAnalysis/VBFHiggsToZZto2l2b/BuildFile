@@ -40,14 +40,13 @@
 <use name=TrackingTools/TrajectoryCleaning>
 <use name=TrackingTools/TrajectoryState>
 <use name=TrackingTools/TransientTrack>
-<use name=root>
+<use name=rootgraphics>
 <use name=rootmath>
 <use name=rootrflx>
-<use name=rootgraphics>
 <use name=clhep>
 <use name=hepmc>
 <use name=heppdt>
-#<Flags CXXFLAGS="-ggdb">
+<Flags CXXFLAGS="-ggdb">
 <export>
    <lib name=HiggsAnalysisVBFHiggsToZZto2l2b>
    <use name=FWCore/Framework>

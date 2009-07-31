@@ -7,5 +7,3 @@ vbfHZZllbbMuonSelector = cms.EDProducer("VBFHZZllbbMuonSelector",
     sourceMinPEndcapCut  = cms.double(9.0),
     sourceMaxEtaCut      = cms.double(2.4)
 )
-
-

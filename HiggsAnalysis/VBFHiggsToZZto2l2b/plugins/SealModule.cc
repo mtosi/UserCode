@@ -19,8 +19,19 @@
 //define this as a plug-in
 DEFINE_SEAL_MODULE () ;
 
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbSkim.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbSkim);
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbSkimEff.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbSkimEff);
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbPreFilter.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbPreFilter);
+
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBJetTagCountFilter.h"
+DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBJetTagCountFilter);
+
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBTagInfoAnalyzer.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBTagInfoAnalyzer);
+
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbBhadronReconstruction.h"
 DEFINE_ANOTHER_FWK_MODULE(VBFHZZllbbBhadronReconstruction);

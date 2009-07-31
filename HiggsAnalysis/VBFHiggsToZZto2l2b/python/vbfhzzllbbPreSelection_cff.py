@@ -1,7 +1,7 @@
 #!/usr/bin/env cmsRun
 import FWCore.ParameterSet.Config as cms
 
-from HiggsAnalysis.Skimming.vbfhzzllbb_HLTPaths_cfi import *
+from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbb_HLTPaths_cfi import *
 from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbcorjetwithbtagproducer_cff import *
 from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbMCprocessFilter_cfi import *
 from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbPreSelection_cfi import *

@@ -31,9 +31,9 @@ class VBFHZZllbbMCprocessFilter : public edm::EDFilter {
    private:
       // ----------member data ---------------------------
       
-  int whichSim_;
-  int signal_;
-
+  int  whichSim_;
+  int  signal_;
+  bool vbfFlag_;
 };
 
 #endif

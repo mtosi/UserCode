@@ -1,14 +1,21 @@
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("testJET")
+
+process.load('Configuration/StandardSequences/Services_cff')
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.default.limit = 10
+#process.MessageLogger.cerr.default.limit = 10
 process.MessageLogger.cerr.FwkReport.reportEvery = 10
-process.MessageLogger.categories.append('VBFHZZllbbSimpleNtpleSummary')
+process.MessageLogger.categories.append('testJETSummary')
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    default                   = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
-    VBFHZZllbbSimpleNtpleSummary = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
+    default        = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
+    testJETSummary = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
 )
+
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True) # default values if False
+)
+
 
 ## debugging porpose
 cms.Service('Tracer')
@@ -35,6 +42,43 @@ process.source = RecoInput()
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbIC5CaloCorrections_cff")
 
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbMCprocessFilter_cfi")
+
+process.load("PhysicsTools.RecoAlgos.TrackWithVertexRefSelector_cfi")
+process.trackWithVertexRefSelector.src = cms.InputTag("generalTracks")
+
+process.muonFilter = cms.EDFilter("MuonCountFilter",
+    src = cms.InputTag("muons"),
+#    ptMin = cms.double(10.0),
+    minNumber = cms.uint32(2)
+)
+
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbMuonSelector_cfi")
+
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.zToMuMu_cfi")
+#process.zToMuMu.decay = cms.string('muons@+ muons@-')
+process.zToMuMu.cut = cms.string('mass > 20.0')
+
+process.threeJetsFilter = cms.EDFilter("EtMinCaloJetCountFilter",
+    src = cms.InputTag("iterativeCone5CaloJets"),
+    etMin = cms.double(15.0),
+    minNumber = cms.uint32(3)
+)
+
+process.twoForwardJetsFilter = cms.EDFilter("EtaEtMinCaloJetCountFilter",
+    src = cms.InputTag("iterativeCone5CaloJets"),
+    etMin = cms.double(10.0),
+    etaMin = cms.double(-2.),
+    etaMax = cms.double(2.),
+    minNumber = cms.uint32(2)
+)                                            
+
+process.twoBJetsFilter = cms.EDFilter("JetTagCountFilter",
+    minDiscriminator = cms.double(2.0),
+    src = cms.InputTag("trackCountingHighEffBJetTags"),
+    maxJetEta = cms.double(2.5),
+    minNumber = cms.uint32(1),
+    minJetEt = cms.double(15.0)
+)
 
 process.caloJetCollectionClone = cms.EDProducer("CaloJetShallowCloneProducer",
 #    src = cms.InputTag("iterativeCone5CaloJets")
@@ -107,23 +151,56 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('myPlots.root')
 )
 
+## define output event selection to be that which satisfies 'p'
+process.vbfHZZllbbEventSelection = cms.PSet(
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('p')
+    )
+)
+
 process.printEventNumber = cms.OutputModule("AsciiOutputModule")
 
-process.p = cms.Path( process.ic5CaloJetMETCorrections  *
-                      process.caloJetCollectionClone    *
-                      process.genJetCollectionClone     *
-                      process.caloJetSele               *
-                      process.genJetSele                *
-                      process.jetMatchOne               *
-                      process.jetMatchMany              *
-                      process.vbfhzzllbbMCprocessFilter *
-                      process.printJet                  *
-                      process.effMatchedJet03           *
-                      process.effMatchedJet04           *
-                      process.effMatchedJet06           
-                      )
+from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbEventContent_cff import *
+process.out = cms.OutputModule("PoolOutputModule",
+    VBFHZZ2l2bEventContent,
+    process.vbfHZZllbbEventSelection,
+    fileName = cms.untracked.string('VBFHZZllbb.root'),
+    verbose  = cms.untracked.bool(False)
+)                               
 
-process.outpath = cms.EndPath(process.printEventNumber)
+# extend event content to include objects from EDNtuple
+process.out.outputCommands.extend(["keep *_*_*_testJET"])
+process.out.outputCommands.extend(["keep *_TrackWithVertexRefSelector_*_"])
+
+
+process.p = cms.Path(
+    process.vbfhzzllbbMCprocessFilter  *
+    process.ic5CaloJetMETCorrections  *
+    process.vbfHZZllbbMuonSelector     *
+    process.muonFilter                 *
+    process.zToMuMu                    *
+#    process.dimuons                    *
+#    process.zToMuMuGolden              *
+#    ~process.twoForwardJetsFilter       *
+    process.threeJetsFilter            *
+    process.twoBJetsFilter             *
+#    process.trackWithVertexRefSelector *
+    process.caloJetCollectionClone    *
+    process.genJetCollectionClone     *
+    process.caloJetSele               *
+    process.genJetSele                *
+    process.jetMatchOne               *
+    process.jetMatchMany              *
+    process.printJet                  *
+    process.effMatchedJet03           *
+    process.effMatchedJet04           *
+    process.effMatchedJet06           
+)
+
+process.outpath = cms.EndPath(
+    process.out
+#    +process.printEventNumber
+)
 
 
 

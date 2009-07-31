@@ -64,7 +64,6 @@ process.vbfHZZllbbEventSelection = cms.PSet(
 )
 
 from HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbEventContent_cff import *
-
 ## output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
     VBFHZZ2l2bEventContent,

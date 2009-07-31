@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id: VBFHZZllbbMCvalidation.h,v 1.2 2009/04/28 16:45:01 tosi Exp $
+// $Id: VBFHZZllbbMCvalidation.h,v 1.3 2009/05/14 16:52:18 tosi Exp $
 //
 //
 
@@ -92,7 +92,7 @@ class VBFHZZllbbMCvalidation : public edm::EDAnalyzer {
 
   edm::ParameterSet conf_;
   std::string MCParticleLabel_;
-  bool        signal_;
+  int         signal_;
 
   TFile* OutputFile;
 

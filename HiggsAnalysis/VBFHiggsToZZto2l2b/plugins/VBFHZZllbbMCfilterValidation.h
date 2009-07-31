@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id: VBFHZZllbbMCfilterValidation.h,v 1.3 2009/04/29 14:06:22 tosi Exp $
+// $Id: VBFHZZllbbMCfilterValidation.h,v 1.4 2009/05/14 10:50:34 tosi Exp $
 //
 //
 
@@ -101,7 +101,7 @@ class VBFHZZllbbMCfilterValidation : public edm::EDAnalyzer {
 
 
   int           whichSim_;
-  bool          signal_;
+  int           signal_;
   edm::InputTag genJetLabel_;
   edm::InputTag genParticleLabel_;
 

@@ -33,6 +33,7 @@ void VBFHZZllbbJetMatchAnalyzer::beginJob( const edm::EventSetup& iSetup)
 
   if (histomakerFlag_) {
     deltaR_          = fs->make<TH1D> ( "deltaR",          "#DeltaR between matched jets",                            100,   0.,  5. );
+    totalLenght_     = fs->make<TH1D> ( "totalLenght",     "Total lenght",                                            100,   0.,  5. );
     deltaPt_         = fs->make<TH1D> ( "deltaPt",         "#Deltap_{T} between matched jets",                        100, -20., 20. );
     resPt_           = fs->make<TH1D> ( "resPt",           "p_{T} resolution between matched jets",                   100,  -1.,  1. );
     deltaPtVSdeltaR_ = fs->make<TH2D> ( "deltaPtVSdeltaR", "#Deltap_{T} VS #DeltaR between matched jets",             100,   0.,  5. , 100, -20., 20. );
@@ -70,15 +71,15 @@ void VBFHZZllbbJetMatchAnalyzer::analyze(const edm::Event& iEvent, const edm::Ev
     cerr << "[GenJetTest] caught std::exception " << ce.what() << endl;
     return;
   }
+
   
   //
   // Printout for OneToOne matcher
   //
   unsigned matchedcounter       = 0;
   unsigned matchedcounter_dRcut = 0;
-  double dR    = -1.;
-  double dPt   = -99.;
-  double resPt = -99.; 
+  double totalLenght = 0.;
+
   cout << "**********************" << endl;
   cout << "* OneToOne Printout  *" << endl;
   cout << "**********************" << endl;
@@ -89,9 +90,10 @@ void VBFHZZllbbJetMatchAnalyzer::analyze(const edm::Event& iEvent, const edm::Ev
     eventmatchedcounter_++;
     const Candidate *sourceRef = &*(f->key);
     const Candidate *matchRef  = &*(f->val);
-    dR= DeltaR( sourceRef->p4() , matchRef->p4() );
-    dPt = sourceRef->pt() - matchRef->pt();
-    resPt = (sourceRef->pt() - matchRef->pt())/sourceRef->pt();
+    double dR= DeltaR( sourceRef->p4() , matchRef->p4() );
+    double dPt = sourceRef->pt() - matchRef->pt();
+    double resPt = (sourceRef->pt() - matchRef->pt())/sourceRef->pt();
+    totalLenght += dR;
     printf("[GenJetTest] (pt,eta,phi) source = %6.2f %5.2f %5.2f matched = %6.2f %5.2f %5.2f dR=%5.3f\n",
 	   sourceRef->et(),
 	   sourceRef->eta(),
@@ -116,6 +118,8 @@ void VBFHZZllbbJetMatchAnalyzer::analyze(const edm::Event& iEvent, const edm::Ev
       }
     }
   }
+
+  totalLenght_ -> Fill ( totalLenght );
 
   std::cout << "number of matched jets:              " << matchedcounter       << std::endl;
   std::cout << "number of matched jets w/ dR<=dRcut: " << matchedcounter_dRcut << std::endl;
@@ -142,7 +146,7 @@ void VBFHZZllbbJetMatchAnalyzer::analyze(const edm::Event& iEvent, const edm::Ev
     for ( matchIT = vectMatched.begin(); matchIT != vectMatched.end(); matchIT++) {
       const Candidate *matchedRef = &*( (*matchIT).first );
       double deltaR = (*matchIT).second;
-      printf("             (pt,eta,phi) matched = %6.2f %5.2f %5.2f - dR=%5.2f\n",
+      printf("             (pt,eta,phi) matched = %6.2f %5.2f %5.2f - deltaR=%5.2f\n",
 	     matchedRef->et(),
 	     matchedRef->eta(),
 	     matchedRef->phi(),

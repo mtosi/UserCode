@@ -4,8 +4,8 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.StandardSequences.Geometry_cff import *
 from Configuration.StandardSequences.FrontierConditions_GlobalTag_cff import *
 from Geometry.CommonDetUnit.globalTrackingGeometry_cfi import *
-#process.GlobalTag.globaltag = cms.string('IDEAL_V11::All')
-GlobalTag.globaltag = cms.string('IDEAL_V11::All')
+GlobalTag.globaltag = cms.string('IDEAL_V9::All')
+#GlobalTag.globaltag = cms.string('IDEAL_V11::All')
 from Configuration.StandardSequences.MagneticField_cff import *
 
 from TrackingTools.TrackAssociator.default_cfi import *
@@ -32,7 +32,7 @@ corMetType1Icone5.corrector = cms.string('L2L3JetCorrectorIC5Calo')
 # MET corrections from muons
 from JetMETCorrections.Type1MET.MetMuonCorrections_cff import corMetGlobalMuons, goodMuonsforMETCorrection
 # muon MET correction maker 
-globalMuonsForMET     = goodMuonsforMETCorrection.clone(
+globalMuonsForMET = goodMuonsforMETCorrection.clone(
    cut = cms.string('isGlobalMuon = 1')
 )
 goodGlobalMuonsForMET = goodMuonsforMETCorrection.clone(
@@ -44,12 +44,12 @@ corMetType1Icone5Muons = corMetGlobalMuons.clone(
 )
 
 # It would be better to get this config to JetMETCorrections/Type1MET/data/ at some point
-corMetType1Icone5Muons.TrackAssociatorParameters.useEcal    = False ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useHcal    = False ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useHO      = False ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useCalo    = True  ## CaloTowers
-corMetType1Icone5Muons.TrackAssociatorParameters.useMuon    = False ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.truthMatch = False
+corMetType1Icone5Muons.TrackAssociatorParameters.useEcal    = True ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useHcal    = True ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useHO      = True ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useCalo    = True ## CaloTowers
+corMetType1Icone5Muons.TrackAssociatorParameters.useMuon    = True ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.truthMatch = True
 
 # default sequence for JetMET corrections
 ic5CaloJetMETCorrections = cms.Sequence(L2L3CorJetIC5Calo      +

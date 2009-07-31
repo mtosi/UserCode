@@ -1,20 +1,25 @@
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/plugins/VBFHZZllbbMCprocessFilter.h"
 
-#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ProcessIndex.h"
-
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+
+// utilities
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ProcessIndex.h"
 
 #include <iostream>
 
-enum { FASTSIM = 0,
-       FULLSIM = 1
-};
+using namespace vbfhzz2l2b;
+
 
 //! constructor
 VBFHZZllbbMCprocessFilter::VBFHZZllbbMCprocessFilter(const edm::ParameterSet& iConfig) :
   whichSim_ ( iConfig.getParameter<int>( "whichSim"  ) ), // 0:FastSim, 1:FullSim
-  signal_   ( iConfig.getParameter<int>( "signal"    ) )  // 0:Signal,  1:Background
+  signal_   ( iConfig.getParameter<int>( "signal"    ) )  // 1:Signal,  0:Background
 {
+  vbfFlag_ = true;
+  if (signal_)
+    vbfFlag_ = iConfig.getParameter<bool>( "vbfFlag" );
+  //  std::cout << "vbfFlag_: " << vbfFlag_ << std::endl;
 }
 
 
@@ -34,11 +39,11 @@ bool
 VBFHZZllbbMCprocessFilter::filter (edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-  using namespace vbfhzz2l2b;
+  if (!signal_) return true;
 
   int processID = 0;
   
-  if ( whichSim_ == FULLSIM ) {
+  if ( whichSim_ == vbfhzz2l2b::FULLSIM ) {
     edm::Handle<edm::HepMCProduct> evtMC;
     try {
       iEvent.getByLabel("source", evtMC); }
@@ -47,7 +52,7 @@ VBFHZZllbbMCprocessFilter::filter (edm::Event& iEvent, const edm::EventSetup& iS
     const HepMC::GenEvent * mcEv = evtMC->GetEvent();
     processID = mcEv->signal_process_id();
   }
-  else if ( whichSim_ == FASTSIM ) {
+  else if ( whichSim_ == vbfhzz2l2b::FASTSIM ) {
     edm::Handle<int> genProcessID;
     try {
       iEvent.getByLabel( "genEventProcID", genProcessID ); }
@@ -60,12 +65,16 @@ VBFHZZllbbMCprocessFilter::filter (edm::Event& iEvent, const edm::EventSetup& iS
     std::cout << "--> WARNING: simulation not specificied!!" << std::endl;
   }
 
-  std::cout << "processID: " << processID << std::endl;
+  //  std::cout << "processID: " << processID << std::endl;
   
-  if (processID == HZZFusion_ || processID == HWWFusion_) return true ;
-  // if (processID == HggFusion_) return true ;
+  if(vbfFlag_) {
+    if (processID == HZZFusion_ || processID == HWWFusion_) 
+      return true ; 
+  } else
+    if (processID == HggFusion_)
+      return true ;
+  
   return false ;
-
 }
 	
 

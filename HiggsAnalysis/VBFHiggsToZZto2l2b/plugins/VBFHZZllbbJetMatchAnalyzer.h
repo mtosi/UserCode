@@ -65,6 +65,7 @@ class VBFHZZllbbJetMatchAnalyzer : public edm::EDAnalyzer {
 
     edm::Service<TFileService> fs;
     TH1D * deltaR_; 
+    TH1D * totalLenght_; 
     TH1D * deltaPt_;
     TH1D * resPt_; 
     TH2D * deltaPtVSdeltaR_;

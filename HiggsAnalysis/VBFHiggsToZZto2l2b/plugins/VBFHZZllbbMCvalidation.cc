@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Tue Jan 20 15:48:58 CET 2009
-// $Id: VBFHZZllbbMCvalidation.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
+// $Id: VBFHZZllbbMCvalidation.cc,v 1.3 2009/05/14 16:52:18 tosi Exp $
 //
 //
 
@@ -29,7 +29,7 @@
 VBFHZZllbbMCvalidation::VBFHZZllbbMCvalidation(const edm::ParameterSet& iConfig) :
   conf_( iConfig ),
   MCParticleLabel_(iConfig.getUntrackedParameter<std::string>("MCParticles") ),
-  signal_(iConfig.getUntrackedParameter<bool>("signal") )
+  signal_(iConfig.getUntrackedParameter<int>("signal") )  // 1:Signal,  0:Background
 {
    //now do what ever initialization is needed
   eventcounter_ = 0;

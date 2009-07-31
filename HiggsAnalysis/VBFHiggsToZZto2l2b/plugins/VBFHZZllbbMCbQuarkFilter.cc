@@ -15,7 +15,7 @@ using namespace std;
 //! constructor
 VBFHZZllbbMCbQuarkFilter::VBFHZZllbbMCbQuarkFilter(const edm::ParameterSet& iConfig) :
   genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
-  signal_           ( iConfig.getParameter<int>           ( "signal"           ) )  // 0:Signal,  1:Background
+  signal_           ( iConfig.getParameter<int>           ( "signal"           ) )  // 1:Signal,  0:Background
 {
 }
 

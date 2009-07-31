@@ -31,7 +31,7 @@ typedef reco::GenJetCollection::const_iterator genJetItr;
 //
 VBFHZZllbbMCfilterValidation::VBFHZZllbbMCfilterValidation(const edm::ParameterSet& iConfig) :
   whichSim_ ( iConfig.getParameter<int>  ( "whichSim" ) ), // 0:FastSim, 1:FullSim
-  signal_   ( iConfig.getParameter<bool> ( "signal"   ) ),
+  signal_   ( iConfig.getParameter<int>  ( "signal"   ) ), // 1:Signal,  0:Background
   genJetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
   genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
   jetNumberCut_       ( iConfig.getParameter<int>    ( "jetNumberCut"       ) ),

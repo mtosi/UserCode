@@ -1,7 +1,7 @@
 //
 // Original Author:  Mia Tosi
 //         Created:  Fri Feb 22 17:56:22 CET 2008
-// $Id: VBFHZZalternativekinematicsAnalyzer.cc,v 1.1 2008/12/05 17:22:51 tosi Exp $
+// $Id: TMVAntple.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
 //
 //
 
@@ -109,7 +109,7 @@ enum { NZ        = 2,
 
 
 TMVAntple::TMVAntple(const edm::ParameterSet& iConfig) :
-  signal_          ( iConfig.getParameter<int>           ( "signal"           ) ), // 0:Signal,  1:Background
+  signal_          ( iConfig.getParameter<int>           ( "signal"           ) ), // 1:Signal,  0:Background
   whichSim_        ( iConfig.getParameter<int>           ( "whichSim"         ) ), // 0:FastSim, 1:FullSim
   electronLabel_   ( iConfig.getParameter<edm::InputTag> ( "electronLabel"    ) ),
   muonLabel_       ( iConfig.getParameter<edm::InputTag> ( "muonLabel"        ) ),

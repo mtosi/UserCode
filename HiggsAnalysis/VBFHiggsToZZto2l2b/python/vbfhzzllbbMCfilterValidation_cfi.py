@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 vbfhzzllbbMCfilterValidation = cms.EDFilter("VBFHZZllbbMCfilterValidation",
         whichSim = cms.int32(1),
-        signal   = cms.bool(True),
+        signal   = cms.int32(1),
         genJetLabel      = cms.InputTag('iterativeCone5GenJets'),
         genParticleLabel = cms.InputTag('genParticles'),
         jetNumberCut       = cms.int32(2), 

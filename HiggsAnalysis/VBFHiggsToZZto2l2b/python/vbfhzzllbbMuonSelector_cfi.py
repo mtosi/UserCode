@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-vbfHZZllbbMuonSelector = cms.EDProducer("VBFHZZllbbMuonSelector",
+vbfhzzllbbMuonSelector = cms.EDProducer("VBFHZZllbbMuonSelector",
     sourceLabel = cms.InputTag("muons"),
     sourceMinPtBarrelCut = cms.double(5.0),
     sourceMinPtEndcapCut = cms.double(3.0),

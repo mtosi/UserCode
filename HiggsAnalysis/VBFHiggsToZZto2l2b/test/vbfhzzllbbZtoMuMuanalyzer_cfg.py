@@ -30,17 +30,17 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Muon selection
-process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbMuonSelector_cfi")
-#process.vbfHZZllbbMuonSelector.sourceMinPtBarrelCut = cms.double(5.0)
-#process.vbfHZZllbbMuonSelector.sourceMinPtEndcapCut = cms.double(3.0)
-#process.vbfHZZllbbMuonSelector.sourceMinPEndcapCut  = cms.double(9.0)
-#process.vbfHZZllbbMuonSelector.sourceMaxEtaCut      = cms.double(2.4)
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbMuonSelector_cfi")
+#process.vbfhzzllbbMuonSelector.sourceMinPtBarrelCut = cms.double(5.0)
+#process.vbfhzzllbbMuonSelector.sourceMinPtEndcapCut = cms.double(3.0)
+#process.vbfhzzllbbMuonSelector.sourceMinPEndcapCut  = cms.double(9.0)
+#process.vbfhzzllbbMuonSelector.sourceMaxEtaCut      = cms.double(2.4)
 
 # zToMuMu
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.zToMuMu_cfi")
-process.zToMuMu.decay = cms.string('vbfHZZllbbMuonSelector@+ vbfHZZllbbMuonSelector@-')
+process.zToMuMu.decay = cms.string('vbfhzzllbbMuonSelector@+ vbfhzzllbbMuonSelector@-')
 
-process.p = cms.Path(process.vbfHZZllbbMuonSelector*
+process.p = cms.Path(process.vbfhzzllbbMuonSelector*
                      process.zToMuMu)
 
 ## define output event selection to be that which satisfies 'p'

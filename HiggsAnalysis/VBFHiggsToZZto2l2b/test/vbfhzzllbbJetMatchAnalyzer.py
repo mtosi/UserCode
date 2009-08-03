@@ -52,7 +52,7 @@ process.muonFilter = cms.EDFilter("MuonCountFilter",
     minNumber = cms.uint32(2)
 )
 
-process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfHZZllbbMuonSelector_cfi")
+process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.vbfhzzllbbMuonSelector_cfi")
 
 process.load("HiggsAnalysis.VBFHiggsToZZto2l2b.zToMuMu_cfi")
 #process.zToMuMu.decay = cms.string('muons@+ muons@-')
@@ -176,7 +176,7 @@ process.out.outputCommands.extend(["keep *_TrackWithVertexRefSelector_*_"])
 process.p = cms.Path(
     process.vbfhzzllbbMCprocessFilter  *
     process.ic5CaloJetMETCorrections  *
-    process.vbfHZZllbbMuonSelector     *
+    process.vbfhzzllbbMuonSelector     *
     process.muonFilter                 *
     process.zToMuMu                    *
 #    process.dimuons                    *

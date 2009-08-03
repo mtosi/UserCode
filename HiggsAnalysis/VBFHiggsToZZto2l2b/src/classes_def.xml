@@ -19,6 +19,7 @@
   <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::allJets"/>
   <function name="vbfhzz2l2b::CorJetBTagDiscrAssociation::hasJet"/>
 
+<!--
   <class name="vbfhzz2l2b::SimpleNtpleObj::EVT"/>
   <class name="edm::Wrapper<vbfhzz2l2b::SimpleNtpleObj::EVT>"/>
   <function name="vbfhzz2l2b::SimpleNtpleObj::EVT::Run"/>
@@ -30,6 +31,6 @@
   <class name="edm::Wrapper<vbfhzz2l2b::SimpleNtpleObj::ELECTRON>"/>
   <class name="vbfhzz2l2b::SimpleNtpleObj::ZHAD"/>
   <class name="edm::Wrapper<vbfhzz2l2b::SimpleNtpleObj::ZHAD>"/>
-
+-->
 
 </lcgdict>

@@ -1,7 +1,6 @@
 #ifndef SIMPLENTPLEOBJ_H
 #define SIMPLENTPLEOBJ_H
 
-
 #include "TObject.h"
 #include "TLorentzVector.h"
 

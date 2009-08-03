@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Mon Feb  2 17:31:44 CET 2009
-// $Id: VBFHZZllbbAnalyzer.cc,v 1.2 2009/04/28 16:45:01 tosi Exp $
+// $Id: VBFHZZllbbAnalyzer.cc,v 1.3 2009/07/29 09:57:29 tosi Exp $
 //
 //
 
@@ -40,6 +40,7 @@
 #include "PhysicsTools/UtilAlgos/interface/TH1AddDirectorySentry.h" 
 
 #include "PhysicsTools/Utilities/interface/deltaR.h"
+#include "PhysicsTools/Utilities/interface/deltaPhi.h"
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
@@ -292,8 +293,9 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     h_dimuon_eta  -> Fill ((goodMuonVec[0].p4()+goodMuonVec[1].p4()).eta() );
     h_dimuon_phi  -> Fill ((goodMuonVec[0].p4()+goodMuonVec[1].p4()).phi() );
     h_dimuon_deltaEta -> Fill (fabs(goodMuonVec[0].eta()-goodMuonVec[1].eta()));				 
-    h_dimuon_deltaR   -> Fill (DeltaR<reco::Muon, reco::Muon>()(goodMuonVec[0],goodMuonVec[1]));		 
-    h_dimuon_deltaPhi -> Fill (PI_ - std::fabs( std::fabs( goodMuonVec[0].phi() - goodMuonVec[1].phi() ) - PI_ ) );
+    h_dimuon_deltaR   -> Fill (DeltaR  <reco::Muon, reco::Muon>()(goodMuonVec[0],goodMuonVec[1]));
+    h_dimuon_deltaPhi -> Fill (DeltaPhi<reco::Muon, reco::Muon>()(goodMuonVec[0],goodMuonVec[1]));
+    //PI_ - std::fabs( std::fabs( goodMuonVec[0].phi() - goodMuonVec[1].phi() ) - PI_ ) );
     h_dimuon_pz1pz2   -> Fill (goodMuonVec[0].pz()*goodMuonVec[1].pz());					 
     h_dimuon_eta1eta2 -> Fill (goodMuonVec[0].eta()*goodMuonVec[1].eta());                                       
     h_dimuon_massVSpt       -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),(goodMuonVec[0].p4()+goodMuonVec[1].p4()).pt() );
@@ -301,7 +303,8 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     h_dimuon_massVSphi      -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),(goodMuonVec[0].p4()+goodMuonVec[1].p4()).phi());
     h_dimuon_massVSdeltaEta -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),fabs(goodMuonVec[0].eta()-goodMuonVec[1].eta()) 				    );
     h_dimuon_massVSdeltaR   -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),DeltaR<reco::Muon, reco::Muon>()(goodMuonVec[0],goodMuonVec[1])		    );
-    h_dimuon_massVSdeltaPhi -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),PI_ - std::fabs( std::fabs( goodMuonVec[0].phi() - goodMuonVec[1].phi() ) - PI_ ) );
+    h_dimuon_massVSdeltaPhi -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),DeltaPhi<reco::Muon, reco::Muon>()(goodMuonVec[0],goodMuonVec[1]));
+    //PI_ - std::fabs( std::fabs( goodMuonVec[0].phi() - goodMuonVec[1].phi() ) - PI_ ) );
     h_dimuon_massVSpz1pz2   -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),goodMuonVec[0].pz()*goodMuonVec[1].pz()					    );
     h_dimuon_massVSeta1eta2 -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),goodMuonVec[0].eta()*goodMuonVec[1].eta()                                         );
   }

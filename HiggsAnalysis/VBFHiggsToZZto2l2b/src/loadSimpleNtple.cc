@@ -8,9 +8,6 @@ void loadSimpleNtuple(int index,TChain* chain,
 		      TClonesArray* electronClass,
 		      TClonesArray* zhadClass) {
 
-  using namespace vbfhzz2l2b;
-  using namespace vbfhzz2l2b::SimpleNtpleObj;
-  
   chain->GetEntry(index);
   EVT* event = (EVT*) evtClass->At(0);
 

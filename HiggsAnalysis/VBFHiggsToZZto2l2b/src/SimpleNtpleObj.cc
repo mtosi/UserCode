@@ -2,13 +2,13 @@
 
 // Event constructor
 // -----------------
-vbfhzz2l2b::SimpleNtpleObj::EVT::EVT() :
+EVT::EVT() :
   Run(0),                 // run number
   Event(0),               // event number
   Ilum(0.),               // instantaneous luminosity (e30)
   eventID(0),             // event ID
-                                    // VBF:123 or 124
-                                    // ggF: 102
+                          // VBF:123 or 124
+                          // ggF: 102
   nPV(0),                 // Number of vertices 
   trigpath(-1),           // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists).
                           // ex. 101 means main + 2nd test trigger where fired.
@@ -31,7 +31,7 @@ vbfhzz2l2b::SimpleNtpleObj::EVT::EVT() :
 
 // Jet
 // ---
-vbfhzz2l2b::SimpleNtpleObj::JET::JET() :
+JET::JET() :
   P4jetl0(0.,0.,0.,0.),   // 4-momentum of jet for Jet correction L0
   P4jetl23(0.,0.,0.,0.),  // 4-momentum of jet for Jet correction L2+L3
   etjetl0(0.),            // Et of jet for Jet Correction L0       
@@ -92,7 +92,7 @@ vbfhzz2l2b::SimpleNtpleObj::JET::JET() :
 }
 
 // ZHAD
-vbfhzz2l2b::SimpleNtpleObj::ZHAD::ZHAD() :
+ZHAD::ZHAD() :
   P4Zhadl0(0.,0.,0.,0.),    // 4-momentum of hadronic Z for Jet correction L0
   P4Zhadl23(0.,0.,0.,0.),   // 4-momentum of hadronic Z for jet correction L2+L3
   etZhadl0(0.),             // Et of hadronic Z for jet Correction L0
@@ -115,7 +115,7 @@ vbfhzz2l2b::SimpleNtpleObj::ZHAD::ZHAD() :
 }
 
 // MUON
-vbfhzz2l2b::SimpleNtpleObj::MUON::MUON() :
+MUON::MUON() :
   P4muon(0.,0.,0.,0.), // 4-momentum of muon
   isolMuonSumPt(0.),   // sum of tracks Pt associated to isolated muon
   isolMuonTrkNumber(0) // number of tracks associated to isolated muon
@@ -123,7 +123,7 @@ vbfhzz2l2b::SimpleNtpleObj::MUON::MUON() :
 }
 
 // ELECTRON
-vbfhzz2l2b::SimpleNtpleObj::ELECTRON::ELECTRON() :
+ELECTRON::ELECTRON() :
   P4electron(0.,0.,0.,0.), // 4-momentum of electron
   isolEleSumPt(0.),        // sum of tracks Pt associated to isolated electron
   isolEleTrkNumber(0),     // number of tracks associated to isolated electron
@@ -131,3 +131,8 @@ vbfhzz2l2b::SimpleNtpleObj::ELECTRON::ELECTRON() :
 {
 }
 
+// MET
+MET::MET() :
+  P4met(0.,0.,0.,0.) // 4-momentum of met
+{
+}

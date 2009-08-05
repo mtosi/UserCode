@@ -1,6 +1,7 @@
 #ifndef SIMPLENTPLEOBJ_H
 #define SIMPLENTPLEOBJ_H
 
+
 #include "TObject.h"
 #include "TLorentzVector.h"
 
@@ -8,125 +9,123 @@
 
 using namespace std;
 
-namespace vbfhzz2l2b {
+class EVT;
+class JET;
+class MUON;
+class ELECTRON;
+class MET;
+class ZHAD;
 
-  namespace SimpleNtpleObj {
+// event variables
+class EVT : public TObject {
+ public:
+  EVT();
+  ~EVT() {};
+  //+++
+  int    Run;                   // run number
+  int    Event;                 // event number
+  double Ilum;                  // instantaneous luminosity (e30)
+  int    eventID;               // event ID
+                                // VBF:123 or 124
+                                // ggF: 102
+  int    nPV;                   // number of primary vertices
+  int    trigpath;              // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists). 
+                                // ex. 101 means main + 2nd test trigger where fired.
+  double  pthat;                // pthat
+  
+  TLorentzVector P4bquark1;     // first  b-quark
+  TLorentzVector P4bquark2;     // second b-quark
+  int            indjetb1;      // first b-quark associated jet index
+  int            indjetb2;      // second b-quark associated jet index
+  
+  int      njet;                // number of jets in the event
+  int      ngoodjet;            // number of "good" jets in the event
+  int      nbtag;               // number of tag in the event
+  double   Zvertex;             // Z of the reconstructed primary vertex
+  TVector2 P2met;               // Missing Et vector
+  
+  int nmuon;
+  int nelectron;
+  int nZhad;
 
-    class EVT;
-    class JET;
-    class MUON;
-    class ELECTRON;
-    class ZHAD;
+  ClassDef(EVT,1)
 
-    // event variables
-    class EVT : public TObject {
-    public:
-      EVT();
-      ~EVT() {};
-      //+++
-      int    Run;                   // run number
-      int    Event;                 // event number
-      double Ilum;                  // instantaneous luminosity (e30)
-      int    eventID;               // event ID
-                                    // VBF:123 or 124
-                                    // ggF: 102
-      int    nPV;                   // number of primary vertices
-      int    trigpath;              // Z_BB Trigger Path: 1*main + 10*test1 + 100*test2 (if exists). 
-      // ex. 101 means main + 2nd test trigger where fired.
-      double  pthat;                // pthat
-      
-      TLorentzVector P4bquark1;     // first  b-quark
-      TLorentzVector P4bquark2;     // second b-quark
-      int            indjetb1;      // first b-quark associated jet index
-      int            indjetb2;      // second b-quark associated jet index
-      
-      int      njet;                // number of jets in the event
-      int      ngoodjet;            // number of "good" jets in the event
-      int      nbtag;               // number of tag in the event
-      double   Zvertex;             // Z of the reconstructed primary vertex
-      TVector2 P2met;               // Missing Et vector
-      
-      int nmuon;
-      int nelectron;
-      int nZhad;
+};
 
-      ClassDef(EVT,1)
-    };
-
-    // JET
-    //-----
-    class JET : public TObject {
-    public:
-      JET();
-      ~JET() {};
-      TLorentzVector P4jetl0;     // 4-momentum of jet for Jet correction L0
-      TLorentzVector P4jetl23;    // 4-momentum of jet for Jet correction L2+L3
-      double         etjetl0;     // Et of jet for Jet Correction L0
-      double         etjetl23;    // Et of jet for Jet Correction L2+L3
-      double         etajet;      // Eta of jet
-      double         detetajet;   // Detector eta of jet
-      double         rapidityjet; // Rapidity of jet
-      double         emfjet;      // EMfraction of jet
-      double         chfjet;      // Charge fraction of jet (p/E)
-      double         massjet;     // Mass of jet
-      double         phijet;      // Phi of jet
-      double         etaetajet;   // Eta-Eta moment
-      double         etaphijet;   // Eta-Phi momentum
-      double         phiphijet;   // Phi-Phi momentum
-      double         metprjjet;   // MET projected in the direction to jet
-
-      int            ntrk_tot;    // The number of total track
-      TLorentzVector P4trk_tot;   // Sum of 4-momentum of total track 
-      double         pt_tot;      // Pt of total track
-      double         trkmass_tot; // Mass calculated from total track
-      double         sumPt_tot;   // 
-      double         ch_tot;      // Sum charge of total track
-      
-      double         bDiscr;
-      int            ntrk_tag;    // The number of SVX track
-      TLorentzVector P4trk_tag;   // Sum of 4-momentum of SVX track 
-      double         pt_tag;      // Pt of SVX track
-      double         trkmass_tag; // Mass calculated from SVX track
-      double         ch_tag;      // Sum charge of SVX track
-      double         lxy_tag;     // Lxy 
-      TVector3       L3d_tag;     // 3 dimensional B hadron flight direction
-      int            tag;         // tag -1:negatively tag
-                                  //      0:taggable
-                                  //      1:positively ta
-      TVector3   SecVtxVertex;    // secondary vertex
-      
-      int            nele;        // The number of electron into jet
-      int            nmuon;       // The number of muon into jet
-      TLorentzVector P4ele1;      // 4-momentum of electron 1st into jet
-      TLorentzVector P4ele2;      // 4-momentum of electron 2nd into jet
-      double         pt_ele1;     // Pt of first electron into jet
-      double         pt_ele2;     // Pt of second electron into jet
-      double         ptr_ele1;    // Ptrel of first electron into jet
-      double         ptr_ele2;    // Ptrel of second electron into jet
-      TLorentzVector P4muo1;      // 4-momentum of muon 1st into jet
-      TLorentzVector P4muo2;      // 4-momentum of muon 2nd into jet
-      double         pt_mu1;      // Pt of first muon into jet
-      double         pt_mu2;      // Pt of second muon into jet
-      double         ptr_mu1;     // Ptrel of first muon into jet
-      double         ptr_mu2;     // Ptrel of second muon into jet
-      
-      int            nbqrk;       // 
-      double         dr_bqrk;     // Delta R between jet and nearest b quark
-      TLorentzVector P4bqrk;      // 4-momentum of nearest b quark (pttrue)
-      double         pt_bqrk;     // Pt of nearest b quark
-      int            assjet;      // The relation between quark and jet 0:not match, 
-                                  //                                    1:first b-quark matched,
-                                  //                                    2:second b-quark matched    
-      double         pt_bhad;     // Estimated b-hadron pt
-      double         pt_neu;      // neutral Pt of B hadron
-      
-      //  ClassDef(JET,1);
-    
-    };
+// JET
+//-----
+class JET : public TObject {
+ public:
+  JET();
+  ~JET() {};
+  TLorentzVector P4jetl0;     // 4-momentum of jet for Jet correction L0
+  TLorentzVector P4jetl23;    // 4-momentum of jet for Jet correction L2+L3
+  double         etjetl0;     // Et of jet for Jet Correction L0
+  double         etjetl23;    // Et of jet for Jet Correction L2+L3
+  double         etajet;      // Eta of jet
+  double         detetajet;   // Detector eta of jet
+  double         rapidityjet; // Rapidity of jet
+  double         emfjet;      // EMfraction of jet
+  double         chfjet;      // Charge fraction of jet (p/E)
+  double         massjet;     // Mass of jet
+  double         phijet;      // Phi of jet
+  double         etaetajet;   // Eta-Eta moment
+  double         etaphijet;   // Eta-Phi momentum
+  double         phiphijet;   // Phi-Phi momentum
+  double         metprjjet;   // MET projected in the direction to jet
+  
+  int            ntrk_tot;    // The number of total track
+  TLorentzVector P4trk_tot;   // Sum of 4-momentum of total track 
+  double         pt_tot;      // Pt of total track
+  double         trkmass_tot; // Mass calculated from total track
+  double         sumPt_tot;   // 
+  double         ch_tot;      // Sum charge of total track
+  
+  double         bDiscr;
+  int            ntrk_tag;    // The number of SVX track
+  TLorentzVector P4trk_tag;   // Sum of 4-momentum of SVX track 
+  double         pt_tag;      // Pt of SVX track
+  double         trkmass_tag; // Mass calculated from SVX track
+  double         ch_tag;      // Sum charge of SVX track
+  double         lxy_tag;     // Lxy 
+  TVector3       L3d_tag;     // 3 dimensional B hadron flight direction
+  int            tag;         // tag -1:negatively tag
+                              //      0:taggable
+                              //      1:positively ta
+  TVector3   SecVtxVertex;    // secondary vertex
+  
+  int            nele;        // The number of electron into jet
+  int            nmuon;       // The number of muon into jet
+  TLorentzVector P4ele1;      // 4-momentum of electron 1st into jet
+  TLorentzVector P4ele2;      // 4-momentum of electron 2nd into jet
+  double         pt_ele1;     // Pt of first electron into jet
+  double         pt_ele2;     // Pt of second electron into jet
+  double         ptr_ele1;    // Ptrel of first electron into jet
+  double         ptr_ele2;    // Ptrel of second electron into jet
+  TLorentzVector P4muo1;      // 4-momentum of muon 1st into jet
+  TLorentzVector P4muo2;      // 4-momentum of muon 2nd into jet
+  double         pt_mu1;      // Pt of first muon into jet
+  double         pt_mu2;      // Pt of second muon into jet
+  double         ptr_mu1;     // Ptrel of first muon into jet
+  double         ptr_mu2;     // Ptrel of second muon into jet
+  
+  int            nbqrk;       // 
+  double         dr_bqrk;     // Delta R between jet and nearest b quark
+  TLorentzVector P4bqrk;      // 4-momentum of nearest b quark (pttrue)
+  double         pt_bqrk;     // Pt of nearest b quark
+  int            assjet;      // The relation between quark and jet 0:not match, 
+                              //                                    1:first b-quark matched,
+                              //                                    2:second b-quark matched    
+  double         pt_bhad;     // Estimated b-hadron pt
+  double         pt_neu;      // neutral Pt of B hadron
+  
+  ClassDef(JET,1);
+  
+};
 
 // ZHAD
 class ZHAD : public TObject {
-public:
+ public:
   ZHAD();
   ~ZHAD() {};
   TLorentzVector P4Zhadl0;             // 4-momentum of hadronic Z for Jet correction L0
@@ -147,8 +146,8 @@ public:
   double         massZhad_l23;         // invariant mass corrected L2+L3
   double         collinearityZhad_l0;  //
   double         collinearityZhad_l23; //
-
-  //  ClassDef(ZHAD,1);
+  
+  ClassDef(ZHAD,1);
 };
 
 // MUON
@@ -160,7 +159,7 @@ public:
   double         isolMuonSumPt;     // sum of tracks Pt associated to isolated muon
   int            isolMuonTrkNumber; // number of tracks associated to isolated muon
 
-  //  ClassDef(MUON,1);
+  ClassDef(MUON,1);
 };
 
 // ELECTRON
@@ -173,8 +172,18 @@ public:
   int            isolEleTrkNumber;   // number of tracks associated to isolated electron
   int            eleId;              // electron ID
 
-  //  ClassDef(ELECTRON,1);
+  ClassDef(ELECTRON,1);
 };
-  }
-}
+
+// MET
+class MET : public TObject {
+public:
+  MET();
+  ~MET() {};
+  TLorentzVector P4met;            // 4-momentum of met
+
+  ClassDef(MET,1);
+
+};
+
 #endif // SIMPLENTPLEOBJ_H

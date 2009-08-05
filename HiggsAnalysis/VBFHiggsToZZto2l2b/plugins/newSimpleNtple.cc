@@ -1,8 +1,15 @@
 // -*- C++ -*-
 //
-// Package:    SimpleNtple
-// Class:      SimpleNtple
+// Package:    newSimpleNtple
+// Class:      newSimpleNtple
 // 
+/*
+
+ Description: <one line class summary>
+
+ Implementation:
+     <Notes on implementation>
+*/
 
 // system include files
 #include <memory>
@@ -69,40 +76,51 @@
 
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetWithBTagDiscr.h"
 
+// utilities
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/VBFHZZllbbUtils.h"
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/ProcessIndex.h"
+#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/PythiaParticleIndex.h"
 
 using namespace std;
 using namespace edm;
 using namespace reco;
 using namespace vbfhzz2l2b;
-using namespace vbfhzz2l2b::SimpleNtpleObj;
-
-
-enum { FASTSIM = 0,
-       FULLSIM = 1
-};
 
 newSimpleNtple::newSimpleNtple(const edm::ParameterSet& iConfig) :
-  whichSim_ ( iConfig.getParameter<int> ( "whichSim"  ) ), // 0:FastSim, 1:FullSim
-  tracksLabel_   ( iConfig.getParameter<edm::InputTag> ( "tracksLabel"   ) ),
-  muonLabel_     ( iConfig.getParameter<edm::InputTag> ( "muonLabel"     ) ),
-  electronLabel_ ( iConfig.getParameter<edm::InputTag> ( "electronLabel" ) ),
-  metLabel_      ( iConfig.getParameter<edm::InputTag> ( "metLabel"      ) ),
-  tagJetLabel_   ( iConfig.getParameter<edm::InputTag> ( "tagJetLabel"   ) ),
+  whichSim_          ( iConfig.getParameter<int> ( "whichSim"  ) ), // 0:FastSim, 1:FullSim
+  vertexLabel_       ( iConfig.getParameter<edm::InputTag> ( "vertexLabel"      ) ),
+  trackLabel_        ( iConfig.getParameter<edm::InputTag> ( "trackLabel"       ) ),
+  muonLabel_         ( iConfig.getParameter<edm::InputTag> ( "muonLabel"        ) ),
+  electronLabel_     ( iConfig.getParameter<edm::InputTag> ( "electronLabel"    ) ),
+  eleTrkIsoAlgoFlag_ ( iConfig.getParameter<bool>          ( "eleTrkIsoAlgoFlag") ),
+  metLabel_          ( iConfig.getParameter<edm::InputTag> ( "metLabel"         ) ),
+  tagJetLabel_       ( iConfig.getParameter<edm::InputTag> ( "tagJetLabel"      ) ),
   corIC5CaloJetsWithBTagLabel_ ( iConfig.getParameter<std::string> ( "corIC5CaloJetsWithBTagLabel" ) ),
   corIC5PFJetsWithBTagFlag_    ( iConfig.getParameter<bool>        ( "corIC5PFJetsWithBTagFlag"    ) ),
-  genParticleLabel_ ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
-  genJetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
-  genMetLabel_      ( iConfig.getParameter<edm::InputTag> ( "genMetLabel"      ) ) {
+  genParticleLabel_  ( iConfig.getParameter<edm::InputTag> ( "genParticleLabel" ) ),
+  genJetLabel_       ( iConfig.getParameter<edm::InputTag> ( "genJetLabel"      ) ),
+  genMetLabel_       ( iConfig.getParameter<edm::InputTag> ( "genMetLabel"      ) ) {
 
   if ( corIC5PFJetsWithBTagFlag_ ) 
     corIC5PFJetsWithBTagLabel_ = iConfig.getParameter<std::string> ( "corIC5PFJetsWithBTagLabel" );
- 
+  
+
+  if ( eleTrkIsoAlgoFlag_ )
+    eleTrkIsoAlgo_ = new VBFHZZllbbElectronTrackIsolationAlgos(
+		    iConfig.getParameter         <double> ("coneRadius") ,
+		    iConfig.getParameter         <double> ("vetoRadius") ,
+		    iConfig.getParameter         <double> ("otherVetoRadius") ,
+		    iConfig.getParameter         <double> ("ptMin") ,
+		    iConfig.getParameter         <double> ("lipMax") ,
+		    iConfig.getUntrackedParameter<bool>   ("useTkQuality",true)
+		    );
+
   //now do what ever initialization is needed
   edm::Service<TFileService> fs ;
   mytree_  = fs->make <TTree>("VBFSimpleTree","VBFSimpleTree"); 
-
+  
+  //  std::cout << "[newSimpleNtple::newSimpleNtple] DONE" << std::endl;
+  
 }
 
 
@@ -114,22 +132,7 @@ newSimpleNtple::~newSimpleNtple()
 
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
-
-  delete CloneEvt_;
-  delete CloneJet_;
-  delete CloneMuon_;
-  delete CloneElectron_;
-  delete CloneZhad_;
-
-  delete invMassTagJet_;   
-  delete deltaEtaTagJet_;  
-  delete zeppenfeldTagJet_;
-  delete m_tagJets;
-  delete m_MET;
-  delete m_tracks;
-  delete m_genParticles;
-  delete m_genJets;
-  delete m_genMet;
+  delete eleTrkIsoAlgo_;
 
   std::cout << "[newSimpleNtple::~newSimpleNtple]" << std::endl;
   
@@ -158,14 +161,14 @@ newSimpleNtple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   FillTagJet                 (iEvent, iSetup); // not implemented yet
   if ( corIC5PFJetsWithBTagFlag_ )
     FillcorIC5PFJetsWithBTag (iEvent, iSetup);   
-  if ( whichSim_ == FULLSIM )
-    FillTracks (iEvent, iSetup);
-  FillGenParticles (iEvent, iSetup); // got an error message in execution
-  FillGenJet       (iEvent, iSetup);
-  FillGenMet       (iEvent, iSetup);
+  if ( whichSim_ == vbfhzz2l2b::FULLSIM )
+    FillTrack (iEvent, iSetup);
+  FillGenParticle            (iEvent, iSetup); // got an error message in execution
+  FillGenJet                 (iEvent, iSetup);
+  FillGenMet                 (iEvent, iSetup);
   
   mytree_->Fill();
-  
+
 }
 
 
@@ -198,28 +201,56 @@ void newSimpleNtple::InitObjs() {
   for ( unsigned int index = 0; index < 10; index++ ) 
     Zhad_ =new ((*CloneZhad_)[index]) ZHAD();
   
+  // tag jets
+  invmasstagjetP4_               -> Clear () ;
+  invmasstagjetEmEnergyFraction_ -> clear () ;
+  invmasstagjetChFrac_           -> clear () ;
+  invmasstagjetCorEt_            -> clear () ;
+  invmasstagjetCorPt_            -> clear () ;
+  invmasstagjetPrimVtxP3_        -> Clear () ;
+  deltaetatagjetP4_               -> Clear () ;
+  deltaetatagjetEmEnergyFraction_ -> clear () ;
+  deltaetatagjetChFrac_           -> clear () ; 
+  deltaetatagjetCorEt_            -> clear () ;
+  deltaetatagjetCorPt_            -> clear () ;
+  deltaetatagjetPrimVtxP3_        -> Clear () ;
+  zeptagjetP4_               -> Clear () ;
+  zeptagjetEmEnergyFraction_ -> clear () ;
+  zeptagjetChFrac_           -> clear () ;
+  zeptagjetCorEt_            -> clear () ;
+  zeptagjetCorPt_            -> clear () ;
+  zeptagjetPrimVtxP3_        -> Clear () ;
 
-  invMassTagJet_    -> clear () ;
-  deltaEtaTagJet_   -> clear () ;
-  zeppenfeldTagJet_ -> clear () ;
+  // track
+  trackP4_       -> Clear () ;
 
-  m_tagJets      -> Clear () ;
-  m_MET          -> Clear () ;
-  m_tracks       -> Clear () ;
-  m_genParticles -> Clear () ;
-  m_genJets      -> Clear () ;
-  m_genMet       -> Clear () ;
-  
+  // gen particle
+  genparticleP4_ 	  -> Clear ();
+  genparticlePrimVtxP3_	  -> Clear ();
+  genparticlePdgID_	  -> clear ();
+  genparticleStatus_	  -> clear ();
+  genparticleIndex_	  -> clear ();
+  genparticleMomN_	  -> clear ();
+  genparticleMomPdgID_	  -> clear ();
+  //  genparticleMomPdgIndex_ -> clear ();
+  genparticleKidN_	  -> clear ();
+  genparticleKidPdgID_	  -> clear ();
+  //  genparticleKidPdgIndex_ -> clear ();
+
+  genjetP4_	   -> Clear () ;
+  genjetPrimVtxP3_ -> Clear () ;
+  genjetKidN_      -> clear () ;
+  genjetKidPdgID_  -> clear () ;
+
+  genmetP4_	   -> Clear () ;
+  genmetPrimVtxP3_ -> Clear () ;
+
 }
 
 void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+  //  std::cout << "[newSimpleNtple::FillEvent]" << std::endl;
 
-  //  edm::Handle<edm::EventAuxiliary> eventAuxiliaryHandle;
-  //  iEvent.getByLabel("EventAuxiliary",eventAuxiliaryHandle);
-  //  std::cout << "eventAuxiliaryHandle->run(): " << eventAuxiliaryHandle->run() << std::endl;
-
-  std::cout << "[newSimpleNtple::FillEvent]" << std::endl;
-  if ( whichSim_ == FULLSIM ) {
+  if ( whichSim_ == vbfhzz2l2b::FULLSIM ) {
     edm::Handle<edm::HepMCProduct> evtMC;
     try {
       iEvent.getByLabel("source", evtMC); }
@@ -228,7 +259,7 @@ void newSimpleNtple::FillEvent(const edm::Event& iEvent, const edm::EventSetup& 
     const HepMC::GenEvent * mcEv = evtMC->GetEvent();
     evtID_ = mcEv->signal_process_id();
   }
-  else if ( whichSim_ == FASTSIM ) {
+  else if ( whichSim_ == vbfhzz2l2b::FASTSIM ) {
     edm::Handle<int> genProcessID;
     try {
       iEvent.getByLabel( "genEventProcID", genProcessID ); }
@@ -329,9 +360,9 @@ void newSimpleNtple::FillMet(const edm::Event& iEvent, const edm::EventSetup& iS
   const CaloMETCollection *calometcol = metCollectionHandle.product();
   const CaloMET *calomet = &(calometcol->front());
 
-  TClonesArray &MET = *m_MET;
-  setMomentum (myvector_, calomet->p4());
-  new (MET[0]) TLorentzVector (myvector_);
+//  TClonesArray &MET = *m_MET;
+//  setMomentum (myvector_, calomet->p4());
+//  new (MET[0]) TLorentzVector (myvector_);
   
 }
 
@@ -343,7 +374,8 @@ void newSimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup&
 
   std::cout << "[newSimpleNtple::FillTagJet]" << std::endl;
 
-  //  edm::Handle<reco::RecoChargedCandidateCollection> tagJetHandle;
+  //  std::cout << "[SimpleNtple::FillTagJet]" << std::endl;
+
   edm::Handle<reco::CaloJetCollection> tagJetHandle;
   iEvent.getByLabel (tagJetLabel_, tagJetHandle) ;
 
@@ -354,53 +386,85 @@ void newSimpleNtple::FillTagJet(const edm::Event& iEvent, const edm::EventSetup&
     vbfhzz2l2b::findPair_maxInvMass_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
 							20., 15.);
 
-  double invMass    = -99.;
-  double deltaEta   = -99.;
+  double invMass   = -99.;
+  double deltaEta  = -99.;
   double zeppenfeld = -999.;
+  int    njets     = 0;
   if (maxInvMassPair.first != maxInvMassPair.second) {
     invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
     deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
     zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &invmassjetTag = *invmasstagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
+    new (invmassjetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
+    new (invmassjetTag[1]) TLorentzVector (myvector_);
+    invmasstagjetEmEnergyFraction_->push_back((maxInvMassPair.first)->emEnergyFraction());
+    invmasstagjetEmEnergyFraction_->push_back((maxInvMassPair.second)->emEnergyFraction());
   }
-  invMassTagJet_->push_back(invMass);
-  deltaEtaTagJet_->push_back(deltaEta);
-  zeppenfeldTagJet_->push_back(zeppenfeld);
+  //  invmasstagjetInvMass_->push_back(invMass);
+  //  invmasstagjetDeltaEta_->push_back(deltaEta);
+  //  invmasstagjetZeppenfeld_->push_back(zeppenfeld);
+  //  invmasstagjetN_ = njets;
 
   // looking for the highest delta eta jets pair
   std::pair<tagJetItr,tagJetItr> maxDeltaEtaPair = 
     vbfhzz2l2b::findPair_maxDeltaEta_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
 							 20., 15.);
-  invMass    = -99.;
-  deltaEta   = -99.;
+  invMass   = -99.;
+  deltaEta  = -99.;
   zeppenfeld = -999.;
+  njets     = 0;
   if(maxDeltaEtaPair.first != maxDeltaEtaPair.second) {
     invMass    =  (     (maxDeltaEtaPair.first)->p4() + ((maxDeltaEtaPair.second)->p4()) ).M();
     deltaEta   =  fabs( (maxDeltaEtaPair.first)->eta() - (maxDeltaEtaPair.second)->eta() );
     zeppenfeld =  (     (maxDeltaEtaPair.first)->pz() * (maxDeltaEtaPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &deltaetajetTag = *deltaetatagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
+    new (deltaetajetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
+    new (deltaetajetTag[1]) TLorentzVector (myvector_);
+    deltaetatagjetEmEnergyFraction_->push_back((maxDeltaEtaPair.first)->emEnergyFraction());
+    deltaetatagjetEmEnergyFraction_->push_back((maxDeltaEtaPair.second)->emEnergyFraction());
+  }
+  //  deltaetatagjetInvMass_->push_back(invMass);
+  //  deltaetatagjetDeltaEta_->push_back(deltaEta);
+  //  deltaetatagjetZeppenfeld_->push_back(zeppenfeld);
+  //  deltaetatagjetN_ = njets;
+
+
+  // looking for the highest zeppenfeld variable value jets pair
+  std::pair<tagJetItr,tagJetItr> maxZepPair = 
+    vbfhzz2l2b::findPair_maxZeppenfeld_ptMinCut<tagJetItr>(tagJetHandle->begin(), tagJetHandle->end(),
+							   20., 15.);
+
+  invMass   = -99.;
+  deltaEta  = -99.;
+  zeppenfeld = -999.;
+  njets     = 0;
+  if (maxZepPair.first != maxZepPair.second) {
+    invMass    =  (     (maxInvMassPair.first)->p4() + ((maxInvMassPair.second)->p4()) ).M();
+    deltaEta   =  fabs( (maxInvMassPair.first)->eta() - (maxInvMassPair.second)->eta() );
+    zeppenfeld =  (     (maxInvMassPair.first)->pz() * (maxInvMassPair.second)->pz() );
+    njets = 2;
+
+    TClonesArray &zepjetTag = *zeptagjetP4_;
+    vbfhzz2l2b::setMomentum (myvector_, (maxZepPair.first)->p4());
+    new (zepjetTag[0]) TLorentzVector (myvector_);
+    vbfhzz2l2b::setMomentum (myvector_, (maxZepPair.second)->p4());
+    new (zepjetTag[1]) TLorentzVector (myvector_);
+    zeptagjetEmEnergyFraction_->push_back((maxZepPair.first)->emEnergyFraction());
+    zeptagjetEmEnergyFraction_->push_back((maxZepPair.second)->emEnergyFraction());
   }
 
-
-  TClonesArray &jetTag = *m_tagJets;
-  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.first)->p4());
-  new (jetTag[0]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxInvMassPair.second)->p4());
-  new (jetTag[1]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.first)->p4());
-  new (jetTag[2]) TLorentzVector (myvector_);
-  vbfhzz2l2b::setMomentum (myvector_, (maxDeltaEtaPair.second)->p4());
-  new (jetTag[3]) TLorentzVector (myvector_);
-  
-
-  /*
-  int counter = 0;
-  for (RecoChargedCandidateCollection::const_iterator jet_itr = tagJetHandle->begin (); 
-       jet_itr != tagJetHandle->end (); ++jet_itr ) { 
-    
-    vbfhzz2l2b::setMomentum (myvector_, jet_itr->p4());
-    new (jetTag[counter]) TLorentzVector (myvector_);
-    counter++;
-  }
-  */
+  //  zeptagjetInvMass_->push_back(invMass);
+  //  zeptagjetDeltaEta_->push_back(deltaEta);
+  //  zeptagjetZeppenfeld_->push_back(zeppenfeld);
+  //  zeptagjetN_ = njets;
 }
 // --------------------------------------------------------------------
 
@@ -454,24 +518,24 @@ void newSimpleNtple::FillZhad(const edm::Event& iEvent, const edm::EventSetup& i
 void newSimpleNtple::FillZlep(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 }
 
-void  newSimpleNtple::FillTracks(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void  newSimpleNtple::FillTrack(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::cout << "[newSimpleNtple::FillTracks]" << std::endl;
-  edm::Handle<reco::TrackCollection> tracksHandle ;
-  iEvent.getByLabel (tracksLabel_, tracksHandle) ;
 
-  TClonesArray &tracks = *m_tracks;
-  int counter = 0;
-  for (reco::TrackCollection::const_iterator track_itr = tracksHandle->begin (); 
-       track_itr != tracksHandle->end (); ++track_itr ) { 
+  edm::Handle<reco::TrackCollection> trackHandle ;
+  iEvent.getByLabel (trackLabel_, trackHandle) ;
+
+  TClonesArray &track = *trackP4_;
+  int trackIndex = 0;
+  for (reco::TrackCollection::const_iterator track_itr = trackHandle->begin (); 
+       track_itr != trackHandle->end (); ++track_itr, trackIndex++ ) { 
 
     math::XYZVector mom = track_itr->innerMomentum () ; 
     myvector_.SetPx (mom.x ()) ;
     myvector_.SetPy (mom.y ()) ;
     myvector_.SetPz (mom.z ()) ;
     
-    new (tracks[counter]) TLorentzVector (myvector_);
-    counter++;
+    new (track[trackIndex]) TLorentzVector (myvector_);
   }
 }
 
@@ -479,48 +543,62 @@ void  newSimpleNtple::FillTracks(const edm::Event& iEvent, const edm::EventSetup
 // --------------------------------------------------------------------
 
 
-void newSimpleNtple::FillGenParticles(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void newSimpleNtple::FillGenParticle(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   std::cout << "[newSimpleNtple::FillGenParticles]" << std::endl;
-  edm::Handle<reco::GenParticleCollection> genParticlesHandle; 
-  iEvent.getByLabel (genParticleLabel_,genParticlesHandle);
+  edm::Handle<reco::GenParticleCollection> genParticleHandle; 
+  iEvent.getByLabel (genParticleLabel_,genParticleHandle);
  
-  TClonesArray &genParticles = *m_genParticles;
-  int counter = 0;
- 
+  TClonesArray &genParticleP4        = *genparticleP4_;
+  TClonesArray &genparticlePrimVtxP3 = *genparticlePrimVtxP3_;
   if ( evtID_ == HWWFusion_ || evtID_ == HZZFusion_ ){ //---- only if VBF
-    for (reco::GenParticleCollection::const_iterator particle_itr = genParticlesHandle->begin(); 
-	 particle_itr != genParticlesHandle->end(); ++particle_itr ) {
-   
-   int pdg = particle_itr->pdgId();
-   int status = particle_itr->status();
-   int mother1 = 0;
-   if ( particle_itr->numberOfMothers() > 0 ) mother1 = particle_itr->mother(0)->pdgId();
-   int mother2 = 0;
-   if ( particle_itr->numberOfMothers() > 1 ) mother2 = particle_itr->mother(1)->pdgId();
-   int daughter1 = 0;
-   if ( particle_itr->numberOfDaughters() > 0 ) daughter1 = particle_itr->daughter(0)->pdgId();
-   int daughter2 = 0;
-   if ( particle_itr->numberOfDaughters() > 1 ) daughter2 = particle_itr->daughter(1)->pdgId();
-   double px = particle_itr->px();
-   double py = particle_itr->py();
-   double pz = particle_itr->pz();
-   double e  = particle_itr->energy();
-   double vx = 0.;
-   double vy = 0.;
-   double vz = 0.;
-   double time = 0.;
-  
-   new (genParticles[counter]) TParticle (pdg, status, 
-					  mother1, mother2,
-					  daughter1, daughter2,
-					  px, py, pz, e,
-					  vx, vy, vz, time);
-  
-   counter++;
-  }
- }
+
+    int particleIndex = 0;
+    for (reco::GenParticleCollection::const_iterator particle_itr = genParticleHandle->begin(); 
+	 particle_itr != genParticleHandle->end(); ++particle_itr, particleIndex++ ) {
+
+      if ( fabs(particle_itr->pdgId()) <= pythiaH_ ) {
+	int pdgID = particle_itr->pdgId();
+	int status = particle_itr->status();
+	int mother1pdgID = 0;
+	if ( particle_itr->numberOfMothers() > 0 ) mother1pdgID = particle_itr->mother(0)->pdgId();
+	int mother2pdgID = 0;
+	if ( particle_itr->numberOfMothers() > 1 ) mother2pdgID = particle_itr->mother(1)->pdgId();
+	int daughter1pdgID = 0;
+	if ( particle_itr->numberOfDaughters() > 0 ) daughter1pdgID = particle_itr->daughter(0)->pdgId();
+	int daughter2pdgID = 0;
+	if ( particle_itr->numberOfDaughters() > 1 ) daughter2pdgID = particle_itr->daughter(1)->pdgId();
+	double px = particle_itr->px();
+	double py = particle_itr->py();
+	double pz = particle_itr->pz();
+	double e  = particle_itr->energy();
+	double vx = particle_itr->vx();
+	double vy = particle_itr->vy();
+	double vz = particle_itr->vz();
+	double time = 0.;
+	
+	new (genParticleP4[particleIndex]) TParticle (pdgID, status, 
+						      mother1pdgID, mother2pdgID,
+						      daughter1pdgID, daughter2pdgID,
+						      px, py, pz, e,
+						      vx, vy, vz, time);
+	vbfhzz2l2b::setVertex (myvertex_, particle_itr->vertex());
+	new (genparticlePrimVtxP3[particleIndex]) TVector3 (myvertex_);
+
+	genparticlePdgID_       -> push_back (pdgID);
+	genparticleStatus_      -> push_back (status);
+	genparticleIndex_       -> push_back (particleIndex);
+	genparticleMomN_        -> push_back (particle_itr->numberOfMothers());
+	genparticleMomPdgID_    -> push_back (std::pair<int,int>(mother1pdgID,mother2pdgID));
+	//genparticleMomPdgIndex_ -> push_back ();
+	genparticleKidN_	      -> push_back (particle_itr->numberOfDaughters());
+	genparticleKidPdgID_    -> push_back (std::pair<int,int>(mother1pdgID,mother2pdgID));
+	//genparticleKidPdgIndex_ -> push_back (); 
+
+      } // if pdgId <= pythiaH_
+    } // loop over genParticles
+  } // if VBF
 }
 
 
@@ -533,21 +611,35 @@ void newSimpleNtple::FillGenJet(const edm::Event& iEvent, const edm::EventSetup&
 {
 
   std::cout << "[newSimpleNtple::FillGenJet]" << std::endl;
-  edm::Handle< reco::GenJetCollection > genJetsHandle ;
-  iEvent.getByLabel( genJetLabel_, genJetsHandle ) ;
-
- TClonesArray &genJets = *m_genJets;
- int counter = 0;
- for (reco::GenJetCollection::const_iterator genjet_itr = genJetsHandle->begin (); 
-      genjet_itr != genJetsHandle->end (); ++genjet_itr ) { 
+  edm::Handle< reco::GenJetCollection > genJetHandle ;
+  iEvent.getByLabel( genJetLabel_, genJetHandle ) ;
   
-  myvector_.SetPx ( genjet_itr->px() );
-  myvector_.SetPy ( genjet_itr->py() );
-  myvector_.SetPz ( genjet_itr->pz() );
-  myvector_.SetE  ( genjet_itr->emEnergy() + genjet_itr->hadEnergy() );
-  new (genJets[counter]) TLorentzVector (myvector_);
-  counter++;
- }
+  TClonesArray &genjetP4        = *genjetP4_;
+  TClonesArray &genjetPrimVtxP3 = *genjetPrimVtxP3_;
+
+  int genjetIndex = 0;
+  for (reco::GenJetCollection::const_iterator genjet_itr = genJetHandle->begin (); 
+       genjet_itr != genJetHandle->end (); ++genjet_itr, genjetIndex++ ) { 
+
+    std::cout << "genjet_itr->numberOfDaughters(): " << genjet_itr->numberOfDaughters() << std::endl;
+    std::vector<int> daughterPdgIDVec;
+    for (std::vector<edm::Ptr< reco::Candidate> >::const_iterator daughter_itr = (genjet_itr->daughterPtrVector()).begin();
+	 daughter_itr != (genjet_itr->daughterPtrVector()).end(); ++daughter_itr ) {
+
+      daughterPdgIDVec.push_back ((*daughter_itr)->pdgId());
+    }
+
+    vbfhzz2l2b::setMomentum (myvector_, genjet_itr->p4());
+    vbfhzz2l2b::setVertex   (myvertex_, genjet_itr->vertex());
+    new (genjetP4[genjetIndex])        TLorentzVector (myvector_);
+    new (genjetPrimVtxP3[genjetIndex]) TVector3       (myvertex_);
+
+    genjetKidN_     -> push_back (genjet_itr->numberOfDaughters());
+    genjetKidPdgID_ -> push_back (daughterPdgIDVec);
+
+  }
+
+  //  std::cout << "[SimpleNtple::FillGenJet] DONE" << std::endl;
 }
 
 
@@ -559,23 +651,20 @@ void newSimpleNtple::FillGenMet(const edm::Event& iEvent, const edm::EventSetup&
 {
 
   std::cout << "[newSimpleNtple::FillGenMet]" << std::endl;
-  edm::Handle< reco::GenMETCollection > genMetHandle ;
- iEvent.getByLabel( genMetLabel_, genMetHandle ) ;
 
- TClonesArray &genMets = *m_genMet;
- int counter = 0;
- for (reco::GenMETCollection::const_iterator gMIt = genMetHandle->begin (); 
-      gMIt != genMetHandle->end (); 
-      ++gMIt ) 
- { 
-  myvector_.SetPx ((*gMIt).px ()) ;
-  myvector_.SetPy ((*gMIt).py ()) ;
-  myvector_.SetPz ((*gMIt).pz ()) ;
-  myvector_.SetE ((*gMIt).emEnergy () + (*gMIt).hadEnergy ()) ;
-  new (genMets[counter]) TLorentzVector (myvector_);
-  counter++;
- }
-  std::cout << "[newSimpleNtple::FillGenMet] DONE" << std::endl;
+  edm::Handle< reco::GenMETCollection > genMetCollectionHandle ;
+  iEvent.getByLabel( genMetLabel_, genMetCollectionHandle ) ;
+  
+  const reco::GenMETCollection *genmetcol = genMetCollectionHandle.product();
+  const reco::GenMET *genmet = &(genmetcol->front());
+
+  TClonesArray &genmetP4        = *genmetP4_;
+  TClonesArray &genmetPrimVtxP3 = *genmetPrimVtxP3_;
+  vbfhzz2l2b::setMomentum (myvector_, genmet->p4());
+  vbfhzz2l2b::setVertex   (myvertex_, genmet->vertex());
+  new (genmetP4[0])        TLorentzVector (myvector_);
+  new (genmetPrimVtxP3[0]) TVector3       (myvertex_);
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -586,51 +675,126 @@ void newSimpleNtple::beginJob(const edm::EventSetup& iSetup)
 
   std::cout << "[newSimpleNtple::beginJob]" << std::endl;
 
-  CloneEvt_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::EVT");
+  CloneEvt_ = new TClonesArray("EVT");
   mytree_->Branch("EVT","TClonesArray",&CloneEvt_,256000,0);
-  CloneJet_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::JET");
+  CloneJet_ = new TClonesArray("JET");
   mytree_->Branch("JET","TClonesArray",&CloneJet_,256000,0);
-  CloneMuon_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::MUON");
+  CloneMuon_ = new TClonesArray("MUON");
   mytree_->Branch("MUON","TClonesArray",&CloneMuon_,256000,0);
-  CloneElectron_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::ELECTRON");
+  CloneElectron_ = new TClonesArray("ELECTRON");
   mytree_->Branch("ELECTRON","TClonesArray",&CloneElectron_,256000,0);
-  CloneZhad_ = new TClonesArray("vbfhzz2l2b::SimpleNtpleObj::ZHAD");
+  CloneZhad_ = new TClonesArray("ZHAD");
   mytree_->Branch("ZHAD","TClonesArray",&CloneZhad_,256000,0);
   
 
-  // vector with the 2 tag TLorentzVectors
-  m_tagJets = new TClonesArray ("TLorentzVector");
-  invMassTagJet_    = new std::vector<double>;  
-  deltaEtaTagJet_   = new std::vector<double>;
-  zeppenfeldTagJet_ = new std::vector<double>;
-  mytree_->Branch("tagJets", "TClonesArray", &m_tagJets, 256000,0);
-  mytree_->Branch("invMassTagJet",   "std::vector<double>",&invMassTagJet_   );
-  mytree_->Branch("deltaEtaTagJet",  "std::vector<double>",&deltaEtaTagJet_  );
-  mytree_->Branch("zeppenfeldTagJet","std::vector<double>",&zeppenfeldTagJet_);
-
-  // vector of the TLorentz Vectors of other jets
-  m_MET = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("MET", "TClonesArray", &m_MET, 256000,0);
-
-  // vector of the TLorentz Vectors of other jets
-  m_tracks = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("tracks", "TClonesArray", &m_tracks, 256000,0);
-
-  // vector of the TLorentz Vectors of other genParticles
-  m_genParticles = new TClonesArray ("TParticle");
-  mytree_->Branch ("genParticles", "TClonesArray", &m_genParticles, 256000,0);
-
-  // vector of the TLorentz Vectors of other genJets
-  m_genJets = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("genJets", "TClonesArray", &m_genJets, 256000,0);
-
-  // vector of the TLorentz Vectors of other genMet
-  m_genMet = new TClonesArray ("TLorentzVector");
-  mytree_->Branch ("genMet", "TClonesArray", &m_genMet, 256000,0);
-
-
   std::cout << "[newSimpleNtple::beginJob] DONE" << std::endl;
 
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  invmasstagjetP4_        = new TClonesArray ("TLorentzVector");
+  invmasstagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  invmasstagjetEmEnergyFraction_ = new std::vector<double>;
+  invmasstagjetChFrac_           = new std::vector<double>;
+  invmasstagjetCorEt_            = new std::vector<double>;
+  invmasstagjetCorPt_            = new std::vector<double>;
+  invmasstagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  invmasstagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  invmasstagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("invmasstagjetP4",              "TClonesArray",       &invmasstagjetP4_,        256000,0);
+  mytree_->Branch ("invmasstagjetPrimVtxP3",       "TClonesArray",       &invmasstagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("invmasstagjetEmFrac",          "std::vector<double>",&invmasstagjetEmEnergyFraction_);
+  mytree_->Branch ("invmasstagjetChFrac",          "std::vector<double>",&invmasstagjetChFrac_);
+  mytree_->Branch ("invmasstagjetCorEt",           "std::vector<double>",&invmasstagjetCorEt_);
+  mytree_->Branch ("invmasstagjetCorPt",           "std::vector<double>",&invmasstagjetCorPt_);
+  mytree_->Branch ("invmasstagjetcompoSVbTagDiscr","std::vector<double>",&invmasstagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("invmasstagjethighEFFbTagDiscr","std::vector<double>",&invmasstagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("invmasstagjethighPURbTagDiscr","std::vector<double>",&invmasstagjetHighPURbTagDiscr_);
+
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  deltaetatagjetP4_        = new TClonesArray ("TLorentzVector");
+  deltaetatagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  deltaetatagjetEmEnergyFraction_ = new std::vector<double>;
+  deltaetatagjetChFrac_           = new std::vector<double>;
+  deltaetatagjetCorEt_            = new std::vector<double>;
+  deltaetatagjetCorPt_            = new std::vector<double>;
+  deltaetatagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  deltaetatagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  deltaetatagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("deltaetatagjetP4",              "TClonesArray",       &deltaetatagjetP4_,        256000,0);
+  mytree_->Branch ("deltaetatagjetPrimVtxP3",       "TClonesArray",       &deltaetatagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("deltaetatagjetEmFrac",          "std::vector<double>",&deltaetatagjetEmEnergyFraction_);
+  mytree_->Branch ("deltaetatagjetChFrac",          "std::vector<double>",&deltaetatagjetChFrac_);
+  mytree_->Branch ("deltaetatagjetCorEt",           "std::vector<double>",&deltaetatagjetCorEt_);
+  mytree_->Branch ("deltaetatagjetCorPt",           "std::vector<double>",&deltaetatagjetCorPt_);
+  mytree_->Branch ("deltaetatagjetcompoSVbTagDiscr","std::vector<double>",&deltaetatagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("deltaetatagjethighEFFbTagDiscr","std::vector<double>",&deltaetatagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("deltaetatagjethighPURbTagDiscr","std::vector<double>",&deltaetatagjetHighPURbTagDiscr_);
+
+
+  // vector of the TLorentz Vectors of tag jets with inv mass criteria
+  zeptagjetP4_        = new TClonesArray ("TLorentzVector");
+  zeptagjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  zeptagjetEmEnergyFraction_ = new std::vector<double>;
+  zeptagjetChFrac_           = new std::vector<double>;
+  zeptagjetCorEt_            = new std::vector<double>;
+  zeptagjetCorPt_            = new std::vector<double>;
+  zeptagjetCompoSVbTagDiscr_ = new std::vector<double>;
+  zeptagjetHighEFFbTagDiscr_ = new std::vector<double>;
+  zeptagjetHighPURbTagDiscr_ = new std::vector<double>;
+  mytree_->Branch ("zeptagjetP4",              "TClonesArray",       &zeptagjetP4_,        256000,0);
+  mytree_->Branch ("zeptagjetPrimVtxP3",       "TClonesArray",       &zeptagjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("zeptagjetEmFrac",          "std::vector<double>",&zeptagjetEmEnergyFraction_);
+  mytree_->Branch ("zeptagjetChFrac",          "std::vector<double>",&zeptagjetChFrac_);
+  mytree_->Branch ("zeptagjetCorEt",           "std::vector<double>",&zeptagjetCorEt_);
+  mytree_->Branch ("zeptagjetCorPt",           "std::vector<double>",&zeptagjetCorPt_);
+  mytree_->Branch ("zeptagjetcompoSVbTagDiscr","std::vector<double>",&zeptagjetCompoSVbTagDiscr_);
+  mytree_->Branch ("zeptagjethighEFFbTagDiscr","std::vector<double>",&zeptagjetHighEFFbTagDiscr_);
+  mytree_->Branch ("zeptagjethighPURbTagDiscr","std::vector<double>",&zeptagjetHighPURbTagDiscr_);
+
+  // vector of the TLorentz Vectors of tracks
+  trackP4_ = new TClonesArray ("TLorentzVector");
+  mytree_->Branch ("trackP4", "TClonesArray", &trackP4_, 256000,0);
+
+
+  genparticleP4_          = new TClonesArray ("TParticle");
+  //  genparticleP4_          = new TClonesArray ("TLorentzVector");
+  genparticlePrimVtxP3_   = new TClonesArray ("TVector3");
+  genparticlePdgID_       = new std::vector<int>;
+  genparticleStatus_      = new std::vector<int>;
+  genparticleIndex_	  = new std::vector<int>;
+  genparticleMomN_	  = new std::vector<int>;
+  genparticleMomPdgID_	  = new std::vector< std::pair<int,int> >;
+  //  genparticleMomPdgIndex_ = new std::vector< std::pair<int,int> >;
+  genparticleKidN_	  = new std::vector<int>;
+  genparticleKidPdgID_	  = new std::vector< std::pair<int,int> >;
+  //  genparticleKidPdgIndex_ = new std::vector< std::pair<int,int> >;
+  mytree_->Branch("genparticleP4",         "TClonesArray",                     &genparticleP4_,       256000,0);
+  mytree_->Branch("genparticlePrimVtxP3",  "TClonesArray",                     &genparticlePrimVtxP3_,256000,0);
+  mytree_->Branch("genparticlePdgID",      "std::vector<int>",                 &genparticlePdgID_);
+  mytree_->Branch("genparticleStatus",     "std::vector<int>",                 &genparticleStatus_);
+  mytree_->Branch("genparticleIndex",      "std::vector<int>",                 &genparticleIndex_);
+  mytree_->Branch("genparticleMomN",       "std::vector<int>",                 &genparticleMomN_);
+  mytree_->Branch("genparticleMomPdgID",   "std::vector< std::pair<int,int> >",&genparticleMomPdgID_);
+  //mytree_->Branch("genparticleMomPdgIndex","std::vector< std::pair<int,int> >",&genparticleMomPdgIndex_);
+  mytree_->Branch("genparticleKidN",       "std::vector<int>",                 &genparticleKidN_);
+  mytree_->Branch("genparticleKidPdgID",   "std::vector< std::pair<int,int> >",&genparticleKidPdgID_);
+  //  mytree_->Branch("genparticleKidPdgIndex","std::vector< std::pair<int,int> >",&genparticleKidPdgIndex_);
+
+
+  // vector of the TLorentz Vectors of other genJets
+  genjetP4_        = new TClonesArray ("TLorentzVector");
+  genjetPrimVtxP3_ = new TClonesArray ("TVector3");
+  genjetKidN_     = new std::vector<int>;
+  genjetKidPdgID_ = new std::vector< std::vector<int> >;
+  mytree_->Branch ("genjetP4",        "TClonesArray",                   &genjetP4_,        256000,0);
+  mytree_->Branch ("genjetPrimVtxP3", "TClonesArray",                   &genjetPrimVtxP3_, 256000,0);
+  mytree_->Branch ("genjetKidN",      "std::vector<int>",               &genjetKidN_    );   
+  mytree_->Branch ("genjetKidPdgID",  "std::vector< std::vector<int> >",&genjetKidPdgID_);
+
+  // vector of the TLorentz Vectors of other genMet
+  genmetP4_        = new TClonesArray ("TLorentzVector");
+  genmetPrimVtxP3_ = new TClonesArray ("TVector3");
+  mytree_->Branch ("genmetP4",       "TClonesArray", &genmetP4_,        256000,0);
+  mytree_->Branch ("genmetPrimVtxP3","TClonesArray", &genmetPrimVtxP3_, 256000,0);
 
 
 }
@@ -641,8 +805,64 @@ void newSimpleNtple::beginJob(const edm::EventSetup& iSetup)
 
 void 
 newSimpleNtple::endJob() {
-  mytree_->Write();
+  //  mytree_->Write();
   std::cout << "[newSimpleNtple::endJob]" << std::endl;
+
+  delete invmasstagjetP4_;
+  delete invmasstagjetPrimVtxP3_;
+  delete invmasstagjetEmEnergyFraction_;
+  delete invmasstagjetChFrac_;
+  delete invmasstagjetCorEt_;
+  delete invmasstagjetCorPt_;
+  delete invmasstagjetCompoSVbTagDiscr_;
+  delete invmasstagjetHighEFFbTagDiscr_;
+  delete invmasstagjetHighPURbTagDiscr_;
+
+  delete deltaetatagjetP4_;
+  delete deltaetatagjetPrimVtxP3_;
+  delete deltaetatagjetEmEnergyFraction_;
+  delete deltaetatagjetChFrac_;
+  delete deltaetatagjetCorEt_;
+  delete deltaetatagjetCorPt_;
+  delete deltaetatagjetCompoSVbTagDiscr_;
+  delete deltaetatagjetHighEFFbTagDiscr_;
+  delete deltaetatagjetHighPURbTagDiscr_;
+
+  delete zeptagjetP4_;
+  delete zeptagjetPrimVtxP3_;
+  delete zeptagjetEmEnergyFraction_;
+  delete zeptagjetChFrac_;
+  delete zeptagjetCorEt_;
+  delete zeptagjetCorPt_;
+  delete zeptagjetCompoSVbTagDiscr_;
+  delete zeptagjetHighEFFbTagDiscr_;
+  delete zeptagjetHighPURbTagDiscr_;
+
+  delete trackP4_ ;
+
+  delete genparticleP4_;         
+  delete genparticlePrimVtxP3_;      
+  delete genparticlePdgID_;      
+  delete genparticleStatus_;      
+  delete genparticleIndex_;	 
+  delete genparticleMomN_;	 
+  delete genparticleMomPdgID_;	 
+  //  delete genparticleMomPdgIndex_;
+  delete genparticleKidN_;	 
+  delete genparticleKidPdgID_;	 
+  //  delete genparticleKidPdgIndex_;
+
+  delete genjetP4_;
+  delete genjetPrimVtxP3_;
+  delete genjetKidN_;
+  delete genjetKidPdgID_;
+
+  delete genmetP4_;
+  delete genmetPrimVtxP3_;
+  
+  //  std::cout << "[newSimpleNtple::endJob]" << std::endl;
+
+
 }
 
 

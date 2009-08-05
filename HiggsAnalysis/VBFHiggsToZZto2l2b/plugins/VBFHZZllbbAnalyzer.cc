@@ -13,7 +13,7 @@
 //
 // Original Author:  Mia TOSI
 //         Created:  Mon Feb  2 17:31:44 CET 2009
-// $Id: VBFHZZllbbAnalyzer.cc,v 1.3 2009/07/29 09:57:29 tosi Exp $
+// $Id: VBFHZZllbbAnalyzer.cc,v 1.4 2009/08/03 16:05:03 tosi Exp $
 //
 //
 
@@ -217,10 +217,12 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // -----
   edm::Handle<reco::MuonCollection> muonHandle;
   iEvent.getByLabel (muonLabel_,muonHandle);
+  /*
   // electrons
   // ---------
   edm::Handle<reco::PixelMatchGsfElectronCollection> electronHandle ;
   iEvent.getByLabel (electronLabel_,electronHandle) ;
+  */
   // tracks
   // ------
   edm::Handle<reco::TrackCollection> trackHandle ;
@@ -246,13 +248,14 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle<reco::GenParticleCollection> genParticleHandle; 
   iEvent.getByLabel (genParticleLabel_,genParticleHandle);
 
-  if ( ( muonHandle->size() < nleptons_ && electronHandle->size() < nleptons_ ) ||
+  if ( ( muonHandle->size() < nleptons_ ) ||
+//  if ( ( muonHandle->size() < nleptons_ && electronHandle->size() < nleptons_ ) ||
        corJetWithBTagHandle->size() < njets_ ) {
     badeventcounter_++;
     throw cms::Exception("NotFound") 
       << "BAD event:\n"
       << "# of muons:     " << muonHandle->size()           << " <--> " << nleptons_ << "\n"
-      << "# of electrons: " << electronHandle->size()       << " <--> " << nleptons_ << "\n"
+//      << "# of electrons: " << electronHandle->size()       << " <--> " << nleptons_ << "\n"
       << "# of jets:      " << corJetWithBTagHandle->size() << " <--> " << njets_    << "\n";
   }
 
@@ -308,6 +311,7 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     h_dimuon_massVSpz1pz2   -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),goodMuonVec[0].pz()*goodMuonVec[1].pz()					    );
     h_dimuon_massVSeta1eta2 -> Fill((goodMuonVec[0].p4()+goodMuonVec[1].p4()).M(),goodMuonVec[0].eta()*goodMuonVec[1].eta()                                         );
   }
+  /*
   // electrons
   // ---------   
   h_electron_N->Fill(electronHandle->size());
@@ -333,7 +337,7 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   //  std::cout << "goodElectronVec: "  << goodElectronVec.size() << std::endl;
   //  if (goodElectronVec.size() != 0)
   //    std::cout << "dielectronMass: " << (goodElectronVec[0].p4()+goodElectronVec[1].p4()).M() << std::endl;
-
+  */
   /////////////////////////////////// QUICK LOOP over JETS ////////////////////////////
   std::vector<vbfhzz2l2b::CorJetWithBTagDiscrCollection> goodJetVec;
   h_jet_N->Fill(corJetWithBTagHandle->size());
@@ -351,12 +355,14 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       h_jetmuon_deltaR->Fill(deltaR);
       if (discrVec[vbfhzz2l2b::COMBSECVTX] > 0.8) h_bjetmuon_deltaR->Fill(deltaR); 
     }
+    /*
     for ( reco::PixelMatchGsfElectronCollection::const_iterator electron_itr = electronHandle->begin(); 
 	  electron_itr != electronHandle->end(); ++electron_itr ) {
       double deltaR = DeltaR<reco::GsfElectron, reco::Jet>()(*electron_itr, **jet_itr);
       h_jetelectron_deltaR->Fill(deltaR);
       if (discrVec[vbfhzz2l2b::COMBSECVTX] > 0.8) h_bjetelectron_deltaR->Fill(deltaR); 
     }
+    */
     const reco::CaloMETCollection * metCollection = metCollectionHandle.product();
     for ( reco::CaloMETCollection::const_iterator met = metCollection->begin();
 	  met != metCollection->end(); ++met ) {
@@ -384,17 +390,17 @@ VBFHZZllbbAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     h_met_phi->Fill( met->phi() );
   }
 
-  if ( goodMuonVec.size() < nleptons_ && goodElectronVec.size() < nleptons_ )
+  if ( goodMuonVec.size() < nleptons_ )
+    if ( goodMuonVec.size() < nleptons_ )
+    //  if ( goodMuonVec.size() < nleptons_ && goodElectronVec.size() < nleptons_ )
     throw cms::Exception("NotFound")
       << "goodMuonVec:     " << goodMuonVec.size()     << " <--> 2\n"
-      << "goodElectronVec: " << goodElectronVec.size() << " <--> 2\n";
+  //      << "goodElectronVec: " << goodElectronVec.size() << " <--> 2\n"
+;
   // count number of events w/ at least 2 leptons
   // of the same flavour
   // opposite charge
   goodLeptonicEventCounter_++;
-
-
-
 
 }
 

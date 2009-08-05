@@ -15,6 +15,7 @@ from TrackingTools.TrackAssociator.DetIdAssociatorESProducer_cff import *
 
 # define eta and pt correction services
 from JetMETCorrections.Configuration.L2L3Corrections_Summer08_cff import *
+#from JetMETCorrections.Configuration.L2L3Corrections_cff import *
 # define jet flavour correction services
 #process.load("JetMETCorrections.Configuration.L5FlavorCorrections_cff")
 # define jet parton correction services
@@ -44,12 +45,12 @@ corMetType1Icone5Muons = corMetGlobalMuons.clone(
 )
 
 # It would be better to get this config to JetMETCorrections/Type1MET/data/ at some point
-corMetType1Icone5Muons.TrackAssociatorParameters.useEcal    = True ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useHcal    = True ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useHO      = True ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.useCalo    = True ## CaloTowers
-corMetType1Icone5Muons.TrackAssociatorParameters.useMuon    = True ## RecoHits
-corMetType1Icone5Muons.TrackAssociatorParameters.truthMatch = True
+corMetType1Icone5Muons.TrackAssociatorParameters.useEcal    = False ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useHcal    = False ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useHO      = False ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.useCalo    = True  ## CaloTowers
+corMetType1Icone5Muons.TrackAssociatorParameters.useMuon    = False ## RecoHits
+corMetType1Icone5Muons.TrackAssociatorParameters.truthMatch = False
 
 # default sequence for JetMET corrections
 ic5CaloJetMETCorrections = cms.Sequence(L2L3CorJetIC5Calo      +

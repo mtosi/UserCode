@@ -22,8 +22,6 @@
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetBTagDiscrAssociation.h"
 #include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/CorJetWithBTagDiscr.h"
 
-//#include "HiggsAnalysis/VBFHiggsToZZto2l2b/interface/SimpleNtpleObj.h"
-
 using namespace vbfhzz2l2b;
 using namespace std;
 using namespace reco;
@@ -36,20 +34,6 @@ namespace {
     CorJetBTagDiscrAssociation::Ref             jea_r;
     CorJetBTagDiscrAssociation::RefProd         jea_rp;
     CorJetBTagDiscrAssociation::RefVector       jea_rv;
-
-
-//    SimpleNtpleObj::EVT evt1;
-//    edm::Wrapper<SimpleNtpleObj::EVT> wevt1;
-//    SimpleNtpleObj::JET jet1;
-//    edm::Wrapper<SimpleNtpleObj::JET> wjet1;
-//    SimpleNtpleObj::MUON muon1;
-//    edm::Wrapper<SimpleNtpleObj::MUON> wmuon1;
-//    SimpleNtpleObj::ELECTRON electron1;
-//    edm::Wrapper<SimpleNtpleObj::ELECTRON> welectron1;
-//    SimpleNtpleObj::ZHAD zhad1;
-//    edm::Wrapper<SimpleNtpleObj::ZHAD> wzhad1;
-
-
   };
 }
 

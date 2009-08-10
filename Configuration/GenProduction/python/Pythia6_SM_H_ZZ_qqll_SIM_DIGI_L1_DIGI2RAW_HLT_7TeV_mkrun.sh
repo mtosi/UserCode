@@ -38,7 +38,7 @@ for k in 130; do
 	--fileout PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_7TeV_SIM_RAW_MC31X.root \
 	--python_filename ${DIROUT}PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_7TeV_SIM_RAW_MC31X_cfg.py \
 	--mc \
-	--dirout $DIROUT 
+	--dirout $DIROUT \
 	-n 10 \
 	--no_exec
 

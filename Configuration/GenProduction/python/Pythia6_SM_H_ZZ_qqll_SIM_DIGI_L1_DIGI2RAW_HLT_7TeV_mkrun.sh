@@ -21,8 +21,7 @@ cd $CMSSW_BASE/src/Configuration/GenProduction/python/
 scramv1 b --reset
 echo '**************************************************************************'
 
-for k in 130; do 
-#for k in ${HIGGSMASSLIST}; do 
+for k in ${HIGGSMASSLIST}; do 
     DIROUT="H${k}ZZllqq/"
 
     echo '********' GENERATING PYTHIA6_SM_H_ZZ_2l_2jets_mH${k}_7TeV_SIM_DIGI_L1_DIGI2RAW_HLT_MC31X.py '********'
